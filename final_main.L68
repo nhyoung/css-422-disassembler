@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 5/11/2020 2:40:49 AM
+Created On: 5/12/2020 12:17:51 AM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : Final Project
@@ -13,39 +13,86 @@ Created On: 5/11/2020 2:40:49 AM
 00001000                             9  
 00001000                            10  * Put program code here
 00001000                            11  
-00001000  43F9 00001038             12              LEA     STARTUP,A1          ; output startup message
-00001006  103C 000E                 13              MOVE.B  #14,D0
-0000100A  4E4F                      14              TRAP    #15
+00001000  43F9 000010AE             12                  LEA     STARTUP,A1          ; output startup message
+00001006  103C 000E                 13                  MOVE.B  #14,D0
+0000100A  4E4F                      14                  TRAP    #15
 0000100C                            15              
-0000100C  43F9 0000108F             16              LEA     STARTING,A1         ; output starting address message
-00001012  103C 000E                 17              MOVE.B  #14,D0
-00001016  4E4F                      18              TRAP    #15
+0000100C  43F9 00001105             16                  LEA     STARTING,A1         ; output starting address message
+00001012  103C 000E                 17                  MOVE.B  #14,D0
+00001016  4E4F                      18                  TRAP    #15
 00001018                            19              
-00001018  103C 0002                 20              MOVE.B  #2,D0               
-0000101C  4E4F                      21              TRAP    #15
-0000101E  3449                      22              MOVEA.W A1,A2               ; move to A2
+00001018  103C 0002                 20                  MOVE.B  #2,D0                   
+0000101C  4E4F                      21                  TRAP    #15
+0000101E  3449                      22                  MOVEA.W A1,A2               ; move to A2
 00001020                            23              
-00001020  43F9 000010C6             24              LEA     ENDING,A1           ; output ending address message
-00001026  103C 000E                 25              MOVE.B  #14,D0
-0000102A  4E4F                      26              TRAP    #15         
+00001020  43F9 0000113C             24                  LEA     ENDING,A1           ; output ending address message
+00001026  103C 000E                 25                  MOVE.B  #14,D0
+0000102A  4E4F                      26                  TRAP    #15         
 0000102C                            27  
-0000102C  103C 0002                 28              MOVE.B  #2,D0
-00001030  4E4F                      29              TRAP    #15
-00001032  3649                      30              MOVEA.W A1,A3               ; move to A3
-00001034                            31  
-00001034                            32  
-00001034  FFFF FFFF                 33      SIMHALT             ; halt simulator
-00001038                            34  
-00001038                            35  * Put variables and constants here
-00001038                            36  
-00001038  =0000000D                 37  CR          EQU     $0D
-00001038  =0000000A                 38  LF          EQU     $0A   
-00001038= 57 65 6C 63 6F 6D ...     39  STARTUP     DC.B    'Welcome to Team Big Blue Disassembler',CR,LF
-0000105F= 46 6F 72 6D 61 74 ...     40              DC.B    'Format: 4 digit address in hexadecimal format',CR,LF,0
-0000108F= 50 6C 65 61 73 65 ...     41  STARTING    DC.B    'Please enter a starting location in the above format',CR,LF,0
-000010C6= 50 6C 65 61 73 65 ...     42  ENDING      DC.B    'Please enter an ending location in the above format',CR,LF,0
-000010FC                            43  
-000010FC                            44              END     START        ; last line of source
+0000102C  103C 0002                 28                  MOVE.B  #2,D0
+00001030  4E4F                      29                  TRAP    #15
+00001032  3649                      30                  MOVEA.W A1,A3               ; move to A3
+00001034  143C 0005                 31                  MOVE.B  #5,D2               ; D2 stores counter
+00001038  1E3C 0005                 32                  MOVE.B  #5,D7               ; D2 stores counter
+0000103C                            33  
+0000103C                            34                  
+0000103C  4283                      35  CONVERT1        CLR.L   D3
+0000103E  4284                      36                  CLR.L   D4
+00001040  161A                      37                  MOVE.B  (A2)+,D3            ; D3 stores current char
+00001042  B63C 0039                 38                  CMP.B   #57,D3
+00001046  6E00 000A                 39                  BGT     ISLETTER1
+0000104A                            40              
+0000104A  0603 00D0                 41                  ADD.B   #-48,D3             ; current char is number
+0000104E  6000 000A                 42                  BRA     CONCAT1
+00001052                            43              
+00001052  0603 00C9                 44  ISLETTER1       ADD.B   #-55,D3             
+00001056  6000 0002                 45                  BRA     CONCAT1
+0000105A                            46              
+0000105A  B43C 0000                 47  CONCAT1         CMP.B   #0,D2               ; D2 stores counter
+0000105E  6D00 0010                 48                  BLT     CONVERT2
+00001062  1802                      49                  MOVE.B  D2,D4               ; D4 stores modified counter 
+00001064  E50C                      50                  LSL.B   #2,D4               ; multiply counter by 4 to scale hex to binary, 8 -> 32, 7 -> 28, etc.
+00001066  E9AB                      51                  LSL.L   D4,D3               ; moves current char to correct position  
+00001068  DA83                      52                  ADD.L   D3,D5               ; D5 stores converted input so far
+0000106A  0602 00FF                 53                  ADD.B   #-1,D2  
+0000106E  60CC                      54                  BRA     CONVERT1            ; continue loop for remaining chars
+00001070                            55  
+00001070  4283                      56  CONVERT2        CLR.L   D3
+00001072  4284                      57                  CLR.L   D4
+00001074  161B                      58                  MOVE.B  (A3)+,D3            ; D3 stores current char
+00001076  B63C 0039                 59                  CMP.B   #57,D3
+0000107A  6E00 000A                 60                  BGT     ISLETTER2
+0000107E                            61              
+0000107E  0603 00D0                 62                  ADD.B   #-48,D3             ; current char is number
+00001082  6000 000A                 63                  BRA     CONCAT2
+00001086                            64              
+00001086  0603 00C9                 65  ISLETTER2       ADD.B   #-55,D3             
+0000108A  6000 0002                 66                  BRA     CONCAT2
+0000108E                            67              
+0000108E  BE3C 0000                 68  CONCAT2         CMP.B   #0,D7               ; D7 stores counter
+00001092  6D00 0010                 69                  BLT     STOP
+00001096  1807                      70                  MOVE.B  D7,D4               ; D4 stores modified counter 
+00001098  E50C                      71                  LSL.B   #2,D4               ; multiply counter by 4 to scale hex to binary, 8 -> 32, 7 -> 28, etc.
+0000109A  E9AB                      72                  LSL.L   D4,D3               ; moves current char to correct position  
+0000109C  DC83                      73                  ADD.L   D3,D6               ; D6 stores converted input so far
+0000109E  0607 00FF                 74                  ADD.B   #-1,D7  
+000010A2  60CC                      75                  BRA     CONVERT2      ; continue loop for remaining chars
+000010A4                            76  
+000010A4  103C 0009                 77  STOP            MOVE.B  #9,D0
+000010A8  4E4F                      78                  TRAP    #15
+000010AA                            79  
+000010AA  FFFF FFFF                 80      SIMHALT             ; halt simulator
+000010AE                            81  
+000010AE                            82  * Put variables and constants here
+000010AE                            83  
+000010AE  =0000000D                 84  CR          EQU     $0D
+000010AE  =0000000A                 85  LF          EQU     $0A   
+000010AE= 57 65 6C 63 6F 6D ...     86  STARTUP     DC.B    'Welcome to Team Big Blue Disassembler',CR,LF
+000010D5= 46 6F 72 6D 61 74 ...     87              DC.B    'Format: 6 digit address in hexadecimal format',CR,LF,0
+00001105= 50 6C 65 61 73 65 ...     88  STARTING    DC.B    'Please enter a starting location in the above format',CR,LF,0
+0000113C= 50 6C 65 61 73 65 ...     89  ENDING      DC.B    'Please enter an ending location in the above format',CR,LF,0
+00001172                            90  
+00001172                            91              END     START        ; last line of source
 
 No errors detected
 No warnings generated
@@ -54,9 +101,16 @@ No warnings generated
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
+CONCAT1             105A
+CONCAT2             108E
+CONVERT1            103C
+CONVERT2            1070
 CR                  D
-ENDING              10C6
+ENDING              113C
+ISLETTER1           1052
+ISLETTER2           1086
 LF                  A
 START               1000
-STARTING            108F
-STARTUP             1038
+STARTING            1105
+STARTUP             10AE
+STOP                10A4
