@@ -1,8 +1,8 @@
 *-----------------------------------------------------------
 * Title      :  Test Code
 * Written by :  Audrey Nguyen
-* Date       :  05/09/2020
-* Description:  Version 1
+* Date       :  05/15/2020
+* Description:  Version 2
 *-----------------------------------------------------------
     ORG    $1000
 START:                  
@@ -11,7 +11,7 @@ START:
 
 * MOVE test
 MOVETEST            
-                * Direct Adressing
+                * Direct Addressing
                 MOVE.B      #$A, D0
                 MOVE.W      #$AAAB, D1
                 MOVE.L      #$AAAAAAAA, D2
@@ -64,7 +64,7 @@ MOVETEST
                 MOVE.L      A2,D4
                 
                 MOVE.W      A1,$6020
-                MOVE.L      D2,$6040
+                MOVE.L      A2,$6040
                 
                 MOVE.W      A1,A2
                 MOVE.L      A2,A3
@@ -202,7 +202,7 @@ MOVETEST
 * MOVEA test
 
 MOVEATEST
-                * Direct Adressing
+                * Direct Addressing
                 MOVEA.W     #$AAAB, A1
                 MOVEA.L     #$AAAAAAAA, A2
                 
@@ -242,13 +242,13 @@ MOVEQTEST
                 
 * MOVEM test
 MOVEMTEST
-                * Direct Adressing
+                * Direct Addressing
                 MOVEM       A0-A6/D0-D7,-(SP)
                 MOVEM       (SP)+,A0-A6/D0-D7
   
 * ADD test
 ADDTEST
-                * Direct Adressing
+                * Direct Addressing
                 ADD.B       #$A, D0
                 ADD.W       #$AAAB, D1
                 ADD.L       #$AAAAAAAA, D2
@@ -300,8 +300,6 @@ ADDTEST
                 ADD.W       A1,D3
                 ADD.L       A2,D4
                 
-                ADD.L       D2,$6040
-                
                 ADD.W       A1,A2
                 ADD.L       A2,A3
                 
@@ -347,7 +345,7 @@ ADDTEST
     
 * ADDA test
 ADDATEST
-                * Direct Adressing
+                * Direct Addressing
                 ADDA.W      #$AAAB, A1
                 ADDA.L      #$AAAAAAAA, A2
                 
@@ -372,147 +370,342 @@ ADDATEST
                 ADDA.L     -(A2),A3
                 
                 * Absolute Long Address
-                ADDA.W     $80200000, A1
-                ADDA.L     $80300000, A2
+                ADDA.W      $80200000, A1
+                ADDA.L      $80300000, A2
                 
                 * Absolute Word Address
-                ADDA.W     $8020, A1
-                ADDA.L     $8030, A2
+                ADDA.W      $8020, A1
+                ADDA.L      $8030, A2
     
 * ADDQ test
 ADDQTEST
-                ADDQ.L     #2,D0
-                ADDQ       #3,D0
+                ADDQ.L      #2,D0
+                ADDQ        #3,D0
     
 * SUB test
 SUBTEST
-                * Direct Adressing
+                * Direct Addressing
+                SUB.B       #$A, D0
+                
+                SUB.W       #$AAAB, D1
+                SUB.L       #$AAAAAAAA, D2
+                
+                SUB.B       #$A, $6000
+                SUB.W       #$AAAB, $6020
+                SUB.L       #$AAAAAAAA, $6040
+                
+                SUB.W       #$AAAB, A1
+                SUB.L       #$AAAAAAAA, A2
+                
+                SUB.B       #$A, (A1)
+                SUB.W       #$AAAB, (A2)
+                SUB.L       #$AAAAAAAA, (A3)
+                
+                SUB.B       #$A, (A1)+
+                SUB.W       #$AAAB, (A2)+
+                SUB.L       #$AAAAAAAA, (A3)+
+                
+                SUB.B       #$A, -(A1)
+                SUB.W       #$AAAB, -(A2)
+                SUB.L       #$AAAAAAAA, -(A3)
                 
                 * Data Register Direct
+                SUB.B       D0,D1
+                SUB.W       D1,D3
+                SUB.L       D2,D4
+                
+                SUB.B       D0,$6000
+                SUB.W       D1,$6020
+                SUB.L       D2,$6040
+                
+                SUB.W       D1,A2
+                SUB.L       D2,A3
+                
+                SUB.B       D0,(A1)
+                SUB.W       D1,(A2)
+                SUB.L       D2,(A3)
+                
+                SUB.B       D0,(A1)+
+                SUB.W       D1,(A2)+
+                SUB.L       D2,(A3)+
+                
+                SUB.B       D0,-(A1)
+                SUB.W       D1,-(A2)
+                SUB.L       D2,-(A3)
                 
                 * Address Register Direct
+                SUB.W       A1,D3
+                SUB.L       A2,D4
+                
+                SUB.W       A1,A2
+                SUB.L       A2,A3
                 
                 * Address Register Indirect
+                SUB.B       (A0),D1
+                SUB.W       (A1),D3
+                SUB.L       (A2),D4
+                
+                SUB.W       (A1),A2
+                SUB.L       (A2),A3
                 
                 * Address Register Indirect with Post incrementing
+                SUB.B       (A0)+,D1
+                SUB.W       (A1)+,D3
+                SUB.L       (A2)+,D4
+                
+                SUB.W       (A1)+,A2
+                SUB.L       (A2)+,A3
                 
                 * Address Register Indirect with Pre decrementing
+                SUB.B       -(A0),D1
+                SUB.W       -(A1),D3
+                SUB.L       -(A2),D4
+                
+                SUB.W       -(A1),A2
+                SUB.L       -(A2),A3
                 
                 * Absolute Long Address
+                SUB.B       $80000000, D0
+                SUB.W       $80200000, D1
+                SUB.L       $80300000, D2
+                
+                SUB.W       $80200000, A1
+                SUB.L       $80300000, A2
                 
                 * Absolute Word Address
+                SUB.B       $8000, D0
+                SUB.W       $8020, D1
+                SUB.L       $8030, D2
+                
+                SUB.W       $8020, A1
+                SUB.L       $8030, A2
     
 * MULS test
 MULSTEST
-                * Direct Adressing
+                * Direct Addressing
+                MULS.W      #$AAAB, D1
                 
                 * Data Register Direct
-                
-                * Address Register Direct
-                
+                MULS.W      D1,D3
+                               
                 * Address Register Indirect
+                MULS.W      (A1),D3
                 
                 * Address Register Indirect with Post incrementing
+                MULS.W      (A1)+,D3
                 
                 * Address Register Indirect with Pre decrementing
-                
+                MULS.W      -(A1),D3
+                                
                 * Absolute Long Address
+                MULS.W      $80200000, D1
                 
                 * Absolute Word Address
+                MULS.W      $8020, D1
     
 * DIVU test
 DIVUTEST
-                * Direct Adressing
+                * Direct Addressing
+                DIVU.W      #$AAAB, D1
                 
                 * Data Register Direct
-                
-                * Address Register Direct
-                
+                DIVU.W      D1,D3
+                               
                 * Address Register Indirect
+                DIVU.W      (A1),D3
                 
                 * Address Register Indirect with Post incrementing
+                DIVU.W      (A1)+,D3
                 
                 * Address Register Indirect with Pre decrementing
-                
+                DIVU.W      -(A1),D3
+                                
                 * Absolute Long Address
+                DIVU.W      $80200000, D1
                 
-                * Absolute Word Address  
+                * Absolute Word Address
+                DIVU.W      $8020, D1
   
 * LEA test
 LEATEST            
-                * Direct Adressing
-                
-                * Data Register Direct
-                
-                * Address Register Direct
-                
-                * Address Register Indirect
-                
-                * Address Register Indirect with Post incrementing
-                
-                * Address Register Indirect with Pre decrementing
-                
-                * Absolute Long Address
-                
-                * Absolute Word Address
-    
+                LEA         (A1),A0
+                LEA         $6000,A1
+                LEA         $80000000,A2
+                  
 * AND test
 ANDTEST
-                * Direct Adressing
+                * Direct Addressing
+                AND.B       #$A, D0
+                AND.W       #$AAAB, D1
+                AND.L       #$AAAAAAAA, D2
                 
+                AND.B       #$A, $6000
+                AND.W       #$AAAB, $6020
+                AND.L       #$AAAAAAAA, $6040
+                
+                AND.B       #$A, (A1)
+                AND.W       #$AAAB, (A2)
+                AND.L       #$AAAAAAAA, (A3)
+                
+                AND.B       #$A, (A1)+
+                AND.W       #$AAAB, (A2)+
+                AND.L       #$AAAAAAAA, (A3)+
+                
+                AND.B       #$A, -(A1)
+                AND.W       #$AAAB, -(A2)
+                AND.L       #$AAAAAAAA, -(A3)
+
                 * Data Register Direct
+                AND.B       D0,D1
+                AND.W       D1,D3
+                AND.L       D2,D4
                 
-                * Address Register Direct
+                AND.B       D0,$6000
+                AND.W       D1,$6020
+                AND.L       D2,$6040
+                
+                AND.B       D0,(A1)
+                AND.W       D1,(A2)
+                AND.L       D2,(A3)
+                
+                AND.B       D0,(A1)+
+                AND.W       D1,(A2)+
+                AND.L       D2,(A3)+
+                
+                AND.B       D0,-(A1)
+                AND.W       D1,-(A2)
+                AND.L       D2,-(A3)
                 
                 * Address Register Indirect
+                AND.B       (A0),D1
+                AND.W       (A1),D3
+                AND.L       (A2),D4
                 
                 * Address Register Indirect with Post incrementing
+                AND.B       (A0)+,D1
+                AND.W       (A1)+,D3
+                AND.L       (A2)+,D4
                 
                 * Address Register Indirect with Pre decrementing
-                
+                AND.B       -(A0),D1
+                AND.W       -(A1),D3
+                AND.L       -(A2),D4
+
                 * Absolute Long Address
+                AND.B       $80000000, D0
+                AND.W       $80200000, D1
+                AND.L       $80300000, D2
                 
                 * Absolute Word Address
-                
+                AND.B       $8000, D0
+                AND.W       $8020, D1
+                AND.L       $8030, D2
+
 * OR test
-ORTEST
-                * Direct Adressing
+                * Direct Addressing
+                OR.B        #$A, D0
+                OR.W        #$AAAB, D1
+                OR.L        #$AAAAAAAA, D2
                 
+                OR.B        #$A, $6000
+                OR.W        #$AAAB, $6020
+                OR.L        #$AAAAAAAA, $6040
+                
+                OR.B        #$A, (A1)
+                OR.W        #$AAAB, (A2)
+                OR.L        #$AAAAAAAA, (A3)
+                
+                OR.B        #$A, (A1)+
+                OR.W        #$AAAB, (A2)+
+                OR.L        #$AAAAAAAA, (A3)+
+                 
+                OR.B        #$A, -(A1)
+                OR.W        #$AAAB, -(A2)
+                OR.L        #$AAAAAAAA, -(A3)
+
                 * Data Register Direct
+                OR.B        D0,D1
+                OR.W        D1,D3
+                OR.L        D2,D4
                 
-                * Address Register Direct
+                OR.B        D0,$6000
+                OR.W        D1,$6020
+                OR.L        D2,$6040
                 
+                OR.B        D0,(A1)
+                OR.W        D1,(A2)
+                OR.L        D2,(A3)
+                
+                OR.B        D0,(A1)+
+                OR.W        D1,(A2)+
+                OR.L        D2,(A3)+
+                
+                OR.B        D0,-(A1)
+                OR.W        D1,-(A2)
+                OR.L        D2,-(A3)
+ 
                 * Address Register Indirect
-                
+                OR.B        (A0),D1
+                OR.W        (A1),D3
+                OR.L        (A2),D4
+
                 * Address Register Indirect with Post incrementing
-                
+                OR.B        -(A0),D1
+                OR.W        -(A1),D3
+                OR.L        -(A2),D4
+
                 * Address Register Indirect with Pre decrementing
-                
+                OR.B        (A0)+,D1
+                OR.W        (A1)+,D3
+                OR.L        (A2)+,D4
+
                 * Absolute Long Address
-                
+                OR.B        $80000000, D0
+                OR.W        $80200000, D1
+                OR.L        $80300000, D2
+
                 * Absolute Word Address
+                OR.B        $8000, D0
+                OR.W        $8020, D1
+                OR.L        $8030, D2
 
 * NOT test
 NOTTEST
-                * Direct Adressing
+                * Direct Addressing
                 
                 * Data Register Direct
-                
-                * Address Register Direct
-                
+                NOT.B       D0
+                NOT.W       D1
+                NOT.L       D2
+                                
                 * Address Register Indirect
-                
+                NOT.B       (A0)
+                NOT.W       (A1)
+                NOT.L       (A2)
+
                 * Address Register Indirect with Post incrementing
-                
+                NOT.B       (A0)+
+                NOT.W       (A1)+
+                NOT.L       (A2)+
+
                 * Address Register Indirect with Pre decrementing
+                NOT.B       -(A0)
+                NOT.W       -(A1)
+                NOT.L       -(A2)
                 
                 * Absolute Long Address
+                NOT.B       $00AFF0000 
+                NOT.W       $00BFF0000  
+                NOT.L       $00CFF0000
                 
                 * Absolute Word Address
+                NOT.B       $00AFF
+                NOT.W       $00BFF 
+                NOT.L       $00CFF     
                 
 * LSL test
 LSLTEST
-                * Direct Adressing
+                * Direct Addressing
                 
                 * Data Register Direct
                 
@@ -530,7 +723,7 @@ LSLTEST
                 
 * LSR test
 LSRTEST
-                * Direct Adressing
+                * Direct Addressing
                 
                 * Data Register Direct
                 
@@ -548,7 +741,7 @@ LSRTEST
 
 * ASL test
 ASLTEST
-                * Direct Adressing
+                * Direct Addressing
                 
                 * Data Register Direct
                 
@@ -566,7 +759,7 @@ ASLTEST
     
 * ASR test
 ASRTEST
-                * Direct Adressing
+                * Direct Addressing
                 
                 * Data Register Direct
                 
@@ -584,7 +777,7 @@ ASRTEST
     
 * Bcc test
 BCCTEST
-                * Direct Adressing
+                * Direct Addressing
                 
                 * Data Register Direct
                 
@@ -602,7 +795,7 @@ BCCTEST
 
 * JSR test
 JSRTEST             
-                * Direct Adressing
+                * Direct Addressing
                 
                 * Data Register Direct
                 
@@ -620,7 +813,7 @@ JSRTEST
     
 * RTS test
 RTSTEST
-                * Direct Adressing
+                * Direct Addressing
                 
                 * Data Register Direct
                 
@@ -638,7 +831,7 @@ RTSTEST
     
 * BRA test 
 BRATEST
-                * Direct Adressing
+                * Direct Addressing
                 
                 * Data Register Direct
                 
@@ -676,6 +869,8 @@ CLEAR           CLR.L   D0
 
 
     END    START        ; last line of source
+
+
 
 
 *~Font name~Courier New~
