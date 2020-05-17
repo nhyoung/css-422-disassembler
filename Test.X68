@@ -1,8 +1,8 @@
 *-----------------------------------------------------------
 * Title      :  Test Code
 * Written by :  Audrey Nguyen
-* Date       :  05/15/2020
-* Description:  Version 2
+* Date       :  05/16/2020
+* Description:  Version 3
 *-----------------------------------------------------------
     ORG    $1000
 START:                  
@@ -705,168 +705,79 @@ NOTTEST
                 
 * LSL test
 LSLTEST
-                * Direct Addressing
+                LSL.B       #1,D0
+                LSL.W       #2,D2
+                LSL.L       #3,D3
                 
-                * Data Register Direct
+                LSL.B       D0,D1
+                LSL.W       D2,D7
+                LSL.L       D3,D4
                 
-                * Address Register Direct
+                LSL.W       $0000A000
+                LSL.W       $21(A4)
+                LSL.W       (A6)
+                LSL.W       (A1)+
+                LSL.W       -(A2)
                 
-                * Address Register Indirect
-                
-                * Address Register Indirect with Post incrementing
-                
-                * Address Register Indirect with Pre decrementing
-                
-                * Absolute Long Address
-                
-                * Absolute Word Address
                 
 * LSR test
 LSRTEST
-                * Direct Addressing
+                LSR.B       #1,D0
+                LSR.W       #2,D2
+                LSR.L       #3,D3
                 
-                * Data Register Direct
+                LSR.B       D0,D1
+                LSR.W       D2,D7
+                LSR.L       D3,D4
                 
-                * Address Register Direct
-                
-                * Address Register Indirect
-                
-                * Address Register Indirect with Post incrementing
-                
-                * Address Register Indirect with Pre decrementing
-                
-                * Absolute Long Address
-                
-                * Absolute Word Address
+                LSR.W       $0000A000
+                LSR.W       $BBBB
+                LSR.W       (A6)
+                LSR.W       (A1)+
+                LSR.W       -(A2)
 
 * ASL test
-ASLTEST
-                * Direct Addressing
-                
-                * Data Register Direct
-                
-                * Address Register Direct
-                
-                * Address Register Indirect
-                
-                * Address Register Indirect with Post incrementing
-                
-                * Address Register Indirect with Pre decrementing
-                
-                * Absolute Long Address
-                
-                * Absolute Word Address
+ASLTEST 
+                ASL.B       #1,D0
+                ASL.W       #2,D2
+                ASL.L       #3,D3
+               
     
 * ASR test
 ASRTEST
-                * Direct Addressing
-                
-                * Data Register Direct
-                
-                * Address Register Direct
-                
-                * Address Register Indirect
-                
-                * Address Register Indirect with Post incrementing
-                
-                * Address Register Indirect with Pre decrementing
-                
-                * Absolute Long Address
-                
-                * Absolute Word Address
+                ASR.B       #1,D0
+                ASR.W       #2,D2
+                ASR.L       #3,D3
     
-* Bcc test
-BCCTEST
-                * Direct Addressing
-                
-                * Data Register Direct
-                
-                * Address Register Direct
-                
-                * Address Register Indirect
-                
-                * Address Register Indirect with Post incrementing
-                
-                * Address Register Indirect with Pre decrementing
-                
-                * Absolute Long Address
-                
-                * Absolute Word Address
-
-* JSR test
+* JSR & RTS test
 JSRTEST             
-                * Direct Addressing
-                
-                * Data Register Direct
-                
-                * Address Register Direct
-                
-                * Address Register Indirect
-                
-                * Address Register Indirect with Post incrementing
-                
-                * Address Register Indirect with Pre decrementing
-                
-                * Absolute Long Address
-                
-                * Absolute Word Address
-    
-* RTS test
-RTSTEST
-                * Direct Addressing
-                
-                * Data Register Direct
-                
-                * Address Register Direct
-                
-                * Address Register Indirect
-                
-                * Address Register Indirect with Post incrementing
-                
-                * Address Register Indirect with Pre decrementing
-                
-                * Absolute Long Address
-                
-                * Absolute Word Address
-    
-* BRA test 
+                JSR     SUBROUTINE
+* Bcc & BRA test 
+BCCTEST
+                BCC         BRANCH
+                BCS         BRANCH
+                BEQ         BRANCH
+                BNE         BRANCH
+                BGE         BRANCH
+                BGT         BRANCH
+                BHI         BRANCH
+                BLE         BRANCH
+                BLS         BRANCH
+                BLT         BRANCH
+                BMI         BRANCH
+                BPL         BRANCH
+                BVC         BRANCH
+                BVS         BRANCH
+
+BRANCH 
 BRATEST
-                * Direct Addressing
+                BRA         TESTBRANCH
                 
-                * Data Register Direct
-                
-                * Address Register Direct
-                
-                * Address Register Indirect
-                
-                * Address Register Indirect with Post incrementing
-                
-                * Address Register Indirect with Pre decrementing
-                
-                * Absolute Long Address
-                
-                * Absolute Word Address
+TESTBRANCH                
 
     SIMHALT             ; halt simulator
 
-* Clears all registers
-CLEAR           CLR.L   D0
-                CLR.L   D1
-                CLR.L   D2
-                CLR.L   D3
-                CLR.L   D4
-                CLR.L   D5
-                CLR.L   D6
-                CLR.L   D7
-                CLR.L   (A0)
-                CLR.L   (A1)
-                CLR.L   (A2)
-                CLR.L   (A3)
-                CLR.L   (A4)
-                CLR.L   (A5)
-                CLR.L   (A6)
-                RTS
-
+SUBROUTINE      RTS
 
     END    START        ; last line of source
 
