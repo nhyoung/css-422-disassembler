@@ -28,8 +28,8 @@ START:                  ; first instruction of program
                 MOVE.B  #2,D0
                 TRAP    #15
                 MOVEA.W A1,A3               ; move to A3
-                MOVE.B  #5,D2               ; D2 stores counter
-                MOVE.B  #5,D7               ; D2 stores counter
+                MOVE.B  #7,D2               ; D2 stores counter
+                MOVE.B  #7,D7               ; D2 stores counter
 
                 
 CONVERT1        CLR.L   D3
@@ -89,6 +89,7 @@ STARTING    DC.B    'Please enter a starting location in the above format',CR,LF
 ENDING      DC.B    'Please enter an ending location in the above format',CR,LF,0
 
             END     START        ; last line of source
+
 
 
 *~Font name~Courier New~
