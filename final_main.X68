@@ -9,7 +9,7 @@ START:                  ; first instruction of program
 
 * Put program code here
 
-                LEA     STARTUP,A1          ; output startup message
+                LEA     STARTUP,A1          ; output welcome startup message
                 MOVE.B  #14,D0
                 TRAP    #15
             
@@ -108,12 +108,13 @@ STOP            MOVE.B  #9,D0
 CR          EQU     $0D
 LF          EQU     $0A   
 STARTUP     DC.B    'Welcome to Team Big Blue Disassembler',CR,LF
-            DC.B    'Format: 8 digit address in hexadecimal format',CR,LF,0
+            DC.B    'Format: 8 digit address in hexadecimal format. Letters must be capital case.',CR,LF,0
 STARTING    DC.B    'Please enter a starting location in the above format',CR,LF,0
 ENDING      DC.B    'Please enter an ending location in the above format',CR,LF,0
 INVALID     DC.B    'Invalid input. Please try again',CR,LF,0
 
             END     START        ; last line of source
+
 
 
 
