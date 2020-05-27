@@ -25,8 +25,7 @@ INPUT1          LEA     STARTING,A1         ; output starting address message
                 MOVE.B  #7,D6               ; D6 stores counter               
                 JSR     CONVERT
                 MOVEA.L D5,A2               ; store first input in A2
-
-                
+  
 INPUT2          MOVE.B  #2,D2
                 LEA     ENDING,A1           ; output ending address message
                 MOVE.B  #14,D0
@@ -45,13 +44,11 @@ STOP            MOVE.B  #9,D0
 
 *--------------------SUBROUTINES------------------                
                 
-CHECK_LENGTH    CLR.L      D3              	; D4 will store if input is correct length
-                MOVEQ      #$0,D4           ; check if input is null   	
+CHECK_LENGTH    MOVEQ      #$0,D4           ; check if input is null   	
                 CMP.B      D4,D1           	; D1 stores length
                 BEQ        INVALID     	    ; input is null
                 CMPI       #$8,D1          	; check if input is longer than a longword
                 BGT        INVALID       	; input is longer than a longword
-                MOVE.B     #$1,D3          	; input is of correct length
                 RTS
                             
 CONVERT         CLR.L   D3

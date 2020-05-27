@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 5/27/2020 4:52:07 AM
+Created On: 5/27/2020 4:53:46 AM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : Final Project
@@ -13,11 +13,11 @@ Created On: 5/27/2020 4:52:07 AM
 00001000                             9  
 00001000                            10  * Put program code here
 00001000                            11  
-00001000  43F9 000010E6             12                  LEA     WELCOME,A1          ; output welcome startup message
+00001000  43F9 000010E0             12                  LEA     WELCOME,A1          ; output welcome startup message
 00001006  103C 000E                 13                  MOVE.B  #14,D0
 0000100A  4E4F                      14                  TRAP    #15
 0000100C                            15              
-0000100C  43F9 0000115C             16  INPUT1          LEA     STARTING,A1         ; output starting address message
+0000100C  43F9 00001156             16  INPUT1          LEA     STARTING,A1         ; output starting address message
 00001012  103C 000E                 17                  MOVE.B  #14,D0
 00001016  4E4F                      18                  TRAP    #15
 00001018                            19              
@@ -27,87 +27,84 @@ Created On: 5/27/2020 4:52:07 AM
 00001022                            23  
 00001022  4EB9 00001064             24                  JSR     CHECK_LENGTH
 00001028  1C3C 0007                 25                  MOVE.B  #7,D6               ; D6 stores counter               
-0000102C  4EB9 0000107C             26                  JSR     CONVERT
+0000102C  4EB9 00001076             26                  JSR     CONVERT
 00001032  2445                      27                  MOVEA.L D5,A2               ; store first input in A2
-00001034                            28  
-00001034                            29                  
-00001034  143C 0002                 30  INPUT2          MOVE.B  #2,D2
-00001038  43F9 00001193             31                  LEA     ENDING,A1           ; output ending address message
-0000103E  103C 000E                 32                  MOVE.B  #14,D0
-00001042  4E4F                      33                  TRAP    #15         
-00001044                            34  
-00001044  103C 0002                 35                  MOVE.B  #2,D0
-00001048  4E4F                      36                  TRAP    #15
-0000104A  4EB9 00001064             37                  JSR     CHECK_LENGTH
-00001050  1C3C 0007                 38                  MOVE.B  #7,D6               ; D6 stores counter
-00001054  4285                      39                  CLR.L   D5
-00001056  4EB9 0000107C             40                  JSR     CONVERT
-0000105C  2645                      41                  MOVEA.L D5,A3               ; store second input in A3
-0000105E                            42                  
-0000105E  103C 0009                 43  STOP            MOVE.B  #9,D0
-00001062  4E4F                      44                  TRAP    #15
-00001064                            45  
-00001064                            46  *--------------------SUBROUTINES------------------                
-00001064                            47                  
-00001064  4283                      48  CHECK_LENGTH    CLR.L      D3               ; D4 will store if input is correct length
-00001066  7800                      49                  MOVEQ      #$0,D4           ; check if input is null    
-00001068  B204                      50                  CMP.B      D4,D1            ; D1 stores length
-0000106A  6700 005E                 51                  BEQ        INVALID          ; input is null
-0000106E  0C41 0008                 52                  CMPI       #$8,D1           ; check if input is longer than a longword
-00001072  6E00 0056                 53                  BGT        INVALID          ; input is longer than a longword
-00001076  163C 0001                 54                  MOVE.B     #$1,D3           ; input is of correct length
-0000107A  4E75                      55                  RTS
-0000107C                            56                              
-0000107C  4283                      57  CONVERT         CLR.L   D3
-0000107E  4284                      58                  CLR.L   D4
-00001080  1619                      59                  MOVE.B  (A1)+,D3            ; D3 stores current char
-00001082  B63C 0039                 60                  CMP.B   #57,D3
-00001086  6E00 0012                 61                  BGT     NOTNUMBER
-0000108A                            62                  
-0000108A  B63C 002F                 63                  CMP.B   #47,D3
-0000108E  6E00 0002                 64                  BGT     ISNUMBER
-00001092                            65                  
-00001092  0603 00D0                 66  ISNUMBER        ADD.B   #-48,D3             ; current char is number
-00001096  6000 001A                 67                  BRA     CONCAT
-0000109A                            68              
-0000109A  B63C 0041                 69  NOTNUMBER       CMP.B   #65,D3
-0000109E  6D00 002A                 70                  BLT     INVALID
-000010A2  B63C 005A                 71                  CMP.B   #90,D3
-000010A6  6E00 0022                 72                  BGT     INVALID  
-000010AA  0603 00C9                 73                  ADD.B   #-55,D3             ; is letter             
-000010AE  6000 0002                 74                  BRA     CONCAT
-000010B2                            75              
-000010B2  BC3C 0000                 76  CONCAT          CMP.B   #0,D6               ; D6 stores counter
-000010B6  6D00 0010                 77                  BLT     RETURN
-000010BA  1806                      78                  MOVE.B  D6,D4               ; D4 stores modified counter 
-000010BC  E50C                      79                  LSL.B   #2,D4               ; multiply counter by 4 to scale hex to binary, 8 -> 32, 7 -> 28, etc.
-000010BE  E9AB                      80                  LSL.L   D4,D3               ; moves current char to correct position  
-000010C0  DA83                      81                  ADD.L   D3,D5               ; D5 stores converted input so far
-000010C2  0606 00FF                 82                  ADD.B   #-1,D6  
-000010C6  60B4                      83                  BRA     CONVERT            ; continue loop for remaining chars
-000010C8                            84                  
-000010C8  4E75                      85  RETURN          RTS
-000010CA                            86                  
-000010CA  43F9 000011C9             87  INVALID         LEA     BAD_INPUT,A1          ; output invalid message
-000010D0  103C 000E                 88                  MOVE.B  #14,D0
-000010D4  4E4F                      89                  TRAP    #15
-000010D6  B47C 0001                 90                  CMP     #1,D2
-000010DA  6700 FF30                 91                  BEQ     INPUT1
-000010DE  6000 FF54                 92                  BRA     INPUT2                 
-000010E2                            93  
-000010E2  FFFF FFFF                 94      SIMHALT             ; halt simulator
-000010E6                            95  
-000010E6                            96  * Put variables and constants here
-000010E6                            97  
-000010E6  =0000000D                 98  CR          EQU     $0D
-000010E6  =0000000A                 99  LF          EQU     $0A   
-000010E6= 57 65 6C 63 6F 6D ...    100  WELCOME     DC.B    'Welcome to Team Big Blue Disassembler',CR,LF
-0000110D= 46 6F 72 6D 61 74 ...    101              DC.B    'Format: 8 digit address in hexadecimal format. Letters must be capital case.',CR,LF,0
-0000115C= 50 6C 65 61 73 65 ...    102  STARTING    DC.B    'Please enter a starting location in the above format',CR,LF,0
-00001193= 50 6C 65 61 73 65 ...    103  ENDING      DC.B    'Please enter an ending location in the above format',CR,LF,0
-000011C9= 49 6E 76 61 6C 69 ...    104  BAD_INPUT   DC.B    'Invalid input. Please try again',CR,LF,0
-000011EB                           105  
-000011EB                           106              END     START        ; last line of source
+00001034                            28    
+00001034  143C 0002                 29  INPUT2          MOVE.B  #2,D2
+00001038  43F9 0000118D             30                  LEA     ENDING,A1           ; output ending address message
+0000103E  103C 000E                 31                  MOVE.B  #14,D0
+00001042  4E4F                      32                  TRAP    #15         
+00001044                            33  
+00001044  103C 0002                 34                  MOVE.B  #2,D0
+00001048  4E4F                      35                  TRAP    #15
+0000104A  4EB9 00001064             36                  JSR     CHECK_LENGTH
+00001050  1C3C 0007                 37                  MOVE.B  #7,D6               ; D6 stores counter
+00001054  4285                      38                  CLR.L   D5
+00001056  4EB9 00001076             39                  JSR     CONVERT
+0000105C  2645                      40                  MOVEA.L D5,A3               ; store second input in A3
+0000105E                            41                  
+0000105E  103C 0009                 42  STOP            MOVE.B  #9,D0
+00001062  4E4F                      43                  TRAP    #15
+00001064                            44  
+00001064                            45  *--------------------SUBROUTINES------------------                
+00001064                            46                  
+00001064  7800                      47  CHECK_LENGTH    MOVEQ      #$0,D4           ; check if input is null    
+00001066  B204                      48                  CMP.B      D4,D1            ; D1 stores length
+00001068  6700 005A                 49                  BEQ        INVALID          ; input is null
+0000106C  0C41 0008                 50                  CMPI       #$8,D1           ; check if input is longer than a longword
+00001070  6E00 0052                 51                  BGT        INVALID          ; input is longer than a longword
+00001074  4E75                      52                  RTS
+00001076                            53                              
+00001076  4283                      54  CONVERT         CLR.L   D3
+00001078  4284                      55                  CLR.L   D4
+0000107A  1619                      56                  MOVE.B  (A1)+,D3            ; D3 stores current char
+0000107C  B63C 0039                 57                  CMP.B   #57,D3
+00001080  6E00 0012                 58                  BGT     NOTNUMBER
+00001084                            59                  
+00001084  B63C 002F                 60                  CMP.B   #47,D3
+00001088  6E00 0002                 61                  BGT     ISNUMBER
+0000108C                            62                  
+0000108C  0603 00D0                 63  ISNUMBER        ADD.B   #-48,D3             ; current char is number
+00001090  6000 001A                 64                  BRA     CONCAT
+00001094                            65              
+00001094  B63C 0041                 66  NOTNUMBER       CMP.B   #65,D3
+00001098  6D00 002A                 67                  BLT     INVALID
+0000109C  B63C 005A                 68                  CMP.B   #90,D3
+000010A0  6E00 0022                 69                  BGT     INVALID  
+000010A4  0603 00C9                 70                  ADD.B   #-55,D3             ; is letter             
+000010A8  6000 0002                 71                  BRA     CONCAT
+000010AC                            72              
+000010AC  BC3C 0000                 73  CONCAT          CMP.B   #0,D6               ; D6 stores counter
+000010B0  6D00 0010                 74                  BLT     RETURN
+000010B4  1806                      75                  MOVE.B  D6,D4               ; D4 stores modified counter 
+000010B6  E50C                      76                  LSL.B   #2,D4               ; multiply counter by 4 to scale hex to binary, 8 -> 32, 7 -> 28, etc.
+000010B8  E9AB                      77                  LSL.L   D4,D3               ; moves current char to correct position  
+000010BA  DA83                      78                  ADD.L   D3,D5               ; D5 stores converted input so far
+000010BC  0606 00FF                 79                  ADD.B   #-1,D6  
+000010C0  60B4                      80                  BRA     CONVERT            ; continue loop for remaining chars
+000010C2                            81                  
+000010C2  4E75                      82  RETURN          RTS
+000010C4                            83                  
+000010C4  43F9 000011C3             84  INVALID         LEA     BAD_INPUT,A1          ; output invalid message
+000010CA  103C 000E                 85                  MOVE.B  #14,D0
+000010CE  4E4F                      86                  TRAP    #15
+000010D0  B47C 0001                 87                  CMP     #1,D2
+000010D4  6700 FF36                 88                  BEQ     INPUT1
+000010D8  6000 FF5A                 89                  BRA     INPUT2                 
+000010DC                            90  
+000010DC  FFFF FFFF                 91      SIMHALT             ; halt simulator
+000010E0                            92  
+000010E0                            93  * Put variables and constants here
+000010E0                            94  
+000010E0  =0000000D                 95  CR          EQU     $0D
+000010E0  =0000000A                 96  LF          EQU     $0A   
+000010E0= 57 65 6C 63 6F 6D ...     97  WELCOME     DC.B    'Welcome to Team Big Blue Disassembler',CR,LF
+00001107= 46 6F 72 6D 61 74 ...     98              DC.B    'Format: 8 digit address in hexadecimal format. Letters must be capital case.',CR,LF,0
+00001156= 50 6C 65 61 73 65 ...     99  STARTING    DC.B    'Please enter a starting location in the above format',CR,LF,0
+0000118D= 50 6C 65 61 73 65 ...    100  ENDING      DC.B    'Please enter an ending location in the above format',CR,LF,0
+000011C3= 49 6E 76 61 6C 69 ...    101  BAD_INPUT   DC.B    'Invalid input. Please try again',CR,LF,0
+000011E5                           102  
+000011E5                           103              END     START        ; last line of source
 
 No errors detected
 No warnings generated
@@ -116,20 +113,20 @@ No warnings generated
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
-BAD_INPUT           11C9
+BAD_INPUT           11C3
 CHECK_LENGTH        1064
-CONCAT              10B2
-CONVERT             107C
+CONCAT              10AC
+CONVERT             1076
 CR                  D
-ENDING              1193
+ENDING              118D
 INPUT1              100C
 INPUT2              1034
-INVALID             10CA
-ISNUMBER            1092
+INVALID             10C4
+ISNUMBER            108C
 LF                  A
-NOTNUMBER           109A
-RETURN              10C8
+NOTNUMBER           1094
+RETURN              10C2
 START               1000
-STARTING            115C
+STARTING            1156
 STOP                105E
-WELCOME             10E6
+WELCOME             10E0
