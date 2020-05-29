@@ -237,7 +237,10 @@ PRINTENTER      MOVE.L      A5, -(SP)      ; saves A5
                 JSR         PRINTNULL      ; prints the new line
                 MOVE.L      (SP)+,A5       ; returns A5
                 RTS
-                
+
+* Prints the size of the MOVE or MOVEA operation  
+* input: D0
+* output: prints out the size of a MOVE or MOVEA operation        
 PRINTMOVESIZE   MOVEM.L D0/A5,-(SP)         ; saves D0 and A5
                 MOVE.W  D0,D1               ; stores d0 in d1
                 AND.W   #$3000,D0           ; gets the size
@@ -271,12 +274,53 @@ ENDING      DC.B    'Please enter an ending location in the above format',CR,LF,
 BAD_INPUT   DC.B    'Invalid input. Please try again',CR,LF,0
 NEW_LINE    DC.B    CR,LF,0
 
-* Opcode messages
+* Opcode Messages
 MSG_NOP     DC.B    'NOP',0
 MSG_MOVE    DC.B    'MOVE',0  
+MSG_MOVEA   DC.B    'MOVEA',0
+MSG_MOVEQ   DC.B    'MOVEQ',0
+MSG_MOVEM   DC.B    'MOVEM',0
+MSG_ADD     DC.B    'ADD',0
+MSG_ADDA    DC.B    'ADDA',0
+MSG_ADDQ    DC.B    'ADDQ',0
+MSG_SUB     DC.B    'SUB',0
+MSG_MULS    DC.B    'MULS',0
+MSG_DIVU    DC.B    'DIVU',0
+MSG_LEA     DC.B    'LEA',0
+MSG_AND     DC.B    'AND',0
+MSG_OR      DC.B    'OR',0
+MSG_NOT     DC.B    'NOT',0
+MSG_LSL     DC.B    'LSL',0
+MSG_LSR     DC.B    'LSR',0
+MSG_ASL     DC.B    'ASL',0
+MSG_ASR     DC.B    'ASR',0
+MSG_BCC     DC.B    'BCC',0
+MSG_BCS     DC.B    'BCS',0
+MSG_BEQ     DC.B    'BEQ',0
+MSG_BNE     DC.B    'BNE',0
+MSG_BGE     DC.B    'BGE',0
+MSG_BGT     DC.B    'BGT',0
+MSG_BHI     DC.B    'BHI',0
+MSG_BLE     DC.B    'BLE',0
+MSG_BLS     DC.B    'BLS',0
+MSG_BLT     DC.B    'BLT',0
+MSG_BMI     DC.B    'BMI',0
+MSG_BPL     DC.B    'BPL',0
+MSG_BVC     DC.B    'BVC',0
+MSG_BVS     DC.B    'BVS',0
+MSG_JSR     DC.B    'JSR',0
+MSG_RTS     DC.B    'RTS',0
+MSG_BRA     DC.B    'BRA',0
 
+* Effective Addresses Messages
+MSG_DR      DC.B    'D',0
+MSG_AR      DC.B    'A',0
+MSG_RB      DC.B    '(',0       ; right bracket
+MSG_LB      DC.B    ')',0       ; left bracket
+MSG_PLUS    DC.B    '+',0
+MSG_MINUS   DC.B    '-',0
 
-* Sizes
+* Size Messages
 MSG_B       DC.B    '.B',0
 MSG_W       DC.B    '.W',0
 MSG_L       DC.B    '.L',0
@@ -284,15 +328,6 @@ MSG_L       DC.B    '.L',0
 * Effective address messages
 
             END     START        ; last line of source
-
-
-
-
-
-*~Font name~Courier New~
-*~Font size~10~
-*~Tab type~1~
-*~Tab size~4~
 
 
 *~Font name~Courier New~

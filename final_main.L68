@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 5/28/2020 5:26:38 PM
+Created On: 5/28/2020 6:32:35 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : Final Project
@@ -241,53 +241,97 @@ Created On: 5/28/2020 5:26:38 PM
 00001168  4EB8 114E                237                  JSR         PRINTNULL      ; prints the new line
 0000116C  2A5F                     238                  MOVE.L      (SP)+,A5       ; returns A5
 0000116E  4E75                     239                  RTS
-00001170                           240                  
-00001170  48E7 8004                241  PRINTMOVESIZE   MOVEM.L D0/A5,-(SP)         ; saves D0 and A5
-00001174  3200                     242                  MOVE.W  D0,D1               ; stores d0 in d1
-00001176  C07C 3000                243                  AND.W   #$3000,D0           ; gets the size
-0000117A  B07C 2000                244                  CMP.W   #$2000,D0           ; checks if is long
-0000117E  6700 001E                245                  BEQ     MOVE_LONG
-00001182  B07C 3000                246                  CMP.W   #$3000,D0           ; checks if is word
-00001186  6700 000C                247                  BEQ     MOVE_WORD
-0000118A                           248                  
-0000118A  4BF9 000012C3            249  MOVE_BYTE       LEA     MSG_B,A5            ; loads string pointer into a1
-00001190  6000 0012                250                  BRA     FINISHMOVE          ; branches to FINISHMOVE
-00001194                           251  
-00001194  4BF9 000012C6            252  MOVE_WORD       LEA     MSG_W,A5            ; loads string pointer into a1
-0000119A  6000 0008                253                  BRA     FINISHMOVE          ; branches to FINISHMOVE
-0000119E                           254  
-0000119E  4BF9 000012C9            255  MOVE_LONG       LEA     MSG_L,A5            ; loads string pointer into a1         
-000011A4                           256                  
-000011A4  4EB8 114E                257  FINISHMOVE      JSR     PRINTNULL           ; prints out the size
-000011A8  4CDF 2001                258                  MOVEM.L (SP)+,D0/A5         ; restores D0 and A5
-000011AC  4E75                     259                  RTS
-000011AE                           260                  
-000011AE  FFFF FFFF                261      SIMHALT             ; halt simulator
-000011B2                           262  
-000011B2                           263  * Put variables and constants here
-000011B2                           264  
-000011B2  =0000000D                265  CR          EQU     $0D
-000011B2  =0000000A                266  LF          EQU     $0A   
-000011B2= 57 65 6C 63 6F 6D ...    267  WELCOME     DC.B    'Welcome to Team Big Blue Disassembler',CR,LF
-000011D9= 46 6F 72 6D 61 74 ...    268              DC.B    'Format: 8 digit address in hexadecimal format. Letters must be capital case.',CR,LF,0
-00001228= 50 6C 65 61 73 65 ...    269  STARTING    DC.B    'Please enter a starting location in the above format',CR,LF,0
-0000125F= 50 6C 65 61 73 65 ...    270  ENDING      DC.B    'Please enter an ending location in the above format',CR,LF,0
-00001295= 49 6E 76 61 6C 69 ...    271  BAD_INPUT   DC.B    'Invalid input. Please try again',CR,LF,0
-000012B7= 0D 0A 00                 272  NEW_LINE    DC.B    CR,LF,0
-000012BA                           273  
-000012BA                           274  * Opcode messages
-000012BA= 4E 4F 50 00              275  MSG_NOP     DC.B    'NOP',0
-000012BE= 4D 4F 56 45 00           276  MSG_MOVE    DC.B    'MOVE',0  
-000012C3                           277  
-000012C3                           278  
-000012C3                           279  * Sizes
-000012C3= 2E 42 00                 280  MSG_B       DC.B    '.B',0
-000012C6= 2E 57 00                 281  MSG_W       DC.B    '.W',0
-000012C9= 2E 4C 00                 282  MSG_L       DC.B    '.L',0
-000012CC                           283  
-000012CC                           284  * Effective address messages
-000012CC                           285  
-000012CC                           286              END     START        ; last line of source
+00001170                           240  
+00001170                           241  * Prints the size of the MOVE or MOVEA operation  
+00001170                           242  * input: D0
+00001170                           243  * output: prints out the size of a MOVE or MOVEA operation        
+00001170  48E7 8004                244  PRINTMOVESIZE   MOVEM.L D0/A5,-(SP)         ; saves D0 and A5
+00001174  3200                     245                  MOVE.W  D0,D1               ; stores d0 in d1
+00001176  C07C 3000                246                  AND.W   #$3000,D0           ; gets the size
+0000117A  B07C 2000                247                  CMP.W   #$2000,D0           ; checks if is long
+0000117E  6700 001E                248                  BEQ     MOVE_LONG
+00001182  B07C 3000                249                  CMP.W   #$3000,D0           ; checks if is word
+00001186  6700 000C                250                  BEQ     MOVE_WORD
+0000118A                           251                  
+0000118A  4BF9 00001360            252  MOVE_BYTE       LEA     MSG_B,A5            ; loads string pointer into a1
+00001190  6000 0012                253                  BRA     FINISHMOVE          ; branches to FINISHMOVE
+00001194                           254  
+00001194  4BF9 00001363            255  MOVE_WORD       LEA     MSG_W,A5            ; loads string pointer into a1
+0000119A  6000 0008                256                  BRA     FINISHMOVE          ; branches to FINISHMOVE
+0000119E                           257  
+0000119E  4BF9 00001366            258  MOVE_LONG       LEA     MSG_L,A5            ; loads string pointer into a1         
+000011A4                           259                  
+000011A4  4EB8 114E                260  FINISHMOVE      JSR     PRINTNULL           ; prints out the size
+000011A8  4CDF 2001                261                  MOVEM.L (SP)+,D0/A5         ; restores D0 and A5
+000011AC  4E75                     262                  RTS
+000011AE                           263                  
+000011AE  FFFF FFFF                264      SIMHALT             ; halt simulator
+000011B2                           265  
+000011B2                           266  * Put variables and constants here
+000011B2                           267  
+000011B2  =0000000D                268  CR          EQU     $0D
+000011B2  =0000000A                269  LF          EQU     $0A   
+000011B2= 57 65 6C 63 6F 6D ...    270  WELCOME     DC.B    'Welcome to Team Big Blue Disassembler',CR,LF
+000011D9= 46 6F 72 6D 61 74 ...    271              DC.B    'Format: 8 digit address in hexadecimal format. Letters must be capital case.',CR,LF,0
+00001228= 50 6C 65 61 73 65 ...    272  STARTING    DC.B    'Please enter a starting location in the above format',CR,LF,0
+0000125F= 50 6C 65 61 73 65 ...    273  ENDING      DC.B    'Please enter an ending location in the above format',CR,LF,0
+00001295= 49 6E 76 61 6C 69 ...    274  BAD_INPUT   DC.B    'Invalid input. Please try again',CR,LF,0
+000012B7= 0D 0A 00                 275  NEW_LINE    DC.B    CR,LF,0
+000012BA                           276  
+000012BA                           277  * Opcode Messages
+000012BA= 4E 4F 50 00              278  MSG_NOP     DC.B    'NOP',0
+000012BE= 4D 4F 56 45 00           279  MSG_MOVE    DC.B    'MOVE',0  
+000012C3= 4D 4F 56 45 41 00        280  MSG_MOVEA   DC.B    'MOVEA',0
+000012C9= 4D 4F 56 45 51 00        281  MSG_MOVEQ   DC.B    'MOVEQ',0
+000012CF= 4D 4F 56 45 4D 00        282  MSG_MOVEM   DC.B    'MOVEM',0
+000012D5= 41 44 44 00              283  MSG_ADD     DC.B    'ADD',0
+000012D9= 41 44 44 41 00           284  MSG_ADDA    DC.B    'ADDA',0
+000012DE= 41 44 44 51 00           285  MSG_ADDQ    DC.B    'ADDQ',0
+000012E3= 53 55 42 00              286  MSG_SUB     DC.B    'SUB',0
+000012E7= 4D 55 4C 53 00           287  MSG_MULS    DC.B    'MULS',0
+000012EC= 44 49 56 55 00           288  MSG_DIVU    DC.B    'DIVU',0
+000012F1= 4C 45 41 00              289  MSG_LEA     DC.B    'LEA',0
+000012F5= 41 4E 44 00              290  MSG_AND     DC.B    'AND',0
+000012F9= 4F 52 00                 291  MSG_OR      DC.B    'OR',0
+000012FC= 4E 4F 54 00              292  MSG_NOT     DC.B    'NOT',0
+00001300= 4C 53 4C 00              293  MSG_LSL     DC.B    'LSL',0
+00001304= 4C 53 52 00              294  MSG_LSR     DC.B    'LSR',0
+00001308= 41 53 4C 00              295  MSG_ASL     DC.B    'ASL',0
+0000130C= 41 53 52 00              296  MSG_ASR     DC.B    'ASR',0
+00001310= 42 43 43 00              297  MSG_BCC     DC.B    'BCC',0
+00001314= 42 43 53 00              298  MSG_BCS     DC.B    'BCS',0
+00001318= 42 45 51 00              299  MSG_BEQ     DC.B    'BEQ',0
+0000131C= 42 4E 45 00              300  MSG_BNE     DC.B    'BNE',0
+00001320= 42 47 45 00              301  MSG_BGE     DC.B    'BGE',0
+00001324= 42 47 54 00              302  MSG_BGT     DC.B    'BGT',0
+00001328= 42 48 49 00              303  MSG_BHI     DC.B    'BHI',0
+0000132C= 42 4C 45 00              304  MSG_BLE     DC.B    'BLE',0
+00001330= 42 4C 53 00              305  MSG_BLS     DC.B    'BLS',0
+00001334= 42 4C 54 00              306  MSG_BLT     DC.B    'BLT',0
+00001338= 42 4D 49 00              307  MSG_BMI     DC.B    'BMI',0
+0000133C= 42 50 4C 00              308  MSG_BPL     DC.B    'BPL',0
+00001340= 42 56 43 00              309  MSG_BVC     DC.B    'BVC',0
+00001344= 42 56 53 00              310  MSG_BVS     DC.B    'BVS',0
+00001348= 4A 53 52 00              311  MSG_JSR     DC.B    'JSR',0
+0000134C= 52 54 53 00              312  MSG_RTS     DC.B    'RTS',0
+00001350= 42 52 41 00              313  MSG_BRA     DC.B    'BRA',0
+00001354                           314  
+00001354                           315  * Effective Addresses Messages
+00001354= 44 00                    316  MSG_DR      DC.B    'D',0
+00001356= 41 00                    317  MSG_AR      DC.B    'A',0
+00001358= 28 00                    318  MSG_RB      DC.B    '(',0       ; right bracket
+0000135A= 29 00                    319  MSG_LB      DC.B    ')',0       ; left bracket
+0000135C= 2B 00                    320  MSG_PLUS    DC.B    '+',0
+0000135E= 2D 00                    321  MSG_MINUS   DC.B    '-',0
+00001360                           322  
+00001360                           323  * Size Messages
+00001360= 2E 42 00                 324  MSG_B       DC.B    '.B',0
+00001363= 2E 57 00                 325  MSG_W       DC.B    '.W',0
+00001366= 2E 4C 00                 326  MSG_L       DC.B    '.L',0
+00001369                           327  
+00001369                           328  * Effective address messages
+00001369                           329  
+00001369                           330              END     START        ; last line of source
 
 No errors detected
 No warnings generated
@@ -344,11 +388,51 @@ LF                  A
 MOVE_BYTE           118A
 MOVE_LONG           119E
 MOVE_WORD           1194
-MSG_B               12C3
-MSG_L               12C9
+MSG_ADD             12D5
+MSG_ADDA            12D9
+MSG_ADDQ            12DE
+MSG_AND             12F5
+MSG_AR              1356
+MSG_ASL             1308
+MSG_ASR             130C
+MSG_B               1360
+MSG_BCC             1310
+MSG_BCS             1314
+MSG_BEQ             1318
+MSG_BGE             1320
+MSG_BGT             1324
+MSG_BHI             1328
+MSG_BLE             132C
+MSG_BLS             1330
+MSG_BLT             1334
+MSG_BMI             1338
+MSG_BNE             131C
+MSG_BPL             133C
+MSG_BRA             1350
+MSG_BVC             1340
+MSG_BVS             1344
+MSG_DIVU            12EC
+MSG_DR              1354
+MSG_JSR             1348
+MSG_L               1366
+MSG_LB              135A
+MSG_LEA             12F1
+MSG_LSL             1300
+MSG_LSR             1304
+MSG_MINUS           135E
 MSG_MOVE            12BE
+MSG_MOVEA           12C3
+MSG_MOVEM           12CF
+MSG_MOVEQ           12C9
+MSG_MULS            12E7
 MSG_NOP             12BA
-MSG_W               12C6
+MSG_NOT             12FC
+MSG_OR              12F9
+MSG_PLUS            135C
+MSG_RB              1358
+MSG_RTS             134C
+MSG_SUB             12E3
+MSG_W               1363
 NEW_LINE            12B7
 NOTNUMBER           1094
 OPCODE_DECODE       10DC
