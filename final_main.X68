@@ -39,12 +39,12 @@ INPUT2          MOVE.B  #2,D2
                 JSR     CONVERT
                 MOVEA.L D5,A3               ; store second input in A3
                 
-DISASSEMBLE     MOVE.L  A2, D1              ; loads current address in D1
-                JSR     PRINTNUM            ; prints out address                    
-                JSR     OPCODE_DECODE       ; decode the opcode
-                JSR     PRINTENTER          ; prints a new line
-                CMP.L   A2, A3              ; checks if A2 has reached A3
-                BLE     DISASSEMBLE         ; if not, loop
+*DISASSEMBLE     MOVE.L  A2, D1              ; loads current address in D1
+*                JSR     PRINTNUM            ; prints out address                    
+*                JSR     OPCODE_DECODE       ; decode the opcode
+*                JSR     PRINTENTER          ; prints a new line
+*                CMP.L   A2, A3              ; checks if A2 has reached A3
+*                BLE     DISASSEMBLE         ; if not, loop
 
 STOP            MOVE.B  #9,D0
                 TRAP    #15
@@ -293,6 +293,7 @@ MSG_L       DC.B    '.L',0
 *~Font size~10~
 *~Tab type~1~
 *~Tab size~4~
+
 
 *~Font name~Courier New~
 *~Font size~10~
