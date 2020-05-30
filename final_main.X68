@@ -39,12 +39,12 @@ INPUT2          MOVE.B  #2,D2
                 JSR     CONVERT
                 MOVEA.L D5,A3               ; store second input in A3
                 
-*DISASSEMBLE     MOVE.L  A2, D1              ; loads current address in D1
-*                JSR     PRINTNUM            ; prints out address                    
-*                JSR     OPCODE_DECODE       ; decode the opcode
-*                JSR     PRINTENTER          ; prints a new line
-*                CMP.L   A2, A3              ; checks if A2 has reached A3
-*                BLE     DISASSEMBLE         ; if not, loop
+DISASSEMBLE     MOVE.L  A2, D1              ; loads current address in D1
+                JSR     PRINTNUM            ; prints out address                    
+                JSR     OPCODE_DECODE       ; decode the opcode
+                JSR     PRINTENTER          ; prints a new line
+                CMP.L   A3, A2              ; checks if A2 has reached A3
+                BLE     DISASSEMBLE         ; if not, loop
 
 STOP            MOVE.B  #9,D0
                 TRAP    #15
@@ -108,20 +108,40 @@ CASE_NOP        CMP.W   #$4E71,D0           ; compares to NOP opcode in hex
                 RTS                         ; returns from the subroutine
                 
                 * if first two bits are 00, next two are not 00
-CASE_MOVE       MOVE.W  D0,D1               ; stores d0 in d1
-                AND.W   #$C000, D1          ; applies a bitmask to get 4 bits, want 00XX
-                BNE     CASE_MOVEQ          ; if not 0, not a  move instruction
-                CMP.W   #$0FFF, D0          ; checks if it exceeds 0FFF
-                BLE     CASE_MOVEQ          ; if less than or equal to, not a move 
-                MOVE.W  D0,D1               ; stores d0 in d1
-                AND.W   #$01C0, D1          ; appplies a bitmask to get 3 bits, check if its 001
-                CMP.W   #$0040, D1          ; confirms if it is a MOVEA
-                BEQ     CASE_MOVEA          ; branches to MOVEA, otherwise it is a normal MOVE
-                LEA     MSG_MOVE,A5         ; loads string pointer into A5
-                JSR     PRINTNULL           ; prints out MOVE
-                JSR     PRINTMOVESIZE       ; prints out the size                
-                * OTHER STUFF PROBABLY
-                RTS
+CASE_MOVE       MOVE.W  D0,D1                   ; stores d0 in d1
+                AND.W   #$C000, D1              ; applies a bitmask to get 4 bits, want 00XX
+                BNE     CASE_MOVEQ              ; if not 0, not a  move instruction
+                CMP.W   #$0FFF, D0              ; checks if it exceeds 0FFF
+                BLE     CASE_MOVEQ              ; if less than or equal to, not a move 
+                MOVE.W  D0,D1                   ; stores d0 in d1
+                AND.W   #$01C0, D1              ; appplies a bitmask to get 3 bits, check if its 001
+                CMP.W   #$0040, D1              ; confirms if it is a MOVEA
+                BEQ     CASE_MOVEA              ; branches to MOVEA, otherwise it is a normal MOVE
+                LEA     MSG_MOVE,A5             ; loads string pointer into A5
+                JSR     PRINTNULL               ; prints out MOVE
+                JSR     PRINTMOVESIZE           ; prints out the size                
+                
+                
+                MOVE.W  #1,D1                   ; specifies that we are looking for destrination addressing mode
+                JSR     GET_EA                  ; gets effective address, output: D1 = EA
+
+CHECKDEST       LEA     VALIDEA_MOVE_DEST,A5    ; load valid move EA
+                JSR     CHECKEAXN_IFVALID       ; checks if EA is valid
+                CMP.W   #2,D1                   ; checks if it is Xn
+                BEQ     CHECKMOVE_XN            ; branches to CHECKXn if it is
+                CMP.W   #1,D1                   ; Checks if it is invalid
+                BEQ     EA_INVALID              ; branches to CHECKXn if it is
+                
+EA_VALID        JSR     EA_TO_STRING            ; outputs it into a string     
+                               
+EA_INVALID      JSR     CASE_DATA               ; prints out the data
+
+CHECKMOVE_Xn    JSR     GET_XN                  ; Gets Xn, puts it into D2
+                LEA     VALIDXN_MOVE,A5         ; Loads EA
+                MOVE.W  D2,D1    
+                JSR     CHECKEAXN_IFVALID       ;
+
+                RTS                             ; returns from subroutine
 
 CASE_MOVEA      
 
@@ -161,17 +181,74 @@ CASE_BCC
 
 CASE_JSR
 
-CASE_RTS
+CASE_RTS        CMP.W   #$4E75,D0           ; compares to NOP opcode in hex
+                BNE     CASE_MOVE           ; checks the next case if not equal
+                LEA     MSG_NOP,A5          ; loads string pointer into A5
+                JSR     PRINTNULL           ; prints NOP                
+                RTS                         ; returns from the subroutine
+CASE_BRA 
 
-CASE_BRA                
+CASE_DATA           
+                    RTS               
+
+CASE_EPICFAIL       RTS
 
 
-* 
-* 
-GET_EA
+* Finds the EA type
+* Inputs: D0 = the instruction word, D1 = 0 (source EA), 1 (dest EA)
+* Output: Addressing Mode (3 bits, 0 to 7) in D1
+GET_EA              MOVE.L    D2, -(SP)             ; stores D2
+                    TST.W     D1                    ; compares D1 to 0
+                    BEQ       SOURCEEA              ; branch to SOURCEEA if it is 0
+                    
+DESTEA              MOVE.W    #$01C0,D2             ; stores bitmask to get the destination EA into D2
+                    BRA       FINDTYPEEA            
 
+SOURCEEA            MOVE.W    #$0038,D2             ; stores bitmask to get the source EA into D2
+
+
+FINDTYPEEA          MOVE.W    D0,D1                 ; copies D0 in D1
+                    AND.W     D2,D1                 ; applies bitmask to D1
+                    MOVE.L    (SP)+,D2              ; restores D2
+                    RTS                             ; returns from subroutine    
+                    
+* Finds Xn type from static last 3 bits 
+* Inputs: D0 = the instruction word
+* Output: Addressing Mode (3 bits, 0 to 7) in D2
+GET_XN              AND.W     #$0007,D2             ; applies bitmask to D2
+                    RTS                             ; returns from subroutine                      
+ 
+                        
+* Checks if EA is valid
+* Inputs: A5 = Pointer to -1 terminated list of valid addressing modes, D1 = Addressing Mode (3 bit), 
+* Outputs: D1 (0 = Valid, 1 = Invalid, 2 = Check Xn)                   
+CHECKEAXN_IFVALID  MOVE.L     D2,-(SP)              ; saves D2
+
+CHECKEAMLOOP       MOVE.B     (A5)+,D2              ; load possible EA
+                   CMP.B      #-$1,D2               ; compares to -1 to see if loop is over
+                   BEQ        INVALIDEA             ; branches to INVALIDEA if its over
+                   CMP.B      D2,D1                 ; check addressing mode, check if current one is one of those
+                   BEQ        VALIDEA               ; branches to valid EA
+                   BRA        CHECKEAMLOOP          ; loops if it isn't valid
+                   
+INVALIDEA          MOVE.W     #$1,D1                ; marks that it is invalid
+                   BRA        CHECKEAEXIT           ; exists the subroutine        
+                  
+VALIDEA            CMP.B      #Other,D2             ; check if its Xn
+                   BEQ        OTHEREA               ; branches to OTHEREA if it is Xn
+                   MOVE.W     #$0,D1                ; marks that it is valid
+                   BRA        CHECKEAEXIT           ; exits the subroutine
+
+OTHEREA            MOVE.W     #$2,D1                ; marks that it is invalid
+
+CHECKEAEXIT        MOVE.L    (SP)+,D2               ; restores D2
+                   RTS                              ; returns from subroutine
+                                
+
+EA_TO_STRING                
 * data register
 CASE_DR
+
 
 * address register
 CASE_AR
@@ -194,8 +271,6 @@ CASE_LONG
 * word address
 CASE_WORD
 
-
-EA_TO_STRING                
 
 
 * DELETE LATER: sorry the formatting is weird here we can fix it later or whenever you want  im just lazy for now
@@ -227,7 +302,7 @@ PRINTRANGE      MOVEM.L     D0-D1/A1, -(SP)  ; saves D0-D1 and A1
 * output: prints out the null terminated string
 PRINTNULL       MOVEM.L     D0/A1, -(SP)    ; saves D0-D1 and A1
                 MOVE.L      A5,A1           ; loads A5 into A1
-                MOVE.B      #10,D0          ; prints null terminated string
+                MOVE.B      #14,D0          ; prints null terminated string
                 TRAP        #15            ; is trap task 10
                 MOVEM.L     (SP)+,D0/A1    ; saves D0-D1 and A1
                 RTS                        ; returns
@@ -247,7 +322,7 @@ PRINTMOVESIZE   MOVEM.L D0/A5,-(SP)         ; saves D0 and A5
                 CMP.W   #$2000,D0           ; checks if is long
                 BEQ     MOVE_LONG
                 CMP.W   #$3000,D0           ; checks if is word
-                BEQ     MOVE_WORD
+                BEQ     MOVE_WORD      
                 
 MOVE_BYTE       LEA     MSG_B,A5            ; loads string pointer into a1
                 BRA     FINISHMOVE          ; branches to FINISHMOVE
@@ -259,77 +334,112 @@ MOVE_LONG       LEA     MSG_L,A5            ; loads string pointer into a1
                 
 FINISHMOVE      JSR     PRINTNULL           ; prints out the size
                 MOVEM.L (SP)+,D0/A5         ; restores D0 and A5
-                RTS
-                
+                RTS        
+          
     SIMHALT             ; halt simulator
 
 * Put variables and constants here
 
-CR          EQU     $0D
-LF          EQU     $0A   
-WELCOME     DC.B    'Welcome to Team Big Blue Disassembler',CR,LF
-            DC.B    'Format: 8 digit address in hexadecimal format. Letters must be capital case.',CR,LF,0
-STARTING    DC.B    'Please enter a starting location in the above format',CR,LF,0
-ENDING      DC.B    'Please enter an ending location in the above format',CR,LF,0
-BAD_INPUT   DC.B    'Invalid input. Please try again',CR,LF,0
-NEW_LINE    DC.B    CR,LF,0
+CR                              EQU     $0D
+LF                              EQU     $0A 
+TAB                             EQU     $09  
+
+* Addressing Modes
+Dn                              EQU     0
+An                              EQU     1
+AnIndirect                      EQU     2
+AnPost                          EQU     3
+AnPre                           EQU     4
+Other                           EQU     7           ; short, long, immediate
+
+* Xn
+ABSShort                        EQU     0
+ABSLong                         EQU     1
+XnImmediate                     EQU     4
+
+* Valid Addressing Modes
+VALIDEA_ALL                     DC.B    Dn,An,AnIndirect,AnPost,AnPre,Other,-1          
+; MOVE (source),MOVEA, ADD, ADDA, ADDQ, and SUB
+VALIDEA_MOVE_DEST               DC.B    Dn,AnIndirect,AnPost,AnPre,Other,-1
+VALIDEA_MOVEQ                   DC.B    Dn,AnIndirect,AnPost,AnPre,Other,-1
+VALIDEA_MOVEM                   DC.B    AnIndirect,AnPre,Other,-1
+VALIDEA_MOVEM_MEMTOREG          DC.B    AnIndirect,AnPost,Other,-1
+VALIDEA_ADDSUB_DESTOPERAND      DC.B    AnIndirect,AnPost,AnPre,Other,-1
+VALIDEA_MULSDIVU                DC.B    Dn,AnIndirect,AnPost,AnPre,Other,-1
+VALIDEA_LEA                     DC.B    An,Other,-1
+VALIDEA_ANDORNOT                DC.B    Dn,AnIndirect,AnPost,AnPre,Other,-1
+VALIDEA_ANDOR_DESTOPERAND       DC.B    AnIndirect,AnPost,AnPre,Other,-1
+VALIDEA_SHIFT                   DC.B    AnIndirect,AnPost,AnPre,Other,-1                ; LSL, LSR, ASL, ASR
+VALIDEA_JSR                     DC.B    AnIndirect, Other,-1
+
+* Valid Xn
+VALIDXN_ALL                     DC.B    ABSShort,ABSLong,XnImmediate,-1                 
+; MOVE (source), MOVEA, ADD, ADDA, SUB, MULS, DIVU, AND, OR, 
+VALIDXN_SHORTLONG               DC.B    ABSShort,ABSLong,-1                             
+; MOVE (dest), MOVEM, ADD (destination operand), ADDQ, SUB (destination operand), LEA, AND (destination operand),
+; OR (destination operand), NOT, LSL/R, ASL/R, JSR
+
+
+* Starting messages
+WELCOME                         DC.B    'Welcome to Team Big Blue Disassembler',CR,LF
+                                DC.B    'Format: 8 digit address in hexadecimal format. Letters must be capital case.',CR,LF,0
+STARTING                        DC.B    'Please enter a starting location in the above format',CR,LF,0
+ENDING                          DC.B    'Please enter an ending location in the above format',CR,LF,0
+BAD_INPUT                       DC.B    'Invalid input. Please try again',CR,LF,0
+NEW_LINE                        DC.B    CR,LF,0
 
 * Opcode Messages
-MSG_NOP     DC.B    'NOP',0
-MSG_MOVE    DC.B    'MOVE',0  
-MSG_MOVEA   DC.B    'MOVEA',0
-MSG_MOVEQ   DC.B    'MOVEQ',0
-MSG_MOVEM   DC.B    'MOVEM',0
-MSG_ADD     DC.B    'ADD',0
-MSG_ADDA    DC.B    'ADDA',0
-MSG_ADDQ    DC.B    'ADDQ',0
-MSG_SUB     DC.B    'SUB',0
-MSG_MULS    DC.B    'MULS',0
-MSG_DIVU    DC.B    'DIVU',0
-MSG_LEA     DC.B    'LEA',0
-MSG_AND     DC.B    'AND',0
-MSG_OR      DC.B    'OR',0
-MSG_NOT     DC.B    'NOT',0
-MSG_LSL     DC.B    'LSL',0
-MSG_LSR     DC.B    'LSR',0
-MSG_ASL     DC.B    'ASL',0
-MSG_ASR     DC.B    'ASR',0
-MSG_BCC     DC.B    'BCC',0
-MSG_BCS     DC.B    'BCS',0
-MSG_BEQ     DC.B    'BEQ',0
-MSG_BNE     DC.B    'BNE',0
-MSG_BGE     DC.B    'BGE',0
-MSG_BGT     DC.B    'BGT',0
-MSG_BHI     DC.B    'BHI',0
-MSG_BLE     DC.B    'BLE',0
-MSG_BLS     DC.B    'BLS',0
-MSG_BLT     DC.B    'BLT',0
-MSG_BMI     DC.B    'BMI',0
-MSG_BPL     DC.B    'BPL',0
-MSG_BVC     DC.B    'BVC',0
-MSG_BVS     DC.B    'BVS',0
-MSG_JSR     DC.B    'JSR',0
-MSG_RTS     DC.B    'RTS',0
-MSG_BRA     DC.B    'BRA',0
+MSG_NOP                         DC.B    TAB,'NOP',0
+MSG_MOVE                        DC.B    TAB,'MOVE',0  
+MSG_MOVEA                       DC.B    TAB,'MOVEA',0
+MSG_MOVEQ                       DC.B    TAB,'MOVEQ',0
+MSG_MOVEM                       DC.B    TAB,'MOVEM',0
+MSG_ADD                         DC.B    TAB,'ADD',0
+MSG_ADDA                        DC.B    TAB,'ADDA',0
+MSG_ADDQ                        DC.B    TAB,'ADDQ',0
+MSG_SUB                         DC.B    TAB,'SUB',0
+MSG_MULS                        DC.B    TAB,'MULS',0
+MSG_DIVU                        DC.B    TAB,'DIVU',0
+MSG_LEA                         DC.B    TAB,'LEA',0
+MSG_AND                         DC.B    TAB,'AND',0
+MSG_OR                          DC.B    TAB,'OR',0
+MSG_NOT                         DC.B    TAB,'NOT',0
+MSG_LSL                         DC.B    TAB,'LSL',0
+MSG_LSR                         DC.B    TAB,'LSR',0
+MSG_ASL                         DC.B    TAB,'ASL',0
+MSG_ASR                         DC.B    TAB,'ASR',0
+MSG_BCC                         DC.B    TAB,'BCC',0
+MSG_BCS                         DC.B    TAB,'BCS',0
+MSG_BEQ                         DC.B    TAB,'BEQ',0
+MSG_BNE                         DC.B    TAB,'BNE',0
+MSG_BGE                         DC.B    TAB,'BGE',0
+MSG_BGT                         DC.B    TAB,'BGT',0
+MSG_BHI                         DC.B    TAB,'BHI',0
+MSG_BLE                         DC.B    TAB,'BLE',0
+MSG_BLS                         DC.B    TAB,'BLS',0
+MSG_BLT                         DC.B    TAB,'BLT',0
+MSG_BMI                         DC.B    TAB,'BMI',0
+MSG_BPL                         DC.B    TAB,'BPL',0
+MSG_BVC                         DC.B    TAB,'BVC',0
+MSG_BVS                         DC.B    TAB,'BVS',0
+MSG_JSR                         DC.B    TAB,'JSR',0
+MSG_RTS                         DC.B    TAB,'RTS',0
+MSG_BRA                         DC.B    TAB,'BRA',0
 
 * Effective Addresses Messages
-MSG_DR      DC.B    'D',0
-MSG_AR      DC.B    'A',0
-MSG_RB      DC.B    '(',0       ; right bracket
-MSG_LB      DC.B    ')',0       ; left bracket
-MSG_PLUS    DC.B    '+',0
-MSG_MINUS   DC.B    '-',0
+MSG_DR                          DC.B    'D',0
+MSG_AR                          DC.B    'A',0
+MSG_RB                          DC.B    '(',0       ; right bracket
+MSG_LB                          DC.B    ')',0       ; left bracket
+MSG_PLUS                        DC.B    '+',0
+MSG_MINUS                       DC.B    '-',0
 
 * Size Messages
-MSG_B       DC.B    '.B',0
-MSG_W       DC.B    '.W',0
-MSG_L       DC.B    '.L',0
-
-* Effective address messages
+MSG_B                           DC.B    '.B',0
+MSG_W                           DC.B    '.W',0
+MSG_L                           DC.B    '.L',0
 
             END     START        ; last line of source
-
-
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
