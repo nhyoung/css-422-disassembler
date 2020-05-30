@@ -389,7 +389,8 @@ CASE_WORD
                    *LEA      MSG_HEX,A5              ; Loads $ into A5
                    *JSR      PRINTNULL               ; Prints $
                    MOVE.W   D0, D1                  ; moves instruction word into d1
-                   JSR      PRINTNUM   
+                   MOVE.W   #0, D4                  ; moves length size (word) into d4
+                   JSR      PRINTSHORTLONGNUM       ; reformats the number to the proper length and prints out the number
                    BRA      EA_TO_STRING_EXIT       ; exits subroutine
 
 * long address 
@@ -397,7 +398,9 @@ CASE_LONG
                    *LEA      MSG_HEX,A5              ; Loads $ into A5
                    *JSR      PRINTNULL               ; Prints $
                    MOVE.W   D0, D1                  ; moves instruction word into d1
-                   JSR      PRINTNUM   
+                   MOVE.W   #1, D4                  ; moves length size (long) into d4
+                   JSR      PRINTSHORTLONGNUM       ; reformats the number to the proper length and prints out the number
+
 
 * exits subroutine
 EA_TO_STRING_EXIT   MOVEM.L  (SP)+,D0-D1/A5          ; restoers D1, D0, and A5
@@ -412,8 +415,23 @@ PRINTNUM         MOVEM.L     D0-D1, -(SP)        ; saves D0 and D1
                  MOVE.B      #3,D0               ; prints D1
                  TRAP        #15                 ; is trap task 3
             
-                 MOVEM.L     (SP)+,D0-D1        ; returns D0 and D1
-                RTS                             ; returns from subroutune
+                 MOVEM.L     (SP)+,D0-D1         ; returns D0 and D1
+                 RTS                             ; returns from subroutine
+                 
+* DELETE LATER: THIS IS A  WIP AND DOESNT ACHIEVE PROPER FUNCTIONALITY YET
+                 
+* Prints out the content of D1 and formats it to have the length of WORD or a LONG
+* Input: number in D1 to be printed, D4 = length (0 = WORD, 1 = LONG)
+* Output: contents of D1 printed
+PRINTSHORTLONGNUM         MOVEM.L     D1-D2, -(SP)        ; saves D0 and D1
+                          MOVE.B      #3,D0               ; prints D1
+                          TRAP        #15                 ; is trap task 3
+                          MOVEM.L     (SP)+,D0-D1         ; returns D0 and D1
+                RTS                                       ; returns from subroutine
+
+* Converts decimal number to hex format
+DECTOHEX                  MOVE                
+             
             
 * Prints contents of things between a range
 * input: A5, A6 (the range)
@@ -422,7 +440,7 @@ PRINTRANGE      MOVEM.L     D0-D1/A1, -(SP)  ; saves D0-D1 and A1
                 MOVEA.L     A5, A1           ; loads A5 into A1
                 SUB.L       A5, A6           ; subtracts A5 to A6, gets us n (number of characters)
                 MOVE.W      A6, D1           ; move n into D1
-                MOVE.B      #1, D0           ; display n characyers of string at A1
+                MOVE.B      #1, D0           ; display n characters of string at A1
                 TRAP        #15              ; is trap task 1
                 MOVEM.L     (SP)+, D0-D1/A1  ; restores D0-D1, A1
                 RTS                          ; returns
@@ -433,14 +451,14 @@ PRINTRANGE      MOVEM.L     D0-D1/A1, -(SP)  ; saves D0-D1 and A1
 PRINTNULL       MOVEM.L     D0/A1, -(SP)    ; saves D0-D1 and A1
                 MOVE.L      A5,A1           ; loads A5 into A1
                 MOVE.B      #14,D0          ; prints null terminated string
-                TRAP        #15            ; is trap task 10
-                MOVEM.L     (SP)+,D0/A1    ; saves D0-D1 and A1
-                RTS                        ; returns
+                TRAP        #15             ; is trap task 10
+                MOVEM.L     (SP)+,D0/A1     ; saves D0-D1 and A1
+                RTS                         ; returns from subroutine
                 
-PRINTENTER      MOVE.L      A5, -(SP)      ; saves A5
-                LEA         NEW_LINE,A5    ; Prints null
-                JSR         PRINTNULL      ; prints the new line
-                MOVE.L      (SP)+,A5       ; returns A5
+PRINTENTER      MOVE.L      A5, -(SP)       ; saves A5
+                LEA         NEW_LINE,A5     ; Prints null
+                JSR         PRINTNULL       ; prints the new line
+                MOVE.L      (SP)+,A5        ; returns A5
                 RTS
 
 * Prints the size of the MOVE or MOVEA operation  
