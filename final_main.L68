@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 6/1/2020 5:26:56 AM
+Created On: 6/1/2020 5:35:49 AM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : Final Project
@@ -18,7 +18,7 @@ Created On: 6/1/2020 5:26:56 AM
 0000100A  4E4F                      14                  TRAP    #15
 0000100C                            15              
 0000100C  43F9 00001545             16  INPUT1          LEA     STARTING,A1         ; output starting address message
-00001012  103C 000E                 17                  MOVE.B  #14,D0
+00001012  103C 000D                 17                  MOVE.B  #13,D0
 00001016  4E4F                      18                  TRAP    #15
 00001018                            19              
 00001018  103C 0002                 20                  MOVE.B  #2,D0                   
@@ -87,7 +87,7 @@ Created On: 6/1/2020 5:26:56 AM
 000010CA                            83              
 000010CA  B63C 0041                 84  NOTNUMBER       CMP.B   #65,D3
 000010CE  6D00 002A                 85                  BLT     INVALID
-000010D2  B63C 005A                 86                  CMP.B   #90,D3
+000010D2  B63C 0046                 86                  CMP.B   #70,D3
 000010D6  6E00 0022                 87                  BGT     INVALID  
 000010DA  0603 00C9                 88                  ADD.B   #-55,D3             ; is letter             
 000010DE  6000 0002                 89                  BRA     CONCAT
