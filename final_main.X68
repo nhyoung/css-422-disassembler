@@ -13,10 +13,12 @@ START:                  ; first instruction of program
                 MOVE.B  #14,D0
                 TRAP    #15
             
-INPUT1          LEA     STARTING,A1         ; output starting address message
+INPUT1          MOVE.L  #$0000000, A1       ;clear A1
+                LEA     STARTING,A1         ; output starting address message
                 MOVE.B  #14,D0
                 TRAP    #15
             
+                MOVE.L  #$0000000, A1       ;clear A1
                 MOVE.B  #2,D0                   
                 TRAP    #15                 ; take input from user
                 MOVE.B  #1,D2               ; D2 stores if starting or ending address
@@ -28,10 +30,12 @@ INPUT1          LEA     STARTING,A1         ; output starting address message
                 MOVEA.L D5,A2               ; store first input in A2
   
 INPUT2          MOVE.B  #2,D2
+                MOVE.L  #$0000000, A1       ;clear A1
                 LEA     ENDING,A1           ; output ending address message
                 MOVE.B  #14,D0
                 TRAP    #15         
 
+                MOVE.L  #$0000000, A1       ;clear A1
                 MOVE.B  #2,D0
                 TRAP    #15
                 
@@ -99,7 +103,8 @@ CONCAT          CMP.B   #0,D6               ; D6 stores counter
                 
 RETURN          RTS
                 
-INVALID         LEA     BAD_INPUT,A1        ; output invalid message
+INVALID         MOVEA.L #$0000000, A1       ; clear A1
+                LEA     BAD_INPUT,A1        ; output invalid message
                 MOVE.B  #14,D0
                 TRAP    #15
                 CMP     #1,D2
