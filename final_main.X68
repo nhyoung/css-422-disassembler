@@ -83,7 +83,7 @@ ISNUMBER        ADD.B   #-48,D3             ; current char is number
             
 NOTNUMBER       CMP.B   #65,D3
                 BLT     INVALID
-                CMP.B   #90,D3
+                CMP.B   #70,D3
                 BGT     INVALID  
                 ADD.B   #-55,D3             ; is letter             
                 BRA     CONCAT
@@ -611,6 +611,7 @@ MSG_W                           DC.B    '.W',TAB,TAB,TAB,0
 MSG_L                           DC.B    '.L',TAB,TAB,TAB,0
 
             END     START        ; last line of source
+
 
 
 
