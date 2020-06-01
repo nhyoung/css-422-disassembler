@@ -45,7 +45,7 @@ INPUT2          MOVE.B  #2,D2
 CHECK_ORDER     MOVE.L  A2,D3
                 MOVE.L  A3,D4
                 CMP.L   D3,D4               ; make sure first input is less than second input
-                BGT     RESET_INPUT
+                BLT     RESET_INPUT
                 
 DISASSEMBLE     MOVE.L  A2, D1              ; loads current address in D1
                 JSR     PRINTNUM            ; prints out address                    
@@ -106,14 +106,14 @@ INVALID         LEA     BAD_INPUT,A1        ; output invalid message
                 BEQ     INPUT1
                 BRA     INPUT2
 
-TEST_RANGE       CLR.L      D4              	; D4 will store test results
-**               MOVE.L     #MIN_ST_ADD,D1  	; D1 stores minimum address
-*                CMP.L      D1,D5           	; Compare minimum address with input
-*                BLT        INVALID   	    ; input is too low. 
-*                MOVE.L     #MAX_EN_ADD,D1  	; D1 now stores maximum address
-*                CMP.L      D1,D3           	; compare maximum address with input
-*                BGT        INVALID          ; input too large
-                 RTS                        	; input is within range 
+TEST_RANGE      CLR.L      D4              	; D4 will store test results
+                MOVE.L     #$1000,D1     	; D1 stores minimum address
+                CMP.L      D1,D5           	; Compare minimum address with input
+                BLT        INVALID   	    ; input is too low. 
+                MOVE.L     #$00FFFFFE,D1  	; D1 now stores maximum address
+                CMP.L      D1,D5          	; compare maximum address with input
+                BGT        INVALID          ; input too large
+                RTS                        	; input is within range 
 
 * Checks every single possible opcode we could have. Jump table
 * Inputs: (A2) which is a pointer to intruction word to be translated
@@ -611,6 +611,7 @@ MSG_W                           DC.B    '.W',TAB,TAB,TAB,0
 MSG_L                           DC.B    '.L',TAB,TAB,TAB,0
 
             END     START        ; last line of source
+
 
 
 *~Font name~Courier New~
