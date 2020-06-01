@@ -44,8 +44,8 @@ INPUT2          MOVE.B  #2,D2
       
 CHECK_ORDER     MOVE.L  A2,D3
                 MOVE.L  A3,D4
-                CMP.L   D3,D4
-                BGT     
+                CMP.L   D3,D4               ; make sure first input is less than second input
+                BGT     RESET_INPUT
                 
 DISASSEMBLE     MOVE.L  A2, D1              ; loads current address in D1
                 JSR     PRINTNUM            ; prints out address                    
@@ -62,11 +62,11 @@ STOP            MOVE.B  #9,D0
 RESET_INPUT     MOVE.B  #1,D2
                 BRA     INVALID            
                 
-CHECK_LENGTH    MOVEQ   #$0,D4           ; check if input is null   	
-                CMP.B   D4,D1           	; D1 stores length
+CHECK_LENGTH    MOVEQ   #$0,D4              ; check if input is null   	
+                CMP.B   D4,D1               ; D1 stores length
                 BEQ     INVALID     	    ; input is null
                 CMPI    #$8,D1          	; check if input is longer than a longword
-                BGT     INVALID       	; input is longer than a longword
+                BGT     INVALID       	    ; input is longer than a longword
                 RTS
                             
 CONVERT         CLR.L   D3
@@ -106,14 +106,14 @@ INVALID         LEA     BAD_INPUT,A1        ; output invalid message
                 BEQ     INPUT1
                 BRA     INPUT2
 
-TEST_RANGE      CLR.L      D4              	; D4 will store test results
-                MOVE.L     #MIN_ST_ADD,D1  	; D1 stores minimum address
-                CMP.L      D1,D5           	; Compare minimum address with input
-                BLT        INVALID   	    ; input is too low. 
-                MOVE.L     #MAX_EN_ADD,D1  	; D1 now stores maximum address
-                CMP.L      D1,D3           	; compare maximum address with input
-                BGT        INVALID          ; input too large
-                RTS                        	; input is within range 
+TEST_RANGE       CLR.L      D4              	; D4 will store test results
+**               MOVE.L     #MIN_ST_ADD,D1  	; D1 stores minimum address
+*                CMP.L      D1,D5           	; Compare minimum address with input
+*                BLT        INVALID   	    ; input is too low. 
+*                MOVE.L     #MAX_EN_ADD,D1  	; D1 now stores maximum address
+*                CMP.L      D1,D3           	; compare maximum address with input
+*                BGT        INVALID          ; input too large
+                 RTS                        	; input is within range 
 
 * Checks every single possible opcode we could have. Jump table
 * Inputs: (A2) which is a pointer to intruction word to be translated
@@ -450,7 +450,7 @@ PRINTSHORTLONGNUM         MOVEM.L     D1-D2, -(SP)        ; saves D0 and D1
                 RTS                                       ; returns from subroutine
 
 * Converts decimal number to hex format
-DECTOHEX                  MOVE                
+*DECTOHEX                  MOVE                
              
             
 * Prints contents of things between a range
