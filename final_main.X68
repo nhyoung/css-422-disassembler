@@ -24,6 +24,7 @@ INPUT1          LEA     STARTING,A1         ; output starting address message
                 JSR     CHECK_LENGTH
                 MOVE.B  #7,D6               ; D6 stores counter               
                 JSR     CONVERT
+                JSR     TEST_RANGE
                 MOVEA.L D5,A2               ; store first input in A2
   
 INPUT2          MOVE.B  #2,D2
@@ -33,10 +34,12 @@ INPUT2          MOVE.B  #2,D2
 
                 MOVE.B  #2,D0
                 TRAP    #15
+                
                 JSR     CHECK_LENGTH
                 MOVE.B  #7,D6               ; D6 stores counter
                 CLR.L   D5
                 JSR     CONVERT
+                JSR     TEST_RANGE
                 MOVEA.L D5,A3               ; store second input in A3
                 
 DISASSEMBLE     MOVE.L  A2, D1              ; loads current address in D1
@@ -93,7 +96,16 @@ INVALID         LEA     BAD_INPUT,A1        ; output invalid message
                 TRAP    #15
                 CMP     #1,D2
                 BEQ     INPUT1
-                BRA     INPUT2 
+                BRA     INPUT2
+
+TEST_RANGE      CLR.L      D4              	; D4 will store test results
+                MOVE.L     #MIN_ST_ADD,D1  	; D1 stores minimum address
+                CMP.L      D1,D5           	; Compare minimum address with input
+                BLT        INVALID   	    ; input is too low. 
+                MOVE.L     #MAX_EN_ADD,D1  	; D1 now stores maximum address
+                CMP.L      D1,D3           	; compare maximum address with input
+                BGT        INVALID          ; input too large
+                RTS                        	; input is within range 
 
 * Checks every single possible opcode we could have. Jump table
 * Inputs: (A2) which is a pointer to intruction word to be translated
@@ -591,6 +603,7 @@ MSG_W                           DC.B    '.W',TAB,TAB,TAB,0
 MSG_L                           DC.B    '.L',TAB,TAB,TAB,0
 
             END     START        ; last line of source
+
 
 *~Font name~Courier New~
 *~Font size~10~
