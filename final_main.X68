@@ -41,6 +41,11 @@ INPUT2          MOVE.B  #2,D2
                 JSR     CONVERT
                 JSR     TEST_RANGE
                 MOVEA.L D5,A3               ; store second input in A3
+      
+CHECK_ORDER     MOVE.L  A2,D3
+                MOVE.L  A3,D4
+                CMP.L   D3,D4
+                BGT     
                 
 DISASSEMBLE     MOVE.L  A2, D1              ; loads current address in D1
                 JSR     PRINTNUM            ; prints out address                    
@@ -52,13 +57,16 @@ DISASSEMBLE     MOVE.L  A2, D1              ; loads current address in D1
 STOP            MOVE.B  #9,D0
                 TRAP    #15
 
-*--------------------SUBROUTINES------------------                
+*--------------------SUBROUTINES------------------    
+
+RESET_INPUT     MOVE.B  #1,D2
+                BRA     INVALID            
                 
-CHECK_LENGTH    MOVEQ      #$0,D4           ; check if input is null   	
-                CMP.B      D4,D1           	; D1 stores length
-                BEQ        INVALID     	    ; input is null
-                CMPI       #$8,D1          	; check if input is longer than a longword
-                BGT        INVALID       	; input is longer than a longword
+CHECK_LENGTH    MOVEQ   #$0,D4           ; check if input is null   	
+                CMP.B   D4,D1           	; D1 stores length
+                BEQ     INVALID     	    ; input is null
+                CMPI    #$8,D1          	; check if input is longer than a longword
+                BGT     INVALID       	; input is longer than a longword
                 RTS
                             
 CONVERT         CLR.L   D3
