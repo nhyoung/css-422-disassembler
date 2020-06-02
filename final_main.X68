@@ -254,9 +254,14 @@ CASE_MOVEM
 CASE_MOVEQ  
 
 GET_NIBBLE1     MOVE.W      D0,D3
-                LSR         #8,D0                               
-                LSR         #4,D0                               
-                BRA         NIBBLE1_JUMP
+                LSR         #8,D3                               
+                LSR         #4,D3                               
+                CMP.W       #9,D3
+                BEQ         FIRST_NIBBLE_9
+                CMP.W       #13,D3
+                BEQ         FIRST_NIBBLE_C
+                CMP.W       #14,D3
+                BEQ         FIRST_NIBBLE_D
                 
 GET_NIBBLE2     MOVE.W      D0,D3
                 LSL         #4,D3                               
@@ -353,6 +358,7 @@ CASE_DIVU
 
 CASE_LEA
 
+*---------------AND opcode----------------------
 CASE_AND        LEA         MSG_AND,A1
                 MOVE.B      #14,D0
                 TRAP        #15 
