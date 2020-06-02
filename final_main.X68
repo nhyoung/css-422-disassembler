@@ -27,6 +27,8 @@ INPUT1          MOVE.L  #$0000000, A1       ;clear A1
                 MOVE.B  #7,D6               ; D6 stores counter               
                 JSR     CONVERT
                 JSR     TEST_RANGE
+                JSR     CHECK_ODD
+                MOVE.L  D5,STARTING_ADDRESS
                 MOVEA.L D5,A2               ; store first input in A2
   
 INPUT2          MOVE.B  #2,D2
@@ -44,6 +46,8 @@ INPUT2          MOVE.B  #2,D2
                 CLR.L   D5
                 JSR     CONVERT
                 JSR     TEST_RANGE
+                JSR     CHECK_ODD
+                MOVE.L  D5,ENDING_ADDRESS
                 MOVEA.L D5,A3               ; store second input in A3
       
 CHECK_ORDER     MOVE.L  A2,D3
@@ -118,7 +122,31 @@ TEST_RANGE      CLR.L      D4              	; D4 will store test results
                 MOVE.L     #$00FFFFFE,D1  	; D1 now stores maximum address
                 CMP.L      D1,D5          	; compare maximum address with input
                 BGT        INVALID          ; input too large
-                RTS                        	; input is within range 
+                RTS                        	; input is within range
+           
+CHECK_ODD       BTST       #0,D5            ; check if input is odd
+                BNE        INVALID
+                RTS
+                
+*HEX_TO_ASCII    LEA         HEX_CHARACTER_JUMP_TABLE,A4             * Load the table to print out ascii charracter
+*                MOVE.W      TEMP_CURRENT_4_NIBBLES,D3
+*                JSR         GET_THE_FIRST_NIBBLE                    * Get the left most hex value and convert
+*                MULU        #6,D3
+*                JSR         0(A4,D3)
+*                MOVE.W      TEMP_CURRENT_4_NIBBLES,D3
+*                JSR         GET_THE_SECOND_NIBBLE
+*                MULU        #6,D3
+*                JSR         0(A4,D3)
+*                MOVE.W      TEMP_CURRENT_4_NIBBLES,D3
+*                JSR         GET_THE_THIRD_NIBBLE
+*                MULU        #6,D3
+*                JSR         0(A4,D3)
+*                MOVE.W      TEMP_CURRENT_4_NIBBLES,D3
+*                JSR         GET_THE_FOURTH_NIBBLE
+*                MULU        #6,D3
+*                JSR         0(A4,D3)
+*                CLR.W       D3
+*                RTS
 
 * Checks every single possible opcode we could have. Jump table
 * Inputs: (A2) which is a pointer to intruction word to be translated
@@ -689,7 +717,12 @@ MSG_B                           DC.B    '.B',TAB,TAB,TAB,0
 MSG_W                           DC.B    '.W',TAB,TAB,TAB,0
 MSG_L                           DC.B    '.L',TAB,TAB,TAB,0
 
+* Variables
+STARTING_ADDRESS                EQU     $100
+ENDING_ADDRESS                  EQU     $150
+
             END     START        ; last line of source
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
