@@ -1,7 +1,7 @@
 *-----------------------------------------------------------
 * Title      : Final Project
 * Written by : Nick Young, Audrey Nguyen, Khiam Rehman
-* Date       : 5/1/20
+* Date       : 6/1/20
 * Description: Final Project
 *-----------------------------------------------------------
     ORG    $1000
@@ -137,11 +137,7 @@ CASE_MOVE       MOVE.W  D0,D1                   ; stores d0 in d1
                 AND.W   #$C000, D1              ; applies a bitmask to get 4 bits, want 00XX
                 BNE     CASE_MOVEQ              ; if not 0, not a  move instruction
                 CMP.W   #$0FFF, D0              ; checks if it exceeds 0FFF
-                BLE     CASE_MOVEQ              ; if less than or equal to, not a move 
-                MOVE.W  D0,D1                   ; stores d0 in d1
-                AND.W   #$01C0, D1              ; appplies a bitmask to get 3 bits, check if its 001
-                CMP.W   #$0040, D1              ; confirms if it is a MOVEA
-                BEQ     CASE_MOVEA              ; branches to MOVEA, otherwise it is a normal MOVE              
+                BLE     CASE_MOVEQ              ; if less than or equal to, not a move             
                 
                 ; get destination
                 MOVE.W  #1,D1                   ; specifies that we are looking for dest addressing mode
@@ -168,8 +164,17 @@ EAMOVE_VALID    MOVE.W  #0,D1                   ; specifies that we are looking 
                 MOVE.W  D1,D5                   ; saves Xn to D7 so it doesn't get overwritten
                 
                 ; print source
-                LEA     MSG_MOVE,A5             ; loads string pointer into A5
-                JSR     PRINTNULL               ; prints out MOVE
+                MOVE.W  D0,D1                   ; stores d0 in d1
+                AND.W   #$01C0, D1              ; appplies a bitmask to get 3 bits, check if its 001
+                CMP.W   #$0040, D1              ; confirms if it is a MOVEA
+                BEQ     INSERTA                 ; branches to MOVEA, otherwise it is a normal MOVE
+ 
+                LEA     MSG_MOVE,A5             ; loads string pointer for MOVE into A5
+                BRA     PRINTMOVE               ; Branches to print move
+                
+INSERTA         LEA     MSG_MOVEA,A5            ; loads string pointer for MOVEA into A5
+
+PRINTMOVE       JSR     PRINTNULL               ; prints out MOVE
                 JSR     PRINTMOVESIZE           ; prints out the size  
                 MOVE.W  D4,D2                   ; Moves D6 (dest effective address) to D2
                 MOVE.W  D5,D3                   ; Moves D7 (dest Xn if applicable) to D3 
@@ -195,9 +200,7 @@ CHECKMOVE_Xn    LEA     VALIDXN_SHORTLONG,A5    ; Loads Xn into A5
                 BEQ     EAMOVE_VALID            ; go to EA_VALID to print
                 BRA     EAMOVE_INVALID          ; branches to EA_INVALID if not              
                 
-                RTS                             ; returns from subroutine
-
-CASE_MOVEA      
+                RTS                             ; returns from subroutine     
 
 CASE_MOVEM
 
@@ -230,17 +233,63 @@ CASE_LSR
 CASE_ASL
 
 CASE_ASR
+             
+CASE_BRA        MOVE.W  D0,D1               ; Copies instruction word to D1
+                AND.W   #$FF00,D1           ; Applies a bitmask to get first 8 bits                
+                CMP.W   #$6000,D1           ; Checks if it fits the BRA opcode
+                BNE.W   CASE_BCC            ; If its not, check BCC
+                
+                LEA     MSG_BRA,A5          ; loads string pointer for BRA into A5
+                JSR     PRINTNULL           ; prints BRA
 
-CASE_BCC
+                MOVE.W  D0,D2               ; Copies instruction word to D1
+                JSR     GETDISPLACEMENT     ; finds the displacement
+                RTS
+                
+; DO NOT MOVE THIS FORM UNDER CASE_BRA. IS DEPENDENT ON RESULTS OF BRA
+; DELETE THIS NOTE: NEED TO FIX LSL/LSR SHIFT TO ENSURE THE BCC CODES GET PRINTED 
+CASE_BCC        MOVE.W  D0,D1               ; 
+                AND.W   #$F000,D1           ; get top 4 bits
+                CMP.W   #$6000,D1           ; make sure top 4 bits are 6
+                BNE.W   CASE_JSR            ;
+                AND.W   #$0F00,D1           ; get next 4 bits, condition code
+                *LSL.W   #8,D1               ; shifts 8 bits to the right
+                
+                CMP.W   #$0E00,D1              ; checks if D1 is BGT (1 1 1 0)
+                BEQ     CASE_BGT            ; branches to BGT if it is
+                
+                CMP.W   #$0F00,D1              ; checks if D1 is BLE (1 1 1 1)
+                BEQ     CASE_BLE            ; branches to BLE if it is
+                    
+                CMP.W   #$0700,D1              ; checks if D1 is BEQ (0 1 1 1)
+                BEQ     CASE_BEQ            ; branches to BEQ if it is
+                BRA     CASE_EPICFAIL       ; BCC condition code not in the system
+  
+CASE_BEQ        LEA     MSG_BEQ,A5          ; loads string pointer for BEQ into A5
+                JSR     PRINTNULL           ; prints BEQ
+                BRA     PRINTBCCDIS
+
+CASE_BLE        LEA     MSG_BLE,A5          ; loads string pointer for BLE into A5
+                JSR     PRINTNULL           ; prints BLE
+                BRA     PRINTBCCDIS
+                
+CASE_BGT        LEA     MSG_BGT,A5          ; loads string pointer for BGT into A5
+                JSR     PRINTNULL           ; prints BGT
+                BRA     PRINTBCCDIS
+
+PRINTBCCDIS     MOVE.W  D0,D2               ; Copies instruction word to D1
+                JSR     GETDISPLACEMENT     ; finds the displacement
+                RTS              
 
 CASE_JSR
 
-CASE_RTS        CMP.W   #$4E75,D0           ; compares to NOP opcode in hex
+CASE_RTS        CMP.W   #$4E75,D0           ; compares to RTS opcode in hex
                 BNE     CASE_MOVE           ; checks the next case if not equal
-                LEA     MSG_NOP,A5          ; loads string pointer into A5
-                JSR     PRINTNULL           ; prints NOP                
+                LEA     MSG_RTS,A5          ; loads string pointer into A5
+                JSR     PRINTNULL           ; prints RTS                
                 RTS                         ; returns from the subroutine
-CASE_BRA 
+
+                
 
 CASE_DATA           
                     RTS               
@@ -287,8 +336,25 @@ FINDTYPEXN          MOVE.W    D0,D1                 ; copies D0 in D1
                     AND.W     D2,D1                 ; applies bitmask to D1
                     LSR.W     D3,D1                 ; shifts D1, moves the result to the end
                     MOVEM.L   (SP)+,D2-D3           ; restores D2 and D3
-                    RTS                             ; returns from subroutine                                           
- 
+                    RTS                             ; returns from subroutine 
+                                          
+* Gets the displacement and pritns it 
+* Inputs: D2 = instruction word, A2 = address of next word
+* Outputs: prints out displacement
+GETDISPLACEMENT     MOVEM.L    D1/A5, -(SP)         ; saves D1
+                    MOVE.W    A2,A5                 ; copies A2 to A5
+                    AND.W     #$00FF,D2             ; applies a bitmask to get rid of the first 8 bits
+                    BNE       PRINTADDRESS          ; prints address if not 0
+                    MOVE.W    (A2)+,D2               ; gets 16 bit displacement                    
+                    
+PRINTADDRESS        ADD.W     A5,D2                 ; Adds address to D2 to get displacement
+                    MOVE.W    D2,D1                 ; moves address to D1 to print it
+                    JSR       PRINTNUM              ; prints address
+                    
+                    MOVEM.L    (SP)+,D1/A5              ; restores D1
+                    ; DELETE LATER. NOTE: WE DONT HAVE HEX YET, PRINT HEX SIGN BEFORE NUM, BUT WILL NEED TO ADD THIS LATER
+                                      
+                 
                         
 * Checks if EA is valid
 * Inputs: A5 = Pointer to -1 terminated list of valid addressing modes, D1 = Addressing Mode (3 bit), 
@@ -407,7 +473,7 @@ CASE_IMMEDIATE     LEA      MSG_POUND,A5            ; Loads # into A5
                    JSR      PRINTNUM 
                    BRA      EA_TO_STRING_EXIT       ; exits subroutine                  
                    
-; DELETE LATER: convert tp hex andwrite code to make them print out a total of 4 and 8 characters, add 0's                      
+; DELETE LATER: convert to hex andwrite code to make them print out a total of 4 and 8 characters, add 0's                      
 
 * word address
 CASE_WORD          
@@ -507,7 +573,15 @@ MOVE_LONG       LEA     MSG_L,A5            ; loads string pointer into a1
                 
 FINISHMOVE      JSR     PRINTNULL           ; prints out the size
                 MOVEM.L (SP)+,D0/A5         ; restores D0 and A5
-                RTS        
+                RTS 
+       
+* DELETE THIS: Test                
+DELETEME        MOVEA.L  -(A1),A3
+                BEQ      DELETEMEAGAIN  
+                BLE      DELETEMEAGAIN
+                BGT      DELETEMEAGAIN        
+                
+DELETEMEAGAIN                 
           
     SIMHALT             ; halt simulator
 
@@ -533,7 +607,7 @@ XnImmediate                     EQU     4
 * Valid Addressing Modes
 VALIDEA_ALL                     DC.B    Dn,An,AnIndirect,AnPost,AnPre,Other,-1          
 ; MOVE (source),MOVEA, ADD, ADDA, ADDQ, and SUB
-VALIDEA_MOVE_DEST               DC.B    Dn,AnIndirect,AnPost,AnPre,Other,-1
+VALIDEA_MOVE_DEST               DC.B    Dn,An,AnIndirect,AnPost,AnPre,Other,-1 * DELETE THIS, REPLACE WITH VALIDEA_ALL
 VALIDEA_MOVEQ                   DC.B    Dn,AnIndirect,AnPost,AnPre,Other,-1
 VALIDEA_MOVEM                   DC.B    AnIndirect,AnPre,Other,-1
 VALIDEA_MOVEM_MEMTOREG          DC.B    AnIndirect,AnPost,Other,-1
@@ -573,7 +647,7 @@ MSG_ADDQ                        DC.B    TAB,'ADDQ',0
 MSG_SUB                         DC.B    TAB,'SUB',0
 MSG_MULS                        DC.B    TAB,'MULS',0
 MSG_DIVU                        DC.B    TAB,'DIVU',0
-MSG_LEA                         DC.B    TAB,'LEA',0
+MSG_LEA                         DC.B    TAB,'LEA',TAB,TAB,TAB,0
 MSG_AND                         DC.B    TAB,'AND',0
 MSG_OR                          DC.B    TAB,'OR',0
 MSG_NOT                         DC.B    TAB,'NOT',0
@@ -581,23 +655,23 @@ MSG_LSL                         DC.B    TAB,'LSL',0
 MSG_LSR                         DC.B    TAB,'LSR',0
 MSG_ASL                         DC.B    TAB,'ASL',0
 MSG_ASR                         DC.B    TAB,'ASR',0
-MSG_BCC                         DC.B    TAB,'BCC',0
-MSG_BCS                         DC.B    TAB,'BCS',0
-MSG_BEQ                         DC.B    TAB,'BEQ',0
-MSG_BNE                         DC.B    TAB,'BNE',0
-MSG_BGE                         DC.B    TAB,'BGE',0
-MSG_BGT                         DC.B    TAB,'BGT',0
-MSG_BHI                         DC.B    TAB,'BHI',0
-MSG_BLE                         DC.B    TAB,'BLE',0
-MSG_BLS                         DC.B    TAB,'BLS',0
-MSG_BLT                         DC.B    TAB,'BLT',0
-MSG_BMI                         DC.B    TAB,'BMI',0
-MSG_BPL                         DC.B    TAB,'BPL',0
-MSG_BVC                         DC.B    TAB,'BVC',0
-MSG_BVS                         DC.B    TAB,'BVS',0
-MSG_JSR                         DC.B    TAB,'JSR',0
+MSG_BCC                         DC.B    TAB,'BCC',TAB,TAB,TAB,0
+MSG_BCS                         DC.B    TAB,'BCS',TAB,TAB,TAB,0
+MSG_BEQ                         DC.B    TAB,'BEQ',TAB,TAB,TAB,0
+MSG_BNE                         DC.B    TAB,'BNE',TAB,TAB,TAB,0
+MSG_BGE                         DC.B    TAB,'BGE',TAB,TAB,TAB,0
+MSG_BGT                         DC.B    TAB,'BGT',TAB,TAB,TAB,0
+MSG_BHI                         DC.B    TAB,'BHI',TAB,TAB,TAB,0
+MSG_BLE                         DC.B    TAB,'BLE',TAB,TAB,TAB,0
+MSG_BLS                         DC.B    TAB,'BLS',TAB,TAB,TAB,0
+MSG_BLT                         DC.B    TAB,'BLT',TAB,TAB,TAB,0
+MSG_BMI                         DC.B    TAB,'BMI',TAB,TAB,TAB,0
+MSG_BPL                         DC.B    TAB,'BPL',TAB,TAB,TAB,0
+MSG_BVC                         DC.B    TAB,'BVC',TAB,TAB,TAB,0
+MSG_BVS                         DC.B    TAB,'BVS',TAB,TAB,TAB,0
+MSG_JSR                         DC.B    TAB,'JSR',TAB,TAB,TAB,0
 MSG_RTS                         DC.B    TAB,'RTS',0
-MSG_BRA                         DC.B    TAB,'BRA',0
+MSG_BRA                         DC.B    TAB,'BRA',TAB,TAB,TAB,0
 
 * Effective Addresses Messages
 MSG_DR                          DC.B    'D',0
@@ -616,10 +690,6 @@ MSG_W                           DC.B    '.W',TAB,TAB,TAB,0
 MSG_L                           DC.B    '.L',TAB,TAB,TAB,0
 
             END     START        ; last line of source
-
-
-
-
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
