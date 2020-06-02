@@ -54,8 +54,13 @@ CHECK_ORDER     MOVE.L  A2,D3
                 MOVE.L  A3,D4
                 CMP.L   D3,D4               ; make sure first input is less than second input
                 BLT     RESET_INPUT
+               
+PREPARE         LEA         NIBBLE1_JUMP,A0              
+                MOVE.L      STARTING_ADDRESS,A2
+                MOVE.L      ENDING_ADDRESS,A3
+                                   
                 
-DISASSEMBLE     MOVE.L  A2, D1              ; loads current address in D1
+DISASSEMBLE     MOVE.L  A2,D1               ; loads current address in D1
                 JSR     PRINTNUM            ; prints out address                    
                 JSR     OPCODE_DECODE       ; decode the opcode
                 JSR     PRINTENTER          ; prints a new line
@@ -127,6 +132,18 @@ TEST_RANGE      CLR.L      D4              	; D4 will store test results
 CHECK_ODD       BTST       #0,D5            ; check if input is odd
                 BNE        INVALID
                 RTS
+
+*PRINT_LOCATION
+*    MOVE.L      A2,D5 * Save the address we are at
+*    LSR         #8,D5                                       * Shift 4 bytes left most to print out
+*    LSR         #8,D5
+*    MOVE.W      D5,TEMP_CURRENT_4_NIBBLES                   * Get the entire long address
+*    JSR         HEX_TO_ASCII
+*    MOVE.W      A2,D5
+*    MOVE.W      D5,TEMP_CURRENT_4_NIBBLES
+*    JSR         HEX_TO_ASCII
+*    JSR         PRINT_SPACE
+*    RTS
                 
 *HEX_TO_ASCII    LEA         HEX_CHARACTER_JUMP_TABLE,A4             * Load the table to print out ascii charracter
 *                MOVE.W      TEMP_CURRENT_4_NIBBLES,D3
@@ -146,13 +163,15 @@ CHECK_ODD       BTST       #0,D5            ; check if input is odd
 *                MULU        #6,D3
 *                JSR         0(A4,D3)
 *                CLR.W       D3
-*                RTS
+*                RTS            
+
 
 * Checks every single possible opcode we could have. Jump table
 * Inputs: (A2) which is a pointer to intruction word to be translated
 * Outputs: Prints out dissasembled content to console and A2 will increment appropriatley
 
-OPCODE_DECODE   MOVE.W  (A2)+,D0                ; load instruction word from memory
+OPCODE_DECODE   MOVE.W  (A2)+,D0                ; load instruction word from memory, store in D0
+                MOVE.W  D0,CURRENT_INSTR
                 
 CASE_NOP        CMP.W   #$4E71,D0               ; compares to NOP opcode in hex
                 BNE     CASE_MOVE               ; checks the next case if not equal
@@ -230,13 +249,99 @@ CHECKMOVE_Xn    LEA     VALIDXN_SHORTLONG,A5    ; Loads Xn into A5
                 
                 RTS                             ; returns from subroutine     
 
-CASE_MOVEM
+CASE_MOVEM  
 
-CASE_MOVEQ
+CASE_MOVEQ  
 
-CASE_ADD
+GET_NIBBLE1     MOVE.W      D0,D3
+                LSR         #8,D0                               
+                LSR         #4,D0                               
+                BRA         NIBBLE1_JUMP
+                
+GET_NIBBLE2     MOVE.W      D0,D3
+                LSL         #4,D3                               
+                LSR         #4,D3                               
+                LSR         #8,D3                               
+                RTS
 
-CASE_ADDA
+NIBBLE1_JUMP    *JMP         FIRST_NIBBLE_0                
+*                JMP         FIRST_NIBBLE_1               
+*                JMP         FIRST_NIBBLE_2               
+*                JMP         FIRST_NIBBLE_3               
+*                JMP         FIRST_NIBBLE_4               
+*                JMP         FIRST_NIBBLE_5               
+*                JMP         FIRST_NIBBLE_6               
+*                JMP         FIRST_NIBBLE_7               
+*                JMP         FIRST_NIBBLE_8              
+                JMP         FIRST_NIBBLE_9      ; SUB         
+*                JMP         FIRST_NIBBLE_A              
+*                JMP         FIRST_NIBBLE_B               
+                JMP         FIRST_NIBBLE_C      ; AND, MULS              
+                JMP         FIRST_NIBBLE_D      ; ADD, ADDA               
+*                JMP         FIRST_NIBBLE_E               
+*                JMP         FIRST_NIBBLE_F 
+
+FIRST_NIBBLE_9   
+
+FIRST_NIBBLE_C  MOVE.W      CURRENT_INSTR,D3
+                JSR         GET_VARS
+                MOVE.W      OPMODE_VAR,D3
+                CMP.W       #%111,D3
+                BEQ         CASE_MULS
+                BRA         CASE_AND
+
+FIRST_NIBBLE_D  MOVE.W      CURRENT_INSTR,D3
+                JSR         GET_VARS
+                MOVE.W      OPMODE_VAR,D3
+                CMP.W       #%11,D3
+                BEQ         CASE_ADDA
+                BRA         CASE_ADD
+                RTS
+
+*Gets bits 11-0, at 3 bit increments
+GET_VARS        MOVE.W      CURRENT_INSTR,D3
+                LSL         #4,D3                               
+                LSR         #4,D3                               
+                LSR         #8,D3                               
+                LSR         #1,D3
+                MOVE.W      D3,REG_VAR
+                MOVE.W      D0,D3                               
+                LSL         #7,D3
+                LSR         #7,D3
+                LSR         #6,D3
+                MOVE.W      D3,OPMODE_VAR
+                MOVE.W      CURRENT_INSTR,D3                    
+                LSL         #8,D3
+                LSL         #2,D3
+                LSR         #8,D3
+                LSR         #2,D3
+                LSR         #3,D3
+                MOVE.W      D3,EA_MODE                           
+                MOVE.W      CURRENT_INSTR,D3
+                LSL         #8,D3
+                LSL         #5,D3
+                LSR         #8,D3
+                LSR         #5,D3
+                MOVE.W      D3,EA_REG
+                MOVE.W      CURRENT_INSTR,D3
+                RTS    
+
+CASE_ADD        LEA         MSG_ADDA,A1
+                MOVE.B      #14,D0
+                TRAP        #15 
+
+CASE_ADDA       LEA         MSG_ADDA,A1
+                MOVE.B      #14,D0
+                TRAP        #15                 ; print "ADDA"
+                MOVE.W      OPMODE_VAR,D3
+                JSR         ADDA_SIZE
+                JSR         ADDR_MODE_JUMP_TABLE
+                    
+            
+ADDA_SIZE       CMP.W       #%111,D3
+                BEQ         PRINT_WORD 
+                BRA         PRINT_LONG          
+                
 
 CASE_ADDQ
 
@@ -248,8 +353,102 @@ CASE_DIVU
 
 CASE_LEA
 
-CASE_AND
+CASE_AND        LEA         MSG_AND,A1
+                MOVE.B      #14,D0
+                TRAP        #15 
+                JSR         GET_VARS
+                JSR         AND_SIZE                        ; .B, .W, or .L  
+                MOVE.W      CURRENT_INSTR, D5                         
+                LSL.W       #7, D5                        
+                LSR.W       #8, D5                   
+                LSR.W       #7, D5                     
+                CMP.B       #00, D5                         ; check if destination is a Dn?
+                BEQ         DEST_DN                         ; Yes it is, go to DEST_DN
+                CMP.B       #$01,D5                         ; Is the destination not a Dn?
+                BEQ         DEST_EA                         ; branch to DEST_EA            
+                RTS
+   
+AND_SIZE        CMP.B       #%00,OPMODE_VAR       
+                BEQ         PRINT_BYTE
+                CMP.B       #$01, OPMODE_VAR
+                BEQ         PRINT_WORD
+                CMP.B       #$02, OPMODE_VAR
+                BEQ         PRINT_LONG    
+    
+DEST_DN         MOVE.W      CURRENT_INSTR, D5               
+                LSL.W       #6,D5
+                LSL.W       #4,D5
+                LSR.W       #6,D5
+                LSR.W       #4,D5
+                LSR.W       #3,D5                           ; d5 stores EA mode                
+                  
+                MOVE.W      CURRENT_INSTR, D6               
+                LSL.W       #6,D5
+                LSL.W       #4,D5
+                LSL.W       #3,D6
+                LSR.W       #6,D6
+                LSR.W       #4,D6
+                LSR.W       #3,D6                           ; d6 stores EA register
+                JSR         FIND_EA1
 
+                
+                MOVE.W      CURRENT_INSTR, D5               
+                LSL.W       #4, D5                         
+                LSR.W       #8, D5                          ; shift bits to get register
+                LSR.W       #5, D5                          ; D5 contains register
+                LEA         MSG_COMMA, A1                   
+                MOVE.B      #14,D0
+                TRAP        #15                             ; print comma
+                LEA         MSG_DR, A1                      ; print D
+                MOVE.B      #14,D0
+                TRAP        #15
+                MOVEA.L     D5,A1
+                MOVE.B      #14,D0
+                TRAP        #15                              
+                RTS        
+
+FIND_EA1        CMP.W       #%010,D5
+                BEQ         CASE_ARI
+                CMP.W       #%011,D5
+                BEQ         CASE_ARIPOST
+                CMP.W       #%100,D5
+                BEQ         CASE_ARIPRE
+                CMP.W       #%111,D5
+                BEQ         CASE_OTHER
+                BRA         ERROR    
+                                     
+DEST_EA         MOVE.W      CURRENT_INSTR, D5               
+                LSL.W       #4, D5                         
+                LSR.W       #8, D5                          ; shift bits to get register
+                LSR.W       #5, D5                          ; D5 contains register
+
+                LEA         MSG_DR, A1                   
+                MOVE.B      #14,D0
+                TRAP        #15                             ; print D
+                MOVEA.L     D5,A1  
+                MOVE.B      #14,D0                          ; print register
+                TRAP        #15
+                
+                LEA         MSG_COMMA, A1                   
+                MOVE.B      #14,D0
+                TRAP        #15                             ; print comma
+                
+                MOVE.W      CURRENT_INSTR, D5               
+                LSL.W       #6,D5
+                LSL.W       #4,D5
+                LSR.W       #6,D5
+                LSR.W       #4,D5
+                LSR.W       #3,D5                           ; d5 stores EA mode                
+                  
+                MOVE.W      CURRENT_INSTR, D6               
+                LSL.W       #6,D6
+                LSL.W       #4,D6
+                LSL.W       #3,D6
+                LSR.W       #6,D6
+                LSR.W       #4,D6
+                LSR.W       #3,D6                           ; d6 stores EA register
+                JSR         FIND_EA1                          
+                RTS                                     Return full instruction               
 CASE_OR
 
 CASE_NOT
@@ -323,6 +522,75 @@ CASE_DATA
                     RTS               
 
 CASE_EPICFAIL       RTS
+
+ADDR_MODE_JUMP_TABLE    JMP         ADDR_MODE_000                       * Data register mode Dn
+                        JMP         ADDR_MODE_001                       * ADdress register mode   An
+                        JMP         ADDR_MODE_010                       * Indirect address register mode (An)
+                        JMP         ADDR_MODE_011                       * Address register with increment (An)+
+                        JMP         ADDR_MODE_100                       * Address register with decrement -(An)
+                        JMP         ADDR_MODE_101                       * Not supported
+                        JMP         ADDR_MODE_110                       * Not supported
+                        JMP         ADDR_MODE_111                       * This could be immediate, absolute short or absolute long
+
+*Dn
+ADDR_MODE_000           JSR         CASE_DR
+                        RTS
+
+* An
+ADDR_MODE_001           JSR         CASE_AR
+                        RTS
+
+* (An)
+ADDR_MODE_010           JSR         CASE_ARI
+                        RTS
+*(An)+
+ADDR_MODE_011           
+                        JSR         CASE_ARIPOST
+                        RTS
+                        
+* -(An)
+ADDR_MODE_100           JSR         CASE_ARIPRE
+                        RTS
+                        
+* Not supported
+ADDR_MODE_101           BRA         ERROR
+                        RTS
+                        
+* Not supported
+ADDR_MODE_110           BRA         ERROR
+                        RTS
+
+* Immediate data, absolute long or absolute short
+ADDR_MODE_111           LEA         ADDR_111_JUMP_TABLE,A4      * Print out the appropriate value
+                        MOVE.W      CURRENT_INSTR,D3
+                        MULU        #6,D3
+                        JSR         0(A4,D3)
+*                        LEA         SHORT_OR_LONG_PRINT,A4          * Prepare the table to print out the data
+                        MOVE.W      CURRENT_INSTR,D3
+                        MULU        #6,D3                           * Use THIRD_TEMP_VAR as a place holder for the data we want to print out for register mode 111.
+                                                * In the code before this, we need to move the appropriate data into this address. Either the destination or the source
+                        JSR         0(A4,D3)                        * Print out the appropriate long or short value
+                        RTS
+
+ADDR_111_JUMP_TABLE   ;JMP         PRINT_SHORT_SYMBOL
+*                        JMP         PRINT_LONG_SYMBOL
+*                        JMP         PRINT_IMMEDIATE_DATA_AND_HEX
+
+*Print .B, .W, or .L
+PRINT_BYTE          LEA     MSG_B,A1
+                    MOVE.B  #14,D0
+                    TRAP    #15
+                    RTS
+                    
+PRINT_WORD          LEA     MSG_W,A1
+                    MOVE.B  #14,D0
+                    TRAP    #15
+                    RTS
+
+PRINT_LONG          LEA     MSG_L,A1
+                    MOVE.B  #14,D0
+                    TRAP    #15
+                    RTS
 
 
 * Finds the EA type
@@ -601,7 +869,11 @@ MOVE_LONG       LEA     MSG_L,A5            ; loads string pointer into a1
                 
 FINISHMOVE      JSR     PRINTNULL           ; prints out the size
                 MOVEM.L (SP)+,D0/A5         ; restores D0 and A5
-                RTS 
+                RTS
+
+ERROR           LEA     ERROR_MSG,A1
+                MOVE.B  #14,D0
+                TRAP    #15 
        
 * DELETE THIS: Test                
 DELETEME        MOVEA.L  -(A1),A3
@@ -661,6 +933,7 @@ WELCOME                         DC.B    'Welcome to Team Big Blue Disassembler',
 STARTING                        DC.B    'Please enter a starting location in the above format',CR,LF,0
 ENDING                          DC.B    'Please enter an ending location in the above format',CR,LF,0
 BAD_INPUT                       DC.B    'Invalid input. Please try again',CR,LF,0
+ERROR_MSG                       DC.B    'Error while disassembling',CR,LF,0
 NEW_LINE                        DC.B    CR,LF,0
 
 * Opcode Messages
@@ -711,6 +984,8 @@ MSG_MINUS                       DC.B    '-',0
 MSG_POUND                       DC.B    '#',0 
 MSG_HEX                         DC.B    '$',0 
 MSG_COMMA                       DC.B    ', ',0 
+MSG_SPACE                       DC.B    ' ',0
+MSG_TAB                         DC.B    TAB,0
 
 * Size Messages
 MSG_B                           DC.B    '.B',TAB,TAB,TAB,0
@@ -720,8 +995,14 @@ MSG_L                           DC.B    '.L',TAB,TAB,TAB,0
 * Variables
 STARTING_ADDRESS                EQU     $100
 ENDING_ADDRESS                  EQU     $150
+CURRENT_INSTR                   EQU     $200
+REG_VAR                         EQU     $250 * Hold bits 11-9
+OPMODE_VAR                      EQU     $300 * Hold bits 8-6
+EA_MODE                         EQU     $350 * Hold bits 5-3
+EA_REG                          EQU     $400 * Hold bits 2-0
 
             END     START        ; last line of source
+
 
 *~Font name~Courier New~
 *~Font size~10~
