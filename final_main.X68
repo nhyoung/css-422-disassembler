@@ -389,7 +389,7 @@ DEST_DN         MOVE.W      CURRENT_INSTR, D5
                 LSR.W       #6,D6
                 LSR.W       #4,D6
                 LSR.W       #3,D6                           ; d6 stores EA register
-                JSR         FIND_EA1
+                JSR         FIND_EA
 
                 
                 MOVE.W      CURRENT_INSTR, D5               
@@ -407,7 +407,7 @@ DEST_DN         MOVE.W      CURRENT_INSTR, D5
                 TRAP        #15                              
                 RTS        
 
-FIND_EA1        CMP.W       #%010,D5
+FIND_EA        CMP.W       #%010,D5
                 BEQ         CASE_ARI
                 CMP.W       #%011,D5
                 BEQ         CASE_ARIPOST
@@ -447,7 +447,7 @@ DEST_EA         MOVE.W      CURRENT_INSTR, D5
                 LSR.W       #6,D6
                 LSR.W       #4,D6
                 LSR.W       #3,D6                           ; d6 stores EA register
-                JSR         FIND_EA1                          
+                JSR         FIND_EA                          
                 RTS                                     Return full instruction               
 CASE_OR
 

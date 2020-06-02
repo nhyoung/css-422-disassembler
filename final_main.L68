@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 6/2/2020 6:12:48 AM
+Created On: 6/2/2020 6:15:16 AM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : Final Project
@@ -393,7 +393,7 @@ Created On: 6/2/2020 6:12:48 AM
 000013C2  EC4E                     389                  LSR.W       #6,D6
 000013C4  E84E                     390                  LSR.W       #4,D6
 000013C6  E64E                     391                  LSR.W       #3,D6                           ; d6 stores EA register
-000013C8  4EB9 000013FC            392                  JSR         FIND_EA1
+000013C8  4EB9 000013FC            392                  JSR         FIND_EA
 000013CE                           393  
 000013CE                           394                  
 000013CE  3A39 00000200            395                  MOVE.W      CURRENT_INSTR, D5               
@@ -411,7 +411,7 @@ Created On: 6/2/2020 6:12:48 AM
 000013F8  4E4F                     407                  TRAP        #15                              
 000013FA  4E75                     408                  RTS        
 000013FC                           409  
-000013FC  BA7C 0002                410  FIND_EA1        CMP.W       #%010,D5
+000013FC  BA7C 0002                410  FIND_EA        CMP.W       #%010,D5
 00001400  6700 02CC                411                  BEQ         CASE_ARI
 00001404  BA7C 0003                412                  CMP.W       #%011,D5
 00001408  6700 02F4                413                  BEQ         CASE_ARIPOST
@@ -451,7 +451,7 @@ Created On: 6/2/2020 6:12:48 AM
 00001468  EC4E                     447                  LSR.W       #6,D6
 0000146A  E84E                     448                  LSR.W       #4,D6
 0000146C  E64E                     449                  LSR.W       #3,D6                           ; d6 stores EA register
-0000146E  4EB8 13FC                450                  JSR         FIND_EA1                          
+0000146E  4EB8 13FC                450                  JSR         FIND_EA                          
 00001472  4E75                     451                  RTS                                     Return full instruction               
 00001474                           452  CASE_OR
 00001474                           453  
@@ -1101,7 +1101,7 @@ ERROR               1858
 ERROR_MSG           19BF
 FINDTYPEEA          15EA
 FINDTYPEXN          1614
-FIND_EA1            13FC
+FIND_EA             13FC
 FINISHMOVE          184E
 FIRST_NIBBLE_9      1286
 FIRST_NIBBLE_C      1286
