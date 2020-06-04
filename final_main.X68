@@ -54,12 +54,7 @@ CHECK_ORDER     MOVE.L  A2,D3
                 MOVE.L  A3,D4
                 CMP.L   D3,D4               ; make sure first input is less than second input
                 BLT     RESET_INPUT
-               
-*PREPARE         LEA         NIBBLE1_JUMP,A0              
-*                MOVE.L      STARTING_ADDRESS,A2
-*                MOVE.L      ENDING_ADDRESS,A3
-                                   
-                
+                               
 DISASSEMBLE     MOVE.L  A2,D1               ; loads current address in D1
                 JSR     PRINTNUM            ; prints out address                    
                 JSR     OPCODE_DECODE       ; decode the opcode
@@ -133,38 +128,6 @@ CHECK_ODD       BTST       #0,D5            ; check if input is odd
                 BNE        INVALID
                 RTS
 
-*PRINT_LOCATION
-*    MOVE.L      A2,D5 * Save the address we are at
-*    LSR         #8,D5                                       * Shift 4 bytes left most to print out
-*    LSR         #8,D5
-*    MOVE.W      D5,TEMP_CURRENT_4_NIBBLES                   * Get the entire long address
-*    JSR         HEX_TO_ASCII
-*    MOVE.W      A2,D5
-*    MOVE.W      D5,TEMP_CURRENT_4_NIBBLES
-*    JSR         HEX_TO_ASCII
-*    JSR         PRINT_SPACE
-*    RTS
-                
-*HEX_TO_ASCII    LEA         HEX_CHARACTER_JUMP_TABLE,A4             * Load the table to print out ascii charracter
-*                MOVE.W      TEMP_CURRENT_4_NIBBLES,D3
-*                JSR         GET_THE_FIRST_NIBBLE                    * Get the left most hex value and convert
-*                MULU        #6,D3
-*                JSR         0(A4,D3)
-*                MOVE.W      TEMP_CURRENT_4_NIBBLES,D3
-*                JSR         GET_THE_SECOND_NIBBLE
-*                MULU        #6,D3
-*                JSR         0(A4,D3)
-*                MOVE.W      TEMP_CURRENT_4_NIBBLES,D3
-*                JSR         GET_THE_THIRD_NIBBLE
-*                MULU        #6,D3
-*                JSR         0(A4,D3)
-*                MOVE.W      TEMP_CURRENT_4_NIBBLES,D3
-*                JSR         GET_THE_FOURTH_NIBBLE
-*                MULU        #6,D3
-*                JSR         0(A4,D3)
-*                CLR.W       D3
-*                RTS            
-
 
 * Checks every single possible opcode we could have. Jump table
 * Inputs: (A2) which is a pointer to intruction word to be translated
@@ -194,7 +157,7 @@ CASE_MOVE       MOVE.W  D0,D1                   ; stores d0 in d1
                 JSR     GET_XN                  ; Gets Xn, puts it into D1
                 MOVE.W  D1,D7                   ; saves Xn to D7 so it doesn't get overwritten
 
-CHECKDEST       LEA     VALIDEA_MOVE_DEST,A5    ; load valid move EA
+CHECKDEST       LEA     VALIDEA_ALL,A5    ; load valid move EA
                 MOVE.W  D6,D1                   ; marks down that we are checking EA
                 JSR     CHECKEAXN_IFVALID       ; checks if EA is valid
                 CMP.W   #2,D1                   ; checks if it is Xn
@@ -252,85 +215,7 @@ CHECKMOVE_Xn    LEA     VALIDXN_SHORTLONG,A5    ; Loads Xn into A5
 CASE_MOVEM  
 
 CASE_MOVEQ  
-*
-*GET_NIBBLE1     MOVE.W      D0,D3
-*                LSR         #8,D3                               
-*                LSR         #4,D3                               
-*                CMP.W       #9,D3
-*                BEQ         FIRST_NIBBLE_9
-*                CMP.W       #13,D3
-*                BEQ         FIRST_NIBBLE_C
-*                CMP.W       #14,D3
-*                BEQ         FIRST_NIBBLE_D
-*                
-*GET_NIBBLE2     MOVE.W      D0,D3
-*                LSL         #4,D3                               
-*                LSR         #4,D3                               
-*                LSR         #8,D3                               
-*                RTS
-*
-*NIBBLE1_JUMP    *JMP         FIRST_NIBBLE_0                
-**                JMP         FIRST_NIBBLE_1               
-**                JMP         FIRST_NIBBLE_2               
-**                JMP         FIRST_NIBBLE_3               
-**                JMP         FIRST_NIBBLE_4               
-**                JMP         FIRST_NIBBLE_5               
-**                JMP         FIRST_NIBBLE_6               
-**                JMP         FIRST_NIBBLE_7               
-**                JMP         FIRST_NIBBLE_8              
-*                JMP         FIRST_NIBBLE_9      ; SUB         
-**                JMP         FIRST_NIBBLE_A              
-**                JMP         FIRST_NIBBLE_B               
-*                JMP         FIRST_NIBBLE_C      ; AND, MULS              
-*                JMP         FIRST_NIBBLE_D      ; ADD, ADDA               
-**                JMP         FIRST_NIBBLE_E               
-**                JMP         FIRST_NIBBLE_F 
-*
-*FIRST_NIBBLE_9   
-*
-*FIRST_NIBBLE_C  MOVE.W      CURRENT_INSTR,D3
-*                JSR         GET_VARS
-*                MOVE.W      OPMODE_VAR,D3
-*                CMP.W       #%111,D3
-*                BEQ         CASE_MULS
-*                BRA         CASE_AND
-*
-*FIRST_NIBBLE_D  MOVE.W      CURRENT_INSTR,D3
-*                JSR         GET_VARS
-*                MOVE.W      OPMODE_VAR,D3
-*                CMP.W       #%11,D3
-*                BEQ         CASE_ADDA
-*                BRA         CASE_ADD
-*                RTS
-*
-**Gets bits 11-0, at 3 bit increments
-*GET_VARS        MOVE.W      CURRENT_INSTR,D3
-*                LSL         #4,D3                               
-*                LSR         #4,D3                               
-*                LSR         #8,D3                               
-*                LSR         #1,D3
-*                MOVE.W      D3,REG_VAR
-*                MOVE.W      D0,D3                               
-*                LSL         #7,D3
-*                LSR         #7,D3
-*                LSR         #6,D3
-*                MOVE.W      D3,OPMODE_VAR
-*                MOVE.W      CURRENT_INSTR,D3                    
-*                LSL         #8,D3
-*                LSL         #2,D3
-*                LSR         #8,D3
-*                LSR         #2,D3
-*                LSR         #3,D3
-*                MOVE.W      D3,EA_MODE                           
-*                MOVE.W      CURRENT_INSTR,D3
-*                LSL         #8,D3
-*                LSL         #5,D3
-*                LSR         #8,D3
-*                LSR         #5,D3
-*                MOVE.W      D3,EA_REG
-*                MOVE.W      CURRENT_INSTR,D3
-*                RTS    
-*
+
 *CASE_ADD        LEA         MSG_ADDA,A1
 *                MOVE.B      #14,D0
 *                TRAP        #15 
@@ -454,7 +339,8 @@ CASE_LEA
 *                LSR.W       #4,D6
 *                LSR.W       #3,D6                           ; d6 stores EA register
 *                JSR         FIND_EA                          
-*                RTS                                     Return full instruction               
+*                RTS                                     Return full instruction   
+            
 CASE_OR
 
 CASE_NOT
@@ -466,7 +352,7 @@ CASE_LSDASD     MOVE.W      D0,D1                            ; copies D0 to D1
                 MOVE.W      D0,D2                            ; copies D0 to D2
                 JSR         GETROTATIONSIZE                  ; gets the rotation size
                 CMP.W       #$3, D2                          ; checks if it is memory or register option
-                BNE         CASE_SHIFTREG                         ; if rotation size not equal to 3, go to shift reg         
+                BNE         CASE_SHIFTREG                    ; if rotation size not equal to 3, go to shift reg         
                 
 CASE_SHIFTMEM   MOVE.W      D0,D2                            ; copies D0 to D2
                 JSR         GETROTATION                      ; gets rotation value of D2
@@ -482,98 +368,146 @@ PRINTSHIFTMEM   JSR         PRINTNULL                        ; Prints LS or AS
                 MOVE.W      D0,D2                            ; copies D0 to D2
                 JSR         GETDIRECTION                     ; gets direction
                 CMP.W       #0,D2                            ; checking if its right
-                BEQ         CASE_RIGHT                       ; shifts to the right 
+                BEQ         CASE_RIGHTMEM                    ; shifts to the right 
 
-CASE_LEFT       LEA         MSG_LEFT,A5                      ; loads L into A5 
+CASE_LEFTMEM    LEA         MSG_LEFT,A5                      ; loads L into A5 
                 BRA         PRINT_MEMDIR                     ; branches for printing
         
-CASE_RIGHT      LEA         MSG_RIGHT,A5                     ; loads R into A5  
+CASE_RIGHTMEM   LEA         MSG_RIGHT,A5                     ; loads R into A5  
 
 PRINT_MEMDIR    JSR         PRINTNULL                        ; Prints L or R
                 LEA         MSG_W,A5                         ; loads .W into A5
                 JSR         PRINTNULL                        ; Prints .W
                 
                 ; get source addressing mode
-                MOVE.W  #0,D1                   ; specifies that we are looking for source addressing mode
-                JSR     GET_EA                  ; gets effective address, output: D1 = EA
-                MOVE.W  D1,D4                   ; saves EA to D4 so it doesn't get overwritten
-                MOVE.W  #0,D1                   ; specifies that we are looking for source Xn
-                JSR     GET_XN                  ; Gets Xn, puts it into D1
-                MOVE.W  D1,D5                   ; saves Xn to D5 so it doesn't get overwritten
+                MOVE.W      #0,D1                            ; specifies that we are looking for source addressing mode
+                JSR         GET_EA                           ; gets effective address, output: D1 = EA
+                MOVE.W      D1,D4                            ; saves EA to D4 so it doesn't get overwritten
+                MOVE.W      #0,D1                            ; specifies that we are looking for source Xn
+                JSR         GET_XN                           ; Gets Xn, puts it into D1
+                MOVE.W      D1,D5                            ; saves Xn to D5 so it doesn't get overwritten
 
-CHECKMEMSOURE   LEA     VALIDEA_SHIFT,A5        ; load valid move EA
-                MOVE.W  D4,D1                   ; marks down that we are checking EA
-                JSR     CHECKEAXN_IFVALID       ; checks if EA is valid
-                CMP.W   #2,D1                   ; checks if it is Xn
-                BEQ     CHECKSHIFT_XN           ; branches to CHECKXn if it is
-                CMP.W   #1,D1                   ; Checks if it is invalid
-                BEQ     CASE_DATA               ; branches to CASE_DATA if it is
+CHECKMEMSOURE   LEA         VALIDEA_SHIFT,A5                 ; load valid move EA
+                MOVE.W      D4,D1                            ; marks down that we are checking EA
+                JSR         CHECKEAXN_IFVALID                ; checks if EA is valid
+                CMP.W       #2,D1                            ; checks if it is Xn
+                BEQ         CHECKSHIFT_XN                    ; branches to CHECKXn if it is
+                CMP.W       #1,D1                            ; Checks if it is invalid
+                BEQ         CASE_DATA                        ; branches to CASE_DATA if it is
 
-EASHIFT_VALID   MOVE.W  D4,D2                   ; moves EA to D2
-                MOVE.W  D5,D3                   ; moves EA to D3
-                JSR     EA_TO_STRING            ; prints out the EA
+EASHIFT_VALID   MOVE.W      D4,D2                            ; moves EA to D2
+                MOVE.W      D5,D3                            ; moves EA to D3
+                JSR         EA_TO_STRING                     ; prints out the EA
                 RTS                
                 
                 
-CHECKSHIFT_Xn   LEA     VALIDXN_SHORTLONG,A5    ; Loads Xn into A5
-                MOVE.W  D5,D1                   ; Loads D5 into D1 to check the Xn
-                JSR     CHECKEAXN_IFVALID       ; checks if the Xn is valid, put result in D1
-                TST.W   D1                      ; checks if it is valid
-                BEQ     EASHIFT_VALID           ; go to EA_SHIFT to print
-                BRA     CASE_DATA               ; branches to CASE_DATA if not                
+CHECKSHIFT_Xn   LEA         VALIDXN_SHORTLONG,A5             ; Loads Xn into A5
+                MOVE.W      D5,D1                            ; Loads D5 into D1 to check the Xn
+                JSR         CHECKEAXN_IFVALID                ; checks if the Xn is valid, put result in D1
+                TST.W       D1                               ; checks if it is valid
+                BEQ         EASHIFT_VALID                    ; go to EA_SHIFT to print
+                BRA         CASE_DATA                        ; branches to CASE_DATA if not                
 
 
-CASE_SHIFTREG   
-             
-CASE_BRA        MOVE.W  D0,D1               ; Copies instruction word to D1
-                AND.W   #$FF00,D1           ; Applies a bitmask to get first 8 bits                
-                CMP.W   #$6000,D1           ; Checks if it fits the BRA opcode
-                BNE.W   CASE_BCC            ; If its not, check BCC
+CASE_SHIFTREG   MOVE.W      D2,D3                            ; copies D2 to D3
+                MOVE.W      D0,D1                            ; copies D0 to D1
+                AND.W       #$0018,D1                        ; gets bits representing type (bitmask: 0000 0000 0001 1000)
+                LSR.W       #3,D1                            ; shifts 3 bits to the right so we only have 2 bits left   
+                CMP.W       #$0,D1                           ; Compares D1 to 0, if it is 0, it is ASd
+                BEQ         CASE_ASdReg                      ; goes to ASd case if so                 
                 
-                LEA     MSG_BRA,A5          ; loads string pointer for BRA into A5
-                JSR     PRINTNULL           ; prints BRA
+CASE_LSdREG     LEA         MSG_LSd,A5                       ; loads LS into A5
+                BRA         PRINTSHIFTREG                    ; branches to PRINTSHIFTREG
 
-                MOVE.W  D0,D2               ; Copies instruction word to D1
-                JSR     GETDISPLACEMENT     ; finds the displacement
+CASE_ASdREG     LEA         MSG_ASd,A5                       ; loads AS into A5             
+                
+PRINTSHIFTREG   JSR         PRINTNULL                        ; Prints LS or AS   
+                MOVE.W      D0,D2                            ; copies D0 to D2
+                JSR         GETDIRECTION                     ; gets direction
+                CMP.W       #0,D2                            ; checking if its right
+                BEQ         CASE_RIGHTREG                    ; shifts to the right 
+
+CASE_LEFTREG    LEA         MSG_LEFT,A5                      ; loads L into A5 
+                BRA         PRINT_REGDIR                     ; branches for printing
+        
+CASE_RIGHTREG   LEA         MSG_RIGHT,A5                     ; loads R into A5  
+
+PRINT_REGDIR    JSR         PRINTNULL                        ; Prints L or R
+                CMP.W       #1,D3                            ; Checks if it is word size
+                BEQ         REG_WORD                         ; Prints .W
+                CMP.W       #2,D3                            ; Checks if it is long size
+                BEQ         REG_LONG                         ; Prints .L
+
+REG_BYTE        LEA         MSG_B,A5                         ; loads .B into A5
+                BRA         PRINTREGEA      
+
+REG_WORD        LEA         MSG_W,A5                         ; loads .W into A5
+                BRA         PRINTREGEA      
+                
+                
+REG_LONG        LEA         MSG_L,A5                         ; loads .L into A5
+
+PRINTREGEA      JSR         PRINTNULL                        ; Prints size
+                MOVE.W      D0,D1                            ; copies D0 to D1
+                AND.W       #$0020,D1                        ; gets bits representing if it is immediate or register (bitmask: 0000 0000 0010 0000)
+                LSR.W       #5,D1                            ; shifts 5 bits to the right so we only have 2 bits left   
+                CMP.W       #$0,D1                           ; Compares D1 to 0, if it is 0, it is ASd
+                BEQ         CASE_ASdReg                      ; goes to ASd case if so
+                
+REG_IMMEDIATE
+
+REG_REGISTER
+                
+                
+                RTS  
+             
+CASE_BRA        MOVE.W  D0,D1                                ; Copies instruction word to D1
+                AND.W   #$FF00,D1                            ; Applies a bitmask to get first 8 bits                
+                CMP.W   #$6000,D1                            ; Checks if it fits the BRA opcode
+                BNE.W   CASE_BCC                             ; If its not, check BCC
+                
+                LEA     MSG_BRA,A5                           ; loads string pointer for BRA into A5
+                JSR     PRINTNULL                            ; prints BRA
+
+                MOVE.W  D0,D2                                ; Copies instruction word to D1
+                JSR     GETDISPLACEMENT                      ; finds the displacement
                 RTS
                 
 ; DO NOT MOVE THIS FORM UNDER CASE_BRA. IS DEPENDENT ON RESULTS OF BRA
 ; DELETE THIS NOTE: NEED TO FIX LSL/LSR SHIFT TO ENSURE THE BCC CODES GET PRINTED 
-CASE_BCC        MOVE.W  D0,D1               ; 
-                AND.W   #$F000,D1           ; get top 4 bits
-                CMP.W   #$6000,D1           ; make sure top 4 bits are 6
-                BNE.W   CASE_JSR            ;
-                AND.W   #$0F00,D1           ; get next 4 bits, condition code
-                *LSL.W   #8,D1               ; shifts 8 bits to the right
+CASE_BCC        MOVE.W  D0,D1                                ; copies instruction word from D0 to D1
+                AND.W   #$F000,D1                            ; get top 4 bits
+                CMP.W   #$6000,D1                            ; make sure top 4 bits are 6
+                BNE.W   CASE_JSR                             ;
+                AND.W   #$0F00,D1                            ; get next 4 bits, condition code
+                LSR.W   #8,D1                                ; shifts 8 bits to the right
                 
-                CMP.W   #$0E00,D1           ; checks if D1 is BGT (1 1 1 0)
-                BEQ     CASE_BGT            ; branches to BGT if it is
+                CMP.W   #$E,D1                               ; checks if D1 is BGT (1 1 1 0)
+                BEQ     CASE_BGT                             ; branches to BGT if it is
                 
-                CMP.W   #$0F00,D1              ; checks if D1 is BLE (1 1 1 1)
-                BEQ     CASE_BLE            ; branches to BLE if it is
+                CMP.W   #$F,D1                               ; checks if D1 is BLE (1 1 1 1)
+                BEQ     CASE_BLE                             ; branches to BLE if it is
                     
-                CMP.W   #$0700,D1           ; checks if D1 is BEQ (0 1 1 1)
-                BEQ     CASE_BEQ            ; branches to BEQ if it is
-                BRA     CASE_EPICFAIL       ; BCC condition code not in the system
-  
-CASE_BEQ        LEA     MSG_BEQ,A5          ; loads string pointer for BEQ into A5
-                JSR     PRINTNULL           ; prints BEQ
-                BRA     PRINTBCCDIS
+                CMP.W   #$7,D1                               ; checks if D1 is BEQ (0 1 1 1)
+                BEQ     CASE_BEQ                             ; branches to BEQ if it is
+                BRA     CASE_DATA                            ; BCC condition code not in the system
+   
+CASE_BEQ        LEA     MSG_BEQ,A5                           ; loads string pointer for BEQ into A5
+                BRA     PRINTBCC
 
-CASE_BLE        LEA     MSG_BLE,A5          ; loads string pointer for BLE into A5
-                JSR     PRINTNULL           ; prints BLE
-                BRA     PRINTBCCDIS
+CASE_BLE        LEA     MSG_BLE,A5                           ; loads string pointer for BLE into A5
+                BRA     PRINTBCC
                 
-CASE_BGT        LEA     MSG_BGT,A5          ; loads string pointer for BGT into A5
-                JSR     PRINTNULL           ; prints BGT
-                BRA     PRINTBCCDIS
+CASE_BGT        LEA     MSG_BGT,A5                           ; loads string pointer for BGT into A5
+                BRA     PRINTBCC
 
-PRINTBCCDIS     MOVE.W  D0,D2               ; Copies instruction word to D1
-                JSR     GETDISPLACEMENT     ; finds the displacement
+PRINTBCC        JSR     PRINTNULL                            ; prints BEQ/BLE/BGT
+                MOVE.W  D0,D2                                ; Copies instruction word to D1
+                JSR     GETDISPLACEMENT                      ; finds the displacement
                 RTS              
                 
 
-CASE_JSR        
+CASE_JSR       
 
 CASE_RTS        CMP.W   #$4E75,D0           ; compares to RTS opcode in hex
                 BNE     CASE_MOVE           ; checks the next case if not equal
@@ -587,75 +521,6 @@ CASE_DATA
                     RTS               
 
 CASE_EPICFAIL       RTS
-
-ADDR_MODE_JUMP_TABLE    JMP         ADDR_MODE_000                       * Data register mode Dn
-                        JMP         ADDR_MODE_001                       * ADdress register mode   An
-                        JMP         ADDR_MODE_010                       * Indirect address register mode (An)
-                        JMP         ADDR_MODE_011                       * Address register with increment (An)+
-                        JMP         ADDR_MODE_100                       * Address register with decrement -(An)
-                        JMP         ADDR_MODE_101                       * Not supported
-                        JMP         ADDR_MODE_110                       * Not supported
-                        JMP         ADDR_MODE_111                       * This could be immediate, absolute short or absolute long
-
-*Dn
-ADDR_MODE_000           JSR         CASE_DR
-                        RTS
-
-* An
-ADDR_MODE_001           JSR         CASE_AR
-                        RTS
-
-* (An)
-ADDR_MODE_010           JSR         CASE_ARI
-                        RTS
-*(An)+
-ADDR_MODE_011           
-                        JSR         CASE_ARIPOST
-                        RTS
-                        
-* -(An)
-ADDR_MODE_100           JSR         CASE_ARIPRE
-                        RTS
-                        
-* Not supported
-ADDR_MODE_101           BRA         ERROR
-                        RTS
-                        
-* Not supported
-ADDR_MODE_110           BRA         ERROR
-                        RTS
-
-* Immediate data, absolute long or absolute short
-ADDR_MODE_111           LEA         ADDR_111_JUMP_TABLE,A4      * Print out the appropriate value
-                        MOVE.W      CURRENT_INSTR,D3
-                        MULU        #6,D3
-                        JSR         0(A4,D3)
-*                        LEA         SHORT_OR_LONG_PRINT,A4          * Prepare the table to print out the data
-                        MOVE.W      CURRENT_INSTR,D3
-                        MULU        #6,D3                           * Use THIRD_TEMP_VAR as a place holder for the data we want to print out for register mode 111.
-                                                * In the code before this, we need to move the appropriate data into this address. Either the destination or the source
-                        JSR         0(A4,D3)                        * Print out the appropriate long or short value
-                        RTS
-
-ADDR_111_JUMP_TABLE   ;JMP         PRINT_SHORT_SYMBOL
-*                        JMP         PRINT_LONG_SYMBOL
-*                        JMP         PRINT_IMMEDIATE_DATA_AND_HEX
-
-*Print .B, .W, or .L
-PRINT_BYTE          LEA     MSG_B,A1
-                    MOVE.B  #14,D0
-                    TRAP    #15
-                    RTS
-                    
-PRINT_WORD          LEA     MSG_W,A1
-                    MOVE.B  #14,D0
-                    TRAP    #15
-                    RTS
-
-PRINT_LONG          LEA     MSG_L,A1
-                    MOVE.B  #14,D0
-                    TRAP    #15
-                    RTS
 
 
 * Finds the EA type
@@ -1111,6 +976,8 @@ EA_MODE                         EQU     $350 * Hold bits 5-3
 EA_REG                          EQU     $400 * Hold bits 2-0
 
             END     START        ; last line of source
+
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
