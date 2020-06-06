@@ -56,7 +56,8 @@ CHECK_ORDER     MOVE.L  A2,D3
                 BLT     RESET_INPUT
                                
 DISASSEMBLE     MOVE.L  A2,D1               ; loads current address in D1
-                JSR     PRINTNUM            ; prints out address                    
+                MOVE.L  #1,D4               ; tells subroutine we want to make the address print as a long
+                JSR     PRINTSHORTLONGNUM   ; prints out address                    
                 JSR     OPCODE_DECODE       ; decode the opcode
                 JSR     PRINTENTER          ; prints a new line
                 CMP.L   A3, A2              ; checks if A2 has reached A3
@@ -923,31 +924,30 @@ CASE_OTHER         MOVE     (A2)+, D0               ; Moves next instruction wor
 * immediate
 CASE_IMMEDIATE     LEA      MSG_POUND,A5            ; Loads # into A5
                    JSR      PRINTNULL               ; Prints #  
-                   * uncomment after converting to hex 
-                   *LEA      MSG_HEX,A5              ; Loads $ into A5
-                   *JSR      PRINTNULL               ; Prints $
+                   LEA      MSG_HEX,A5              ; Loads $ into A5
+                   JSR      PRINTNULL               ; Prints $
                    MOVE.W   D0, D1                  ; moves instruction word into d1
-                   JSR      PRINTNUM 
+                   JSR      PRINTHEXNUM 
                    BRA      EA_TO_STRING_EXIT       ; exits subroutine                  
                    
 ; DELETE LATER: convert to hex andwrite code to make them print out a total of 4 and 8 characters, add 0's                      
 
 * word address
 CASE_WORD          
-                   *LEA      MSG_HEX,A5              ; Loads $ into A5
-                   *JSR      PRINTNULL               ; Prints $
+                   LEA      MSG_HEX,A5              ; Loads $ into A5
+                   JSR      PRINTNULL               ; Prints $
                    MOVE.W   D0, D1                  ; moves instruction word into d1
                    MOVE.W   #0, D4                  ; moves length size (word) into d4
-                   JSR      PRINTNUM               ; reformats the number to the proper length and prints out the number
+                   JSR      PRINTSHORTLONGNUM       ; reformats the number to the proper length and prints out the number
                    BRA      EA_TO_STRING_EXIT       ; exits subroutine
 
 * long address 
 CASE_LONG          
-                   *LEA      MSG_HEX,A5              ; Loads $ into A5
-                   *JSR      PRINTNULL               ; Prints $
+                   LEA      MSG_HEX,A5              ; Loads $ into A5
+                   JSR      PRINTNULL               ; Prints $
                    MOVE.W   D0, D1                  ; moves instruction word into d1
                    MOVE.W   #1, D4                  ; moves length size (long) into d4
-                   JSR      PRINTNUM                ; reformats the number to the proper length and prints out the number
+                   JSR      PRINTSHORTLONGNUM       ; reformats the number to the proper length and prints out the number
                    MOVE     (A2)+, D1               ; Moves next instruction word into D1 since A2 is auxilliary instruction word
                    JSR      PRINTNUM                ; reformats the number to the proper length and prints out the number
 
@@ -958,7 +958,7 @@ EA_TO_STRING_EXIT   MOVEM.L  (SP)+,D0-D1/A5          ; restoers D1, D0, and A5
 
 * DELETE LATER: sorry the formatting is weird here we can fix it later or whenever you want  im just lazy for now
 
-* Prints out the content of D1
+* Prints out the content of D1 as a decimal number
 * Input: number in D1 to be printed
 * Output: contents of D1 printed
 PRINTNUM         MOVEM.L     D0-D1, -(SP)        ; saves D0 and D1
@@ -968,17 +968,97 @@ PRINTNUM         MOVEM.L     D0-D1, -(SP)        ; saves D0 and D1
                  MOVEM.L     (SP)+,D0-D1         ; returns D0 and D1
                  RTS                             ; returns from subroutine
                  
-* DELETE LATER: THIS IS A  WIP AND DOESNT ACHIEVE PROPER FUNCTIONALITY YET
+* Prints out the content of D1 as a hex number
+* Input: number in D1 to be printed
+* Output: contents of D1 printed
+PRINTHEXNUM      MOVEM.L     D0-D1, -(SP)        ; saves D0 and D1
+                 MOVE.B      #16,D2              ; for trap task 15 to print it out as hex
+                 MOVE.B      #15,D0              ; converts D1 to Hex and prints it out
+                 TRAP        #15                 ; is trap task 15
+                 MOVEM.L     (SP)+,D0-D1         ; returns D0 and D1
+                 RTS                             ; returns from subroutine
                  
-* Prints out the content of D1 and formats it to have the length of WORD or a LONG
+* Prints out the content of D1 as a hex number and formats it to have the length of WORD or a LONG
 * Input: number in D1 to be printed, D4 = length (0 = WORD, 1 = LONG)
 * Output: contents of D1 printed
-PRINTSHORTLONGNUM         MOVEM.L     D1-D2, -(SP)        ; saves D0 and D1
-                          MOVE.B      #3,D0               ; prints D1
-                          TRAP        #15                 ; is trap task 3
-                          MOVEM.L     (SP)+,D0-D1         ; returns D0 and D1
-                RTS                                       ; returns from subroutine    
-             
+PRINTSHORTLONGNUM         MOVEM.L     D0-D2, -(SP)        ; saves D0 to D2
+                          CMP.B       #1,D4               ; checks size of number
+                          BEQ         PRINTLONGZERO       ; if it is a long then branch to PRINTLONGZERO
+
+PRINTSHORTZERO            MOVE.W      D1,D2               ; copies number to D2
+                          AND.W       #$F000,D2           ; gets the first digit
+                          CMP.W       #0, D2              ; checks if it is 0
+                          BNE         PRINTASHEX          ; if the digit is not equal to zero then print the full number
+                          JSR         PRINTZERO           ; prints a zero
+                          
+                          MOVE.W      D1,D2               ; copies number to D2
+                          AND.W       #$0F00,D2           ; gets the second digit
+                          CMP.W       #0, D2              ; checks if it is 0
+                          BNE         PRINTASHEX          ; if the digit is not equal to zero then print the full number
+                          JSR         PRINTZERO           ; prints a zero
+                          
+                          MOVE.W      D1,D2               ; copies number to D2
+                          AND.W       #$00F0,D2           ; gets the third digit
+                          CMP.W       #0, D2              ; checks if it is 0
+                          BNE         PRINTASHEX          ; if the digit is not equal to zero then print the full number
+                          JSR         PRINTZERO           ; prints a zero
+                          BRA         PRINTASHEX          ; prints last digit
+                          
+PRINTLONGZERO             MOVE.L      D1,D2               ; copies number to D2
+                          AND.L       #$F0000000,D2       ; gets the first digit
+                          CMP.L       #0, D2              ; checks if it is 0
+                          BNE         PRINTASHEX          ; if the digit is not equal to zero then print the full number
+                          JSR         PRINTZERO           ; prints a zero
+                          
+                          MOVE.L      D1,D2               ; copies number to D2
+                          AND.L       #$0F000000,D2       ; gets the second digit
+                          CMP.L       #0, D2              ; checks if it is 0
+                          BNE         PRINTASHEX          ; if the digit is not equal to zero then print the full number
+                          JSR         PRINTZERO           ; prints a zero
+                          
+                          MOVE.L      D1,D2               ; copies number to D2
+                          AND.L       #$00F00000,D2       ; gets the third digit
+                          CMP.L       #0, D2              ; checks if it is 0
+                          BNE         PRINTASHEX          ; if the digit is not equal to zero then print the full number
+                          JSR         PRINTZERO           ; prints a zero
+                          
+                          MOVE.L      D1,D2               ; copies number to D2
+                          AND.L       #$000F0000,D2       ; gets the fourth digit
+                          CMP.L       #0, D2              ; checks if it is 0
+                          BNE         PRINTASHEX          ; if the digit is not equal to zero then print the full number
+                          JSR         PRINTZERO           ; prints a zero
+                          
+                          MOVE.L      D1,D2               ; copies number to D2
+                          AND.L       #$0000F000,D2       ; gets the fith digit
+                          CMP.L       #0, D2              ; checks if it is 0
+                          BNE         PRINTASHEX          ; if the digit is not equal to zero then print the full number
+                          JSR         PRINTZERO           ; prints a zero
+                          
+                          MOVE.L      D1,D2               ; copies number to D2
+                          AND.L       #$00000F00,D2       ; gets the sixth digit
+                          CMP.L       #0, D2              ; checks if it is 0
+                          BNE         PRINTASHEX          ; if the digit is not equal to zero then print the full number
+                          JSR         PRINTZERO           ; prints a zero
+                          
+                          MOVE.L      D1,D2               ; copies number to D2
+                          AND.L       #$000000F0,D2       ; gets the seventh digit
+                          CMP.L       #0, D2              ; checks if it is 0
+                          BNE         PRINTASHEX          ; if the digit is not equal to zero then print the full number
+                          JSR         PRINTZERO           ; prints a zero
+
+PRINTASHEX                MOVE.B      #16,D2              ; for trap task 15 to print it out as hex
+                          MOVE.B      #15,D0              ; converts D1 to Hex and prints it out
+                          TRAP        #15                 ; is trap task 15
+                          MOVEM.L     (SP)+,D0-D2         ; returns D0 and D1
+                          RTS                             ; returns from subroutine    
+* Prints a zero
+* Input: nothing
+* Output: 0 printed out to the console
+PRINTZERO                 MOVE.L      D1,-(SP)            ; saves D1
+                          MOVE.L      #0,D1               ; moves 0 to D1
+                          JSR         PRINTNUM            ; prints the number
+                          MOVE.L      (SP)+,D1            ; restores D1
+                          RTS                             ; returns from subroutine
             
 * Prints contents of things between a range
 * input: A5, A6 (the range)
@@ -1191,6 +1271,7 @@ EA_MODE                         EQU     $350 * Hold bits 5-3
 EA_REG                          EQU     $400 * Hold bits 2-0
 
             END     START        ; last line of source
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
