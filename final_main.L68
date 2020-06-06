@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 6/3/2020 10:47:12 PM
+Created On: 6/5/2020 6:31:16 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : Final Project
@@ -13,12 +13,12 @@ Created On: 6/3/2020 10:47:12 PM
 00001000                             9  
 00001000                            10  * Put program code here
 00001000                            11  
-00001000  43F9 0000175E             12                  LEA     WELCOME,A1          ; output welcome startup message
+00001000  43F9 00001933             12                  LEA     WELCOME,A1          ; output welcome startup message
 00001006  103C 000E                 13                  MOVE.B  #14,D0
 0000100A  4E4F                      14                  TRAP    #15
 0000100C                            15              
 0000100C  227C 00000000             16  INPUT1          MOVE.L  #$0000000, A1       ;clear A1
-00001012  43F9 000017D4             17                  LEA     STARTING,A1         ; output starting address message
+00001012  43F9 000019A9             17                  LEA     STARTING,A1         ; output starting address message
 00001018  103C 000E                 18                  MOVE.B  #14,D0
 0000101C  4E4F                      19                  TRAP    #15
 0000101E                            20              
@@ -37,7 +37,7 @@ Created On: 6/3/2020 10:47:12 PM
 00001052                            33    
 00001052  143C 0002                 34  INPUT2          MOVE.B  #2,D2
 00001056  227C 00000000             35                  MOVE.L  #$0000000, A1       ;clear A1
-0000105C  43F9 0000180B             36                  LEA     ENDING,A1           ; output ending address message
+0000105C  43F9 000019E0             36                  LEA     ENDING,A1           ; output ending address message
 00001062  103C 000E                 37                  MOVE.B  #14,D0
 00001066  4E4F                      38                  TRAP    #15         
 00001068                            39  
@@ -60,9 +60,9 @@ Created On: 6/3/2020 10:47:12 PM
 000010A0  6D00 0020                 56                  BLT     RESET_INPUT
 000010A4                            57                                 
 000010A4  220A                      58  DISASSEMBLE     MOVE.L  A2,D1               ; loads current address in D1
-000010A6  4EB9 0000165E             59                  JSR     PRINTNUM            ; prints out address                    
+000010A6  4EB9 00001822             59                  JSR     PRINTNUM            ; prints out address                    
 000010AC  4EB9 00001168             60                  JSR     OPCODE_DECODE       ; decode the opcode
-000010B2  4EB9 000016A6             61                  JSR     PRINTENTER          ; prints a new line
+000010B2  4EB9 0000186A             61                  JSR     PRINTENTER          ; prints a new line
 000010B8  B5CB                      62                  CMP.L   A3, A2              ; checks if A2 has reached A3
 000010BA  6FE8                      63                  BLE     DISASSEMBLE         ; if not, loop
 000010BC                            64  
@@ -112,7 +112,7 @@ Created On: 6/3/2020 10:47:12 PM
 00001128  4E75                     108  RETURN          RTS
 0000112A                           109                  
 0000112A  227C 00000000            110  INVALID         MOVEA.L #$0000000, A1       ; clear A1
-00001130  43F9 00001841            111                  LEA     BAD_INPUT,A1        ; output invalid message
+00001130  43F9 00001A16            111                  LEA     BAD_INPUT,A1        ; output invalid message
 00001136  103C 000E                112                  MOVE.B  #14,D0
 0000113A  4E4F                     113                  TRAP    #15
 0000113C  B47C 0001                114                  CMP     #1,D2
@@ -142,844 +142,1008 @@ Created On: 6/3/2020 10:47:12 PM
 00001170                           138                  
 00001170  B07C 4E71                139  CASE_NOP        CMP.W   #$4E71,D0               ; compares to NOP opcode in hex
 00001174  6600 0010                140                  BNE     CASE_MOVE               ; checks the next case if not equal
-00001178  4BF9 00001886            141                  LEA     MSG_NOP,A5              ; loads string pointer into A5
-0000117E  4EB9 00001694            142                  JSR     PRINTNULL               ; prints NOP                
+00001178  4BF9 00001A5B            141                  LEA     MSG_NOP,A5              ; loads string pointer into A5
+0000117E  4EB9 00001858            142                  JSR     PRINTNULL               ; prints NOP                
 00001184  4E75                     143                  RTS                             ; returns from the subroutine
 00001186                           144                  
 00001186                           145                  * if first two bits are 00, next two are not 00
 00001186  3200                     146  CASE_MOVE       MOVE.W  D0,D1                   ; stores d0 in d1
 00001188  C27C C000                147                  AND.W   #$C000, D1              ; applies a bitmask to get 4 bits, want 00XX
-0000118C  6600 00C0                148                  BNE     CASE_MOVEQ              ; if not 0, not a  move instruction
+0000118C  6600 009A                148                  BNE     CASE_MOVEM              ; if not 0, not a  move instruction
 00001190  B07C 0FFF                149                  CMP.W   #$0FFF, D0              ; checks if it exceeds 0FFF
-00001194  6F00 00B8                150                  BLE     CASE_MOVEQ              ; if less than or equal to, not a move             
+00001194  6F00 0092                150                  BLE     CASE_MOVEM              ; if less than or equal to, not a move             
 00001198                           151                  
-00001198                           152                  ; get destination
-00001198  323C 0001                153                  MOVE.W  #1,D1                   ; specifies that we are looking for dest addressing mode
-0000119C  4EB9 00001446            154                  JSR     GET_EA                  ; gets effective address, output: D1 = EA
-000011A2  3C01                     155                  MOVE.W  D1,D6                   ; saves EA to D6 so it doesn't get overwritten
-000011A4  323C 0001                156                  MOVE.W  #1,D1                   ; specifies that we are looking for dest Xn
-000011A8  4EB9 00001470            157                  JSR     GET_XN                  ; Gets Xn, puts it into D1
-000011AE  3E01                     158                  MOVE.W  D1,D7                   ; saves Xn to D7 so it doesn't get overwritten
-000011B0                           159  
-000011B0  4BF9 0000171A            160  CHECKDEST       LEA     VALIDEA_ALL,A5    ; load valid move EA
-000011B6  3206                     161                  MOVE.W  D6,D1                   ; marks down that we are checking EA
-000011B8  4EB9 000014DA            162                  JSR     CHECKEAXN_IFVALID       ; checks if EA is valid
-000011BE  B27C 0002                163                  CMP.W   #2,D1                   ; checks if it is Xn
-000011C2  6700 0074                164                  BEQ     CHECKMOVE_XN            ; branches to CHECKXn if it is
-000011C6  B27C 0001                165                  CMP.W   #1,D1                   ; Checks if it is invalid
-000011CA  6700 0066                166                  BEQ     EAMOVE_INVALID          ; branches to CHECKXn if it is
-000011CE                           167                  
-000011CE                           168                  ; get source
-000011CE  323C 0000                169  EAMOVE_VALID    MOVE.W  #0,D1                   ; specifies that we are looking for source addressing mode
-000011D2  4EB9 00001446            170                  JSR     GET_EA                  ; gets effective address, output: D1 = EA
-000011D8  3801                     171                  MOVE.W  D1,D4                   ; saves EA to D6 so it doesn't get overwritten
-000011DA  323C 0000                172                  MOVE.W  #0,D1                   ; specifies that we are looking for source Xn
-000011DE  4EB9 00001470            173                  JSR     GET_XN                  ; Gets Xn, puts it into D1
-000011E4  3A01                     174                  MOVE.W  D1,D5                   ; saves Xn to D7 so it doesn't get overwritten
-000011E6                           175                  
-000011E6                           176                  ; print source
-000011E6  3200                     177                  MOVE.W  D0,D1                   ; stores d0 in d1
-000011E8  C27C 01C0                178                  AND.W   #$01C0, D1              ; appplies a bitmask to get 3 bits, check if its 001
-000011EC  B27C 0040                179                  CMP.W   #$0040, D1              ; confirms if it is a MOVEA
-000011F0  6700 000C                180                  BEQ     INSERTA                 ; branches to MOVEA, otherwise it is a normal MOVE
-000011F4                           181   
-000011F4  4BF9 0000188B            182                  LEA     MSG_MOVE,A5             ; loads string pointer for MOVE into A5
-000011FA  6000 0008                183                  BRA     PRINTMOVE               ; Branches to print move
-000011FE                           184                  
-000011FE  4BF9 00001891            185  INSERTA         LEA     MSG_MOVEA,A5            ; loads string pointer for MOVEA into A5
-00001204                           186  
-00001204  4EB9 00001694            187  PRINTMOVE       JSR     PRINTNULL               ; prints out MOVE
-0000120A  4EB9 000016B6            188                  JSR     PRINTMOVESIZE           ; prints out the size  
-00001210  3404                     189                  MOVE.W  D4,D2                   ; Moves D6 (dest effective address) to D2
-00001212  3605                     190                  MOVE.W  D5,D3                   ; Moves D7 (dest Xn if applicable) to D3 
-00001214  4EB9 0000150E            191                  JSR     EA_TO_STRING            ; outputs it into a string
-0000121A                           192                  
-0000121A                           193                  ; prints a comma to seperate
-0000121A  4BF9 0000197F            194                  LEA     MSG_COMMA,A5            ; loads string pointer into A5
-00001220  4EB9 00001694            195                  JSR     PRINTNULL               ; prints out MOVE
-00001226                           196                  
-00001226                           197                  ; print destination
-00001226  3406                     198                  MOVE.W  D6,D2                   ; Moves D6 (dest effective address) to D2
-00001228  3607                     199                  MOVE.W  D7,D3                   ; Moves D7 (dest Xn if applicable) to D3 
-0000122A  4EB9 0000150E            200                  JSR     EA_TO_STRING            ; outputs it into a string
-00001230  4E75                     201                  RTS                             ; exits subroutine
-00001232                           202                       
-00001232                           203                                 
-00001232  4EB9 00001442            204  EAMOVE_INVALID  JSR     CASE_DATA               ; prints out the data                    
-00001238                           205  
-00001238  4BF9 0000175B            206  CHECKMOVE_Xn    LEA     VALIDXN_SHORTLONG,A5    ; Loads Xn into A5
-0000123E  3207                     207                  MOVE.W  D7,D1                   ; Loads D2 into D1 to check the Xn
-00001240  4EB9 000014DA            208                  JSR     CHECKEAXN_IFVALID       ; checks if the Xn is valid, put result in D1
-00001246  4A41                     209                  TST.W   D1                      ; checks if it is valid
-00001248  6784                     210                  BEQ     EAMOVE_VALID            ; go to EA_VALID to print
-0000124A  60E6                     211                  BRA     EAMOVE_INVALID          ; branches to EA_INVALID if not              
-0000124C                           212                  
-0000124C  4E75                     213                  RTS                             ; returns from subroutine     
-0000124E                           214  
-0000124E                           215  CASE_MOVEM  
-0000124E                           216  
-0000124E                           217  CASE_MOVEQ  
-0000124E                           218  
-0000124E                           219  *CASE_ADD        LEA         MSG_ADDA,A1
-0000124E                           220  *                MOVE.B      #14,D0
-0000124E                           221  *                TRAP        #15 
-0000124E                           222  *
-0000124E                           223  *CASE_ADDA       LEA         MSG_ADDA,A1
-0000124E                           224  *                MOVE.B      #14,D0
-0000124E                           225  *                TRAP        #15                 ; print "ADDA"
-0000124E                           226  *                MOVE.W      OPMODE_VAR,D3
-0000124E                           227  *                JSR         ADDA_SIZE
-0000124E                           228  *                JSR         ADDR_MODE_JUMP_TABLE
-0000124E                           229  *                    
-0000124E                           230  *            
-0000124E                           231  *ADDA_SIZE       CMP.W       #%111,D3
-0000124E                           232  *                BEQ         PRINT_WORD 
-0000124E                           233  *                BRA         PRINT_LONG          
-0000124E                           234                  
-0000124E                           235  
-0000124E                           236  CASE_ADDQ
-0000124E                           237  
-0000124E                           238  CASE_SUB
-0000124E                           239  
-0000124E                           240  CASE_MULS
-0000124E                           241  
-0000124E                           242  CASE_DIVU
-0000124E                           243  
-0000124E                           244  CASE_LEA
-0000124E                           245  
-0000124E                           246  **---------------AND opcode----------------------
-0000124E                           247  *CASE_AND        LEA         MSG_AND,A1
-0000124E                           248  *                MOVE.B      #14,D0
-0000124E                           249  *                TRAP        #15 
-0000124E                           250  *                JSR         GET_VARS
-0000124E                           251  *                JSR         AND_SIZE                        ; .B, .W, or .L  
-0000124E                           252  *                MOVE.W      CURRENT_INSTR, D5                         
-0000124E                           253  *                LSL.W       #7, D5                        
-0000124E                           254  *                LSR.W       #8, D5                   
-0000124E                           255  *                LSR.W       #7, D5                     
-0000124E                           256  *                CMP.B       #00, D5                         ; check if destination is a Dn?
-0000124E                           257  *                BEQ         DEST_DN                         ; Yes it is, go to DEST_DN
-0000124E                           258  *                CMP.B       #$01,D5                         ; Is the destination not a Dn?
-0000124E                           259  *                BEQ         DEST_EA                         ; branch to DEST_EA            
-0000124E                           260  *                RTS
-0000124E                           261     
-0000124E                           262  *AND_SIZE        CMP.B       #%00,OPMODE_VAR       
-0000124E                           263  *                BEQ         PRINT_BYTE
-0000124E                           264  *                CMP.B       #$01, OPMODE_VAR
-0000124E                           265  *                BEQ         PRINT_WORD
-0000124E                           266  *                CMP.B       #$02, OPMODE_VAR
-0000124E                           267  *                BEQ         PRINT_LONG    
-0000124E                           268  *    
-0000124E                           269  *DEST_DN         MOVE.W      CURRENT_INSTR, D5               
-0000124E                           270  *                LSL.W       #6,D5
-0000124E                           271  *                LSL.W       #4,D5
-0000124E                           272  *                LSR.W       #6,D5
-0000124E                           273  *                LSR.W       #4,D5
-0000124E                           274  *                LSR.W       #3,D5                           ; d5 stores EA mode                
-0000124E                           275  *                  
-0000124E                           276  *                MOVE.W      CURRENT_INSTR, D6               
-0000124E                           277  *                LSL.W       #6,D5
-0000124E                           278  *                LSL.W       #4,D5
-0000124E                           279  *                LSL.W       #3,D6
-0000124E                           280  *                LSR.W       #6,D6
-0000124E                           281  *                LSR.W       #4,D6
-0000124E                           282  *                LSR.W       #3,D6                           ; d6 stores EA register
-0000124E                           283  *                JSR         FIND_EA
-0000124E                           284  *
-0000124E                           285  *                
-0000124E                           286  *                MOVE.W      CURRENT_INSTR, D5               
-0000124E                           287  *                LSL.W       #4, D5                         
-0000124E                           288  *                LSR.W       #8, D5                          ; shift bits to get register
-0000124E                           289  *                LSR.W       #5, D5                          ; D5 contains register
-0000124E                           290  *                LEA         MSG_COMMA, A1                   
-0000124E                           291  *                MOVE.B      #14,D0
-0000124E                           292  *                TRAP        #15                             ; print comma
-0000124E                           293  *                LEA         MSG_DR, A1                      ; print D
-0000124E                           294  *                MOVE.B      #14,D0
-0000124E                           295  *                TRAP        #15
-0000124E                           296  *                MOVEA.L     D5,A1
-0000124E                           297  *                MOVE.B      #14,D0
-0000124E                           298  *                TRAP        #15                              
-0000124E                           299  *                RTS        
-0000124E                           300  *
-0000124E                           301  *FIND_EA        CMP.W       #%010,D5
-0000124E                           302  *                BEQ         CASE_ARI
-0000124E                           303  *                CMP.W       #%011,D5
-0000124E                           304  *                BEQ         CASE_ARIPOST
-0000124E                           305  *                CMP.W       #%100,D5
-0000124E                           306  *                BEQ         CASE_ARIPRE
-0000124E                           307  *                CMP.W       #%111,D5
-0000124E                           308  *                BEQ         CASE_OTHER
-0000124E                           309  *                BRA         ERROR    
-0000124E                           310  *                                     
-0000124E                           311  *DEST_EA         MOVE.W      CURRENT_INSTR, D5               
-0000124E                           312  *                LSL.W       #4, D5                         
-0000124E                           313  *                LSR.W       #8, D5                          ; shift bits to get register
-0000124E                           314  *                LSR.W       #5, D5                          ; D5 contains register
-0000124E                           315  *
-0000124E                           316  *                LEA         MSG_DR, A1                   
-0000124E                           317  *                MOVE.B      #14,D0
-0000124E                           318  *                TRAP        #15                             ; print D
-0000124E                           319  *                MOVEA.L     D5,A1  
-0000124E                           320  *                MOVE.B      #14,D0                          ; print register
-0000124E                           321  *                TRAP        #15
-0000124E                           322  *                
-0000124E                           323  *                LEA         MSG_COMMA, A1                   
-0000124E                           324  *                MOVE.B      #14,D0
-0000124E                           325  *                TRAP        #15                             ; print comma
-0000124E                           326  *                
-0000124E                           327  *                MOVE.W      CURRENT_INSTR, D5               
-0000124E                           328  *                LSL.W       #6,D5
-0000124E                           329  *                LSL.W       #4,D5
-0000124E                           330  *                LSR.W       #6,D5
-0000124E                           331  *                LSR.W       #4,D5
-0000124E                           332  *                LSR.W       #3,D5                           ; d5 stores EA mode                
-0000124E                           333  *                  
-0000124E                           334  *                MOVE.W      CURRENT_INSTR, D6               
-0000124E                           335  *                LSL.W       #6,D6
-0000124E                           336  *                LSL.W       #4,D6
-0000124E                           337  *                LSL.W       #3,D6
-0000124E                           338  *                LSR.W       #6,D6
-0000124E                           339  *                LSR.W       #4,D6
-0000124E                           340  *                LSR.W       #3,D6                           ; d6 stores EA register
-0000124E                           341  *                JSR         FIND_EA                          
-0000124E                           342  *                RTS                                     Return full instruction   
-0000124E                           343              
-0000124E                           344  CASE_OR
-0000124E                           345  
-0000124E                           346  CASE_NOT
-0000124E                           347  
-0000124E  3200                     348  CASE_LSDASD     MOVE.W      D0,D1                            ; copies D0 to D1
-00001250  C27C F000                349                  AND.W       #$F000, D1                       ; gets first 4 bits
-00001254  B27C E000                350                  CMP.W       #$E000,D1                        ; checks if next 4 bits is E (confirm if ASd/LSd)
-00001258  6600 0150                351                  BNE         CASE_BRA                         ; if not equal ASd/LSd check BRA
-0000125C  3400                     352                  MOVE.W      D0,D2                            ; copies D0 to D2
-0000125E  4EB9 000014CA            353                  JSR         GETROTATIONSIZE                  ; gets the rotation size
-00001264  B47C 0003                354                  CMP.W       #$3, D2                          ; checks if it is memory or register option
-00001268  6600 00B2                355                  BNE         CASE_SHIFTREG                    ; if rotation size not equal to 3, go to shift reg         
-0000126C                           356                  
-0000126C  3400                     357  CASE_SHIFTMEM   MOVE.W      D0,D2                            ; copies D0 to D2
-0000126E  4EB9 000014B8            358                  JSR         GETROTATION                      ; gets rotation value of D2
-00001274  B47C 0000                359                  CMP.W       #ASd_Mem,D2                      ; checks if rotation value is ASdMem
-00001278  6700 000C                360                  BEQ         CASE_ASdMEM                      ; branches to ASd_MEM if value matches
-0000127C                           361                  
-0000127C  4BF9 000018DE            362  CASE_LSdMEM     LEA         MSG_LSd,A5                       ; loads LS into A5
-00001282  6000 0008                363                  BRA         PRINTSHIFTMEM                    ; branches to PRINTSHIFTMEM
-00001286                           364  
-00001286  4BF9 000018E2            365  CASE_ASdMEM     LEA         MSG_ASd,A5                       ; loads AS into A5             
-0000128C                           366                  
-0000128C  4EB9 00001694            367  PRINTSHIFTMEM   JSR         PRINTNULL                        ; Prints LS or AS   
-00001292  3400                     368                  MOVE.W      D0,D2                            ; copies D0 to D2
-00001294  4EB9 000014C2            369                  JSR         GETDIRECTION                     ; gets direction
-0000129A  B47C 0000                370                  CMP.W       #0,D2                            ; checking if its right
-0000129E  6700 000C                371                  BEQ         CASE_RIGHTMEM                    ; shifts to the right 
-000012A2                           372  
-000012A2  4BF9 0000196D            373  CASE_LEFTMEM    LEA         MSG_LEFT,A5                      ; loads L into A5 
-000012A8  6000 0008                374                  BRA         PRINT_MEMDIR                     ; branches for printing
-000012AC                           375          
-000012AC  4BF9 0000196B            376  CASE_RIGHTMEM   LEA         MSG_RIGHT,A5                     ; loads R into A5  
-000012B2                           377  
-000012B2  4EB9 00001694            378  PRINT_MEMDIR    JSR         PRINTNULL                        ; Prints L or R
-000012B8  4BF9 0000198C            379                  LEA         MSG_W,A5                         ; loads .W into A5
-000012BE  4EB9 00001694            380                  JSR         PRINTNULL                        ; Prints .W
-000012C4                           381                  
-000012C4                           382                  ; get source addressing mode
-000012C4  323C 0000                383                  MOVE.W      #0,D1                            ; specifies that we are looking for source addressing mode
-000012C8  4EB9 00001446            384                  JSR         GET_EA                           ; gets effective address, output: D1 = EA
-000012CE  3801                     385                  MOVE.W      D1,D4                            ; saves EA to D4 so it doesn't get overwritten
-000012D0  323C 0000                386                  MOVE.W      #0,D1                            ; specifies that we are looking for source Xn
-000012D4  4EB9 00001470            387                  JSR         GET_XN                           ; Gets Xn, puts it into D1
-000012DA  3A01                     388                  MOVE.W      D1,D5                            ; saves Xn to D5 so it doesn't get overwritten
-000012DC                           389  
-000012DC  4BF9 0000174F            390  CHECKMEMSOURE   LEA         VALIDEA_SHIFT,A5                 ; load valid move EA
-000012E2  3204                     391                  MOVE.W      D4,D1                            ; marks down that we are checking EA
-000012E4  4EB9 000014DA            392                  JSR         CHECKEAXN_IFVALID                ; checks if EA is valid
-000012EA  B27C 0002                393                  CMP.W       #2,D1                            ; checks if it is Xn
-000012EE  6700 0016                394                  BEQ         CHECKSHIFT_XN                    ; branches to CHECKXn if it is
-000012F2  B27C 0001                395                  CMP.W       #1,D1                            ; Checks if it is invalid
-000012F6  6700 014A                396                  BEQ         CASE_DATA                        ; branches to CASE_DATA if it is
-000012FA                           397  
-000012FA  3404                     398  EASHIFT_VALID   MOVE.W      D4,D2                            ; moves EA to D2
-000012FC  3605                     399                  MOVE.W      D5,D3                            ; moves EA to D3
-000012FE  4EB9 0000150E            400                  JSR         EA_TO_STRING                     ; prints out the EA
-00001304  4E75                     401                  RTS                
-00001306                           402                  
-00001306                           403                  
-00001306  4BF9 0000175B            404  CHECKSHIFT_Xn   LEA         VALIDXN_SHORTLONG,A5             ; Loads Xn into A5
-0000130C  3205                     405                  MOVE.W      D5,D1                            ; Loads D5 into D1 to check the Xn
-0000130E  4EB9 000014DA            406                  JSR         CHECKEAXN_IFVALID                ; checks if the Xn is valid, put result in D1
-00001314  4A41                     407                  TST.W       D1                               ; checks if it is valid
-00001316  67E2                     408                  BEQ         EASHIFT_VALID                    ; go to EA_SHIFT to print
-00001318  6000 0128                409                  BRA         CASE_DATA                        ; branches to CASE_DATA if not                
-0000131C                           410  
-0000131C                           411  
-0000131C  3602                     412  CASE_SHIFTREG   MOVE.W      D2,D3                            ; copies D2 to D3
-0000131E  3200                     413                  MOVE.W      D0,D1                            ; copies D0 to D1
-00001320  C27C 0018                414                  AND.W       #$0018,D1                        ; gets bits representing type (bitmask: 0000 0000 0001 1000)
-00001324  E649                     415                  LSR.W       #3,D1                            ; shifts 3 bits to the right so we only have 2 bits left   
-00001326  B27C 0000                416                  CMP.W       #$0,D1                           ; Compares D1 to 0, if it is 0, it is ASd
-0000132A  6700 000C                417                  BEQ         CASE_ASdReg                      ; goes to ASd case if so                 
-0000132E                           418                  
-0000132E  4BF9 000018DE            419  CASE_LSdREG     LEA         MSG_LSd,A5                       ; loads LS into A5
-00001334  6000 0008                420                  BRA         PRINTSHIFTREG                    ; branches to PRINTSHIFTREG
-00001338                           421  
-00001338  4BF9 000018E2            422  CASE_ASdREG     LEA         MSG_ASd,A5                       ; loads AS into A5             
-0000133E                           423                  
-0000133E  4EB9 00001694            424  PRINTSHIFTREG   JSR         PRINTNULL                        ; Prints LS or AS   
-00001344  3400                     425                  MOVE.W      D0,D2                            ; copies D0 to D2
-00001346  4EB9 000014C2            426                  JSR         GETDIRECTION                     ; gets direction
-0000134C  B47C 0000                427                  CMP.W       #0,D2                            ; checking if its right
-00001350  6700 000C                428                  BEQ         CASE_RIGHTREG                    ; shifts to the right 
-00001354                           429  
-00001354  4BF9 0000196D            430  CASE_LEFTREG    LEA         MSG_LEFT,A5                      ; loads L into A5 
-0000135A  6000 0008                431                  BRA         PRINT_REGDIR                     ; branches for printing
-0000135E                           432          
-0000135E  4BF9 0000196B            433  CASE_RIGHTREG   LEA         MSG_RIGHT,A5                     ; loads R into A5  
-00001364                           434  
-00001364  4EB9 00001694            435  PRINT_REGDIR    JSR         PRINTNULL                        ; Prints L or R
-0000136A  B67C 0001                436                  CMP.W       #1,D3                            ; Checks if it is word size
-0000136E  6700 0014                437                  BEQ         REG_WORD                         ; Prints .W
-00001372  B67C 0002                438                  CMP.W       #2,D3                            ; Checks if it is long size
-00001376  6700 0016                439                  BEQ         REG_LONG                         ; Prints .L
-0000137A                           440  
-0000137A  4BF9 00001986            441  REG_BYTE        LEA         MSG_B,A5                         ; loads .B into A5
-00001380  6000 0012                442                  BRA         PRINTREGEA      
-00001384                           443  
-00001384  4BF9 0000198C            444  REG_WORD        LEA         MSG_W,A5                         ; loads .W into A5
-0000138A  6000 0008                445                  BRA         PRINTREGEA      
-0000138E                           446                  
-0000138E                           447                  
-0000138E  4BF9 00001992            448  REG_LONG        LEA         MSG_L,A5                         ; loads .L into A5
-00001394                           449  
-00001394  4EB9 00001694            450  PRINTREGEA      JSR         PRINTNULL                        ; Prints size
-0000139A  3200                     451                  MOVE.W      D0,D1                            ; copies D0 to D1
-0000139C  C27C 0020                452                  AND.W       #$0020,D1                        ; gets bits representing if it is immediate or register (bitmask: 0000 0000 0010 0000)
-000013A0  EA49                     453                  LSR.W       #5,D1                            ; shifts 5 bits to the right so we only have 2 bits left   
-000013A2  B27C 0000                454                  CMP.W       #$0,D1                           ; Compares D1 to 0, if it is 0, it is ASd
-000013A6  6790                     455                  BEQ         CASE_ASdReg                      ; goes to ASd case if so
-000013A8                           456                  
-000013A8                           457  REG_IMMEDIATE
-000013A8                           458  
-000013A8                           459  REG_REGISTER
-000013A8                           460                  
-000013A8                           461                  
-000013A8  4E75                     462                  RTS  
-000013AA                           463               
-000013AA  3200                     464  CASE_BRA        MOVE.W  D0,D1                                ; Copies instruction word to D1
-000013AC  C27C FF00                465                  AND.W   #$FF00,D1                            ; Applies a bitmask to get first 8 bits                
-000013B0  B27C 6000                466                  CMP.W   #$6000,D1                            ; Checks if it fits the BRA opcode
-000013B4  6600 0018                467                  BNE.W   CASE_BCC                             ; If its not, check BCC
-000013B8                           468                  
-000013B8  4BF9 00001963            469                  LEA     MSG_BRA,A5                           ; loads string pointer for BRA into A5
-000013BE  4EB9 00001694            470                  JSR     PRINTNULL                            ; prints BRA
-000013C4                           471  
-000013C4  3400                     472                  MOVE.W  D0,D2                                ; Copies instruction word to D1
-000013C6  4EB9 0000149A            473                  JSR     GETDISPLACEMENT                      ; finds the displacement
-000013CC  4E75                     474                  RTS
-000013CE                           475                  
-000013CE                           476  ; DO NOT MOVE THIS FORM UNDER CASE_BRA. IS DEPENDENT ON RESULTS OF BRA
-000013CE                           477  ; DELETE THIS NOTE: NEED TO FIX LSL/LSR SHIFT TO ENSURE THE BCC CODES GET PRINTED 
-000013CE  3200                     478  CASE_BCC        MOVE.W  D0,D1                                ; copies instruction word from D0 to D1
-000013D0  C27C F000                479                  AND.W   #$F000,D1                            ; get top 4 bits
-000013D4  B27C 6000                480                  CMP.W   #$6000,D1                            ; make sure top 4 bits are 6
-000013D8  6600 0052                481                  BNE.W   CASE_JSR                             ;
-000013DC  C27C 0F00                482                  AND.W   #$0F00,D1                            ; get next 4 bits, condition code
-000013E0  E049                     483                  LSR.W   #8,D1                                ; shifts 8 bits to the right
-000013E2                           484                  
-000013E2  B27C 000E                485                  CMP.W   #$E,D1                               ; checks if D1 is BGT (1 1 1 0)
-000013E6  6700 002A                486                  BEQ     CASE_BGT                             ; branches to BGT if it is
-000013EA                           487                  
-000013EA  B27C 000F                488                  CMP.W   #$F,D1                               ; checks if D1 is BLE (1 1 1 1)
-000013EE  6700 0018                489                  BEQ     CASE_BLE                             ; branches to BLE if it is
-000013F2                           490                      
-000013F2  B27C 0007                491                  CMP.W   #$7,D1                               ; checks if D1 is BEQ (0 1 1 1)
-000013F6  6700 0006                492                  BEQ     CASE_BEQ                             ; branches to BEQ if it is
-000013FA  6000 0046                493                  BRA     CASE_DATA                            ; BCC condition code not in the system
-000013FE                           494     
-000013FE  4BF9 000018F6            495  CASE_BEQ        LEA     MSG_BEQ,A5                           ; loads string pointer for BEQ into A5
-00001404  6000 0016                496                  BRA     PRINTBCC
-00001408                           497  
-00001408  4BF9 0000191E            498  CASE_BLE        LEA     MSG_BLE,A5                           ; loads string pointer for BLE into A5
-0000140E  6000 000C                499                  BRA     PRINTBCC
-00001412                           500                  
-00001412  4BF9 0000190E            501  CASE_BGT        LEA     MSG_BGT,A5                           ; loads string pointer for BGT into A5
-00001418  6000 0002                502                  BRA     PRINTBCC
-0000141C                           503  
-0000141C  4EB9 00001694            504  PRINTBCC        JSR     PRINTNULL                            ; prints BEQ/BLE/BGT
-00001422  3400                     505                  MOVE.W  D0,D2                                ; Copies instruction word to D1
-00001424  4EB9 0000149A            506                  JSR     GETDISPLACEMENT                      ; finds the displacement
-0000142A  4E75                     507                  RTS              
-0000142C                           508                  
-0000142C                           509  
-0000142C                           510  CASE_JSR       
-0000142C                           511  
-0000142C  B07C 4E75                512  CASE_RTS        CMP.W   #$4E75,D0           ; compares to RTS opcode in hex
-00001430  6600 FD54                513                  BNE     CASE_MOVE           ; checks the next case if not equal
-00001434  4BF9 0000195E            514                  LEA     MSG_RTS,A5          ; loads string pointer into A5
-0000143A  4EB9 00001694            515                  JSR     PRINTNULL           ; prints RTS                
-00001440  4E75                     516                  RTS                         ; returns from the subroutine
-00001442                           517  
-00001442                           518                  
-00001442                           519  
-00001442                           520  CASE_DATA           
-00001442  4E75                     521                      RTS               
-00001444                           522  
-00001444  4E75                     523  CASE_EPICFAIL       RTS
-00001446                           524  
-00001446                           525  
-00001446                           526  * Finds the EA type
-00001446                           527  * Inputs: D0 = the instruction word, D1 = 0 (source EA), 1 (dest EA)
-00001446                           528  * Output: Addressing Mode (3 bits, 0 to 7) in D1
-00001446  48E7 3000                529  GET_EA              MOVEM.L   D2-D3, -(SP)          ; stores D2 and D3
-0000144A  4A41                     530                      TST.W     D1                    ; compares D1 to 0
-0000144C  6700 000E                531                      BEQ       SOURCEEA              ; branch to SOURCEEA if it is 0
-00001450                           532                      
-00001450  343C 01C0                533  DESTEA              MOVE.W    #$01C0,D2             ; stores bitmask to get the destination EA into D2
-00001454  363C 0006                534                      MOVE.W    #6,D3                 ; stores the shift amount to D3
-00001458  6000 000A                535                      BRA       FINDTYPEEA            
-0000145C                           536  
-0000145C  343C 0038                537  SOURCEEA            MOVE.W    #$0038,D2             ; stores bitmask to get the source EA into D2
-00001460  363C 0003                538                      MOVE.W    #3,D3                 ; stores the shift amount to D3
-00001464                           539  
-00001464                           540  
-00001464  3200                     541  FINDTYPEEA          MOVE.W    D0,D1                 ; copies D0 in D1
-00001466  C242                     542                      AND.W     D2,D1                 ; applies bitmask to D1
-00001468  E669                     543                      LSR.W     D3,D1                 ; shifts D1, moves the result to the end
-0000146A  4CDF 000C                544                      MOVEM.L   (SP)+,D2-D3           ; restores D2 and D3
-0000146E  4E75                     545                      RTS                             ; returns from subroutine    
-00001470                           546                      
-00001470                           547  * Finds Xn type
-00001470                           548  * Inputs: D0 = the instruction word, D1 = 0 (source Xn), 1 (dest Xn)
-00001470                           549  * Output: Addressing Mode (3 bits, 0 to 7) in D1
-00001470  48E7 3000                550  GET_XN              MOVEM.L   D2-D3, -(SP)          ; stores D2 and D3
-00001474  4A41                     551                      TST.W     D1                    ; compares D1 to 0
-00001476  6700 000E                552                      BEQ       SOURCEXN              ; branch to SOURCEEA if it is 0
-0000147A                           553  
-0000147A  343C 0E00                554  DESTXN              MOVE.W    #$0E00,D2             ; stores bitmask to get the destination Xn into D2
-0000147E  363C 0009                555                      MOVE.W    #9,D3                 ; stores the shift amount to D3
-00001482  6000 000A                556                      BRA       FINDTYPEXN            ; finds the type of Xn
-00001486                           557  
-00001486  343C 0007                558  SOURCEXN            MOVE.W    #$0007,D2             ; applies bitmask to D2
-0000148A  363C 0000                559                      MOVE.W    #0,D3                 ; stores the shift amount to D3
-0000148E                           560                      
-0000148E  3200                     561  FINDTYPEXN          MOVE.W    D0,D1                 ; copies D0 in D1
-00001490  C242                     562                      AND.W     D2,D1                 ; applies bitmask to D1
-00001492  E669                     563                      LSR.W     D3,D1                 ; shifts D1, moves the result to the end
-00001494  4CDF 000C                564                      MOVEM.L   (SP)+,D2-D3           ; restores D2 and D3
-00001498  4E75                     565                      RTS                             ; returns from subroutine 
-0000149A                           566                                            
-0000149A                           567  * Gets the displacement and pritns it 
-0000149A                           568  * Inputs: D2 = instruction word, A2 = address of next word
-0000149A                           569  * Outputs: prints out displacement
-0000149A  48E7 4004                570  GETDISPLACEMENT     MOVEM.L    D1/A5, -(SP)         ; saves D1
-0000149E  3A4A                     571                      MOVE.W    A2,A5                 ; copies A2 to A5
-000014A0  C47C 00FF                572                      AND.W     #$00FF,D2             ; applies a bitmask to get rid of the first 8 bits
-000014A4  6600 0004                573                      BNE       PRINTADDRESS          ; prints address if not 0
-000014A8  341A                     574                      MOVE.W    (A2)+,D2               ; gets 16 bit displacement                    
-000014AA                           575                      
-000014AA  D44D                     576  PRINTADDRESS        ADD.W     A5,D2                 ; Adds address to D2 to get displacement
-000014AC  3202                     577                      MOVE.W    D2,D1                 ; moves address to D1 to print it
-000014AE  4EB9 0000165E            578                      JSR       PRINTNUM              ; prints address
-000014B4                           579                      
-000014B4  4CDF 2002                580                      MOVEM.L    (SP)+,D1/A5              ; restores D1
-000014B8                           581                      ; DELETE LATER. NOTE: WE DONT HAVE HEX YET, PRINT HEX SIGN BEFORE NUM, BUT WILL NEED TO ADD THIS LATER
-000014B8                           582  
-000014B8                           583  * Gets the rotation value for ASd and LSd
-000014B8                           584  * Input: D2 = instruction word copy (of D0)                                    
-000014B8                           585  * Output: rotation  value in D2             
-000014B8  C47C 0E00                586  GETROTATION         AND.W      #$0E00,D2             ; gets the rotation bits
-000014BC  E04A                     587                      LSR.W      #8,D2                ; shifts 8 bits to the right to only have the rotation bits
-000014BE  E24A                     588                      LSR.W      #1,D2                ; shifts 1 bits to the right to only have the rotation bits
-000014C0  4E75                     589                      RTS                             ; return from subroutine
-000014C2                           590  
-000014C2                           591  * Gets the direction value for ASd and LSd
-000014C2                           592  * Input: D2 = instruction word copy (of D0)                                    
-000014C2                           593  * Output: direction value in D2             
-000014C2  C47C 0100                594  GETDIRECTION        AND.W      #$0100,D2             ; gets the rotation bits
-000014C6  E04A                     595                      LSR.W      #8,D2                ; shifts 8 bits to the right to only have the rotation bits
-000014C8  4E75                     596                      RTS                             ; return from subroutine
-000014CA                           597  
-000014CA                           598  * Gets the rotation size value for ASd and LSd
-000014CA                           599  * Input: D2 = instruction word copy (of D0)                                    
-000014CA                           600  * Output: rotation size value in D2             
-000014CA  C47C 00C0                601  GETROTATIONSIZE     AND.W      #$00C0,D2             ; gets the rotation bits
-000014CE  EC4A                     602                      LSR.W      #6,D2                ; shifts 6 bits to the right to only have the rotation bits
-000014D0  4E75                     603                      RTS                             ; return from subroutine
-000014D2                           604  
-000014D2                           605  * Gets the rotation location  value for ASd and LSd
-000014D2                           606  * Input: D2 = instruction word copy (of D0)                                    
-000014D2                           607  * Output: rotation location value in D2             
-000014D2  C47C 0020                608  GETROTATIONLOCATION AND.W      #$0020,D2             ; gets the rotation location bits
-000014D6  EA4A                     609                      LSR.W      #5,D2                ; shifts 6 bits to the right to only have the rotation bits
-000014D8  4E75                     610                      RTS                             ; return from subroutine
-000014DA                           611  
-000014DA                           612                          
-000014DA                           613  * Checks if EA is valid
-000014DA                           614  * Inputs: A5 = Pointer to -1 terminated list of valid addressing modes, D1 = Addressing Mode (3 bit), 
-000014DA                           615  * Outputs: D1 (0 = Valid, 1 = Invalid, 2 = Check Xn)                   
-000014DA  2F02                     616  CHECKEAXN_IFVALID  MOVE.L     D2,-(SP)              ; saves D2
-000014DC                           617  
-000014DC  141D                     618  CHECKEAMLOOP       MOVE.B     (A5)+,D2              ; load possible EA
-000014DE  B43C 00FF                619                     CMP.B      #-$1,D2               ; compares to -1 to see if loop is over
-000014E2  6700 000A                620                     BEQ        INVALIDEA             ; branches to INVALIDEA if its over
-000014E6  B202                     621                     CMP.B      D2,D1                 ; check addressing mode, check if current one is one of those
-000014E8  6700 000C                622                     BEQ        VALIDEA               ; branches to valid EA
-000014EC  60EE                     623                     BRA        CHECKEAMLOOP          ; loops if it isn't valid
-000014EE                           624                     
-000014EE  323C 0001                625  INVALIDEA          MOVE.W     #$1,D1                ; marks that it is invalid
-000014F2  6000 0016                626                     BRA        CHECKEAEXIT           ; exists the subroutine        
-000014F6                           627                    
-000014F6  B43C 0007                628  VALIDEA            CMP.B      #Other,D2             ; check if its Xn
-000014FA  6700 000A                629                     BEQ        OTHEREA               ; branches to OTHEREA if it is Xn
-000014FE  323C 0000                630                     MOVE.W     #$0,D1                ; marks that it is valid
-00001502  6000 0006                631                     BRA        CHECKEAEXIT           ; exits the subroutine
-00001506                           632  
-00001506  323C 0002                633  OTHEREA            MOVE.W     #$2,D1                ; marks that it is invalid
-0000150A                           634  
-0000150A  241F                     635  CHECKEAEXIT        MOVE.L    (SP)+,D2               ; restores D2
-0000150C  4E75                     636                     RTS                              ; returns from subroutine
-0000150E                           637  
-0000150E                           638  * Converts EA and Xn into a string                                
-0000150E                           639  * Inputs: D2 = EA, D3 = Xn, A2 = NEXT INSTRUCTION WORD
-0000150E                           640  * Outputs: Prints out EA and Xn into a string
-0000150E  48E7 C004                641  EA_TO_STRING       MOVEM.L  D0-D1/A5,-(SP)          ; saves D1, D0, and A5
-00001512  B47C 0001                642                     CMP.W    #An,D2                  ; checks if it is An
-00001516  6700 003A                643                     BEQ      CASE_AR                 ; branches to CASE_AR if address register
-0000151A                           644                     
-0000151A  B47C 0002                645                     CMP.W    #AnIndirect,D2          ; checks if it is (An)
-0000151E  6700 004A                646                     BEQ      CASE_ARI                ; branches to CASE_ARI if address register indirect
-00001522                           647                     
-00001522  B47C 0003                648                     CMP.W    #AnPost,D2              ; checks if it is (An)+
-00001526  6700 0072                649                     BEQ      CASE_ARIPOST            ; branches to CASE_ARIPOST if address register indirect post increment
-0000152A                           650                     
-0000152A  B47C 0004                651                     CMP.W    #AnPre,D2               ; checks if it is -(An)
-0000152E  6700 00A6                652                     BEQ      CASE_ARIPRE             ; branches to CASE_ARIPRE if address register indirect pre increment
-00001532                           653                     
-00001532  B47C 0007                654                     CMP.W    #Other,D2               ; checks if it is other (has an Xn/D3)
-00001536  6700 00DA                655                     BEQ      CASE_OTHER              ; branches to CASE_AR if address register
-0000153A                           656                     ; otherwise assumes D2 = #Dn which means its a data register                   
-0000153A                           657  
-0000153A                           658  * data register, Dn
-0000153A  4BF9 0000196F            659  CASE_DR            LEA      MSG_DR,A5               ; Loads D into A5
-00001540  4EB9 00001694            660                     JSR      PRINTNULL               ; Prints D
-00001546  3203                     661                     MOVE.W   D3, D1                  ; Loads D3 (the Xn) into D1 for printing 
-00001548  4EB9 0000165E            662                     JSR      PRINTNUM                ; Prints the Xn
-0000154E  6000 0108                663                     BRA      EA_TO_STRING_EXIT       ; exits           
-00001552                           664  
-00001552                           665  
-00001552                           666  * address register
-00001552  4BF9 00001971            667  CASE_AR            LEA      MSG_AR,A5               ; Loads A into A5
-00001558  4EB9 00001694            668                     JSR      PRINTNULL               ; Prints A
-0000155E  3203                     669                     MOVE.W   D3, D1                  ; Loads D3 (the Xn) into D1 for printing 
-00001560  4EB9 0000165E            670                     JSR      PRINTNUM                ; Prints the Xn
-00001566  6000 00F0                671                     BRA      EA_TO_STRING_EXIT       ; exits
-0000156A                           672  
-0000156A                           673  * address register indirect
-0000156A  4BF9 00001973            674  CASE_ARI           LEA      MSG_LB,A5               ; Loads ( into A5
-00001570  4EB9 00001694            675                     JSR      PRINTNULL               ; Prints (
-00001576  4BF9 00001971            676                     LEA      MSG_AR,A5               ; Loads A into A5
-0000157C  4EB9 00001694            677                     JSR      PRINTNULL               ; Prints A
-00001582  3203                     678                     MOVE.W   D3, D1                  ; Loads D3 (the Xn) into D1 for printing 
-00001584  4EB9 0000165E            679                     JSR      PRINTNUM                ; Prints the Xn
-0000158A  4BF9 00001975            680                     LEA      MSG_RB,A5               ; Loads ) into A5
-00001590  4EB9 00001694            681                     JSR      PRINTNULL               ; Prints )
-00001596  6000 00C0                682                     BRA      EA_TO_STRING_EXIT       ; exits
-0000159A                           683  
-0000159A                           684  * address register indirect post increment
-0000159A  4BF9 00001973            685  CASE_ARIPOST       LEA      MSG_LB,A5               ; Loads ( into A5
-000015A0  4EB9 00001694            686                     JSR      PRINTNULL               ; Prints (
-000015A6  4BF9 00001971            687                     LEA      MSG_AR,A5               ; Loads A into A5
-000015AC  4EB9 00001694            688                     JSR      PRINTNULL               ; Prints A
-000015B2  3203                     689                     MOVE.W   D3, D1                  ; Loads D3 (the Xn) into D1 for printing 
-000015B4  4EB9 0000165E            690                     JSR      PRINTNUM                ; Prints the Xn
-000015BA  4BF9 00001975            691                     LEA      MSG_RB,A5               ; Loads ) into A5
-000015C0  4EB9 00001694            692                     JSR      PRINTNULL               ; Prints )
-000015C6  4BF9 00001977            693                     LEA      MSG_PLUS,A5             ; Loads + into A5
-000015CC  4EB9 00001694            694                     JSR      PRINTNULL               ; Prints +
-000015D2  6000 0084                695                     BRA      EA_TO_STRING_EXIT       ; exits
-000015D6                           696  
-000015D6                           697  
-000015D6                           698  * address register indirect pre increment
-000015D6  4BF9 00001979            699  CASE_ARIPRE        LEA      MSG_MINUS,A5            ; Loads - into A5
-000015DC  4EB9 00001694            700                     JSR      PRINTNULL               ; Prints -
-000015E2  4BF9 00001973            701                     LEA      MSG_LB,A5               ; Loads ( into A5
-000015E8  4EB9 00001694            702                     JSR      PRINTNULL               ; Prints (
-000015EE  4BF9 00001971            703                     LEA      MSG_AR,A5               ; Loads A into A5
-000015F4  4EB9 00001694            704                     JSR      PRINTNULL               ; Prints A
-000015FA  3203                     705                     MOVE.W   D3, D1                  ; Loads D3 (the Xn) into D1 for printing 
-000015FC  4EB9 0000165E            706                     JSR      PRINTNUM                ; Prints the Xn
-00001602  4BF9 00001975            707                     LEA      MSG_RB,A5               ; Loads ) into A5
-00001608  4EB9 00001694            708                     JSR      PRINTNULL               ; Prints )
-0000160E  6000 0048                709                     BRA      EA_TO_STRING_EXIT       ; exits
-00001612                           710  
-00001612                           711  * other (long, short, immediate) with Xn
-00001612  301A                     712  CASE_OTHER         MOVE     (A2)+, D0               ; Moves next instruction word into D1 since A2 is auxilliary instruction word 
-00001614  B67C 0000                713                     CMP.W    #ABSShort,D3            ; checks if it is a word
-00001618  6700 0022                714                     BEQ      CASE_WORD               ; branches to CASE_WORD if is a short
-0000161C                           715                     
-0000161C  B67C 0001                716                     CMP.W    #ABSLong,D3             ; checks if it is (An)
-00001620  6700 002A                717                     BEQ      CASE_LONG               ; branches to CASE_LONG if is a long
-00001624                           718  
-00001624                           719  * NOTE DELETE LATER: update to print num as HEX and add NEGATIVE NUMBER CHECK
-00001624                           720  * immediate
-00001624  4BF9 0000197B            721  CASE_IMMEDIATE     LEA      MSG_POUND,A5            ; Loads # into A5
-0000162A  4EB9 00001694            722                     JSR      PRINTNULL               ; Prints #  
-00001630                           723                     * uncomment after converting to hex 
-00001630                           724                     *LEA      MSG_HEX,A5              ; Loads $ into A5
-00001630                           725                     *JSR      PRINTNULL               ; Prints $
-00001630  3200                     726                     MOVE.W   D0, D1                  ; moves instruction word into d1
-00001632  4EB9 0000165E            727                     JSR      PRINTNUM 
-00001638  6000 001E                728                     BRA      EA_TO_STRING_EXIT       ; exits subroutine                  
-0000163C                           729                     
-0000163C                           730  ; DELETE LATER: convert to hex andwrite code to make them print out a total of 4 and 8 characters, add 0's                      
-0000163C                           731  
-0000163C                           732  * word address
-0000163C                           733  CASE_WORD          
-0000163C                           734                     *LEA      MSG_HEX,A5              ; Loads $ into A5
-0000163C                           735                     *JSR      PRINTNULL               ; Prints $
-0000163C  3200                     736                     MOVE.W   D0, D1                  ; moves instruction word into d1
-0000163E  383C 0000                737                     MOVE.W   #0, D4                  ; moves length size (word) into d4
-00001642  4EB9 0000166E            738                     JSR      PRINTSHORTLONGNUM       ; reformats the number to the proper length and prints out the number
-00001648  6000 000E                739                     BRA      EA_TO_STRING_EXIT       ; exits subroutine
-0000164C                           740  
-0000164C                           741  * long address 
-0000164C                           742  CASE_LONG          
-0000164C                           743                     *LEA      MSG_HEX,A5              ; Loads $ into A5
-0000164C                           744                     *JSR      PRINTNULL               ; Prints $
-0000164C  3200                     745                     MOVE.W   D0, D1                  ; moves instruction word into d1
-0000164E  383C 0001                746                     MOVE.W   #1, D4                  ; moves length size (long) into d4
-00001652  4EB9 0000166E            747                     JSR      PRINTSHORTLONGNUM       ; reformats the number to the proper length and prints out the number
-00001658                           748  
-00001658                           749  
-00001658                           750  * exits subroutine
-00001658  4CDF 2003                751  EA_TO_STRING_EXIT   MOVEM.L  (SP)+,D0-D1/A5          ; restoers D1, D0, and A5
-0000165C  4E75                     752                      RTS                              ; returns from subroutine
-0000165E                           753  
-0000165E                           754  * DELETE LATER: sorry the formatting is weird here we can fix it later or whenever you want  im just lazy for now
-0000165E                           755  
-0000165E                           756  * Prints out the content of D1
-0000165E                           757  * Input: number in D1 to be printed
-0000165E                           758  * Output: contents of D1 printed
-0000165E  48E7 C000                759  PRINTNUM         MOVEM.L     D0-D1, -(SP)        ; saves D0 and D1
-00001662  103C 0003                760                   MOVE.B      #3,D0               ; prints D1
-00001666  4E4F                     761                   TRAP        #15                 ; is trap task 3
-00001668                           762              
-00001668  4CDF 0003                763                   MOVEM.L     (SP)+,D0-D1         ; returns D0 and D1
-0000166C  4E75                     764                   RTS                             ; returns from subroutine
-0000166E                           765                   
-0000166E                           766  * DELETE LATER: THIS IS A  WIP AND DOESNT ACHIEVE PROPER FUNCTIONALITY YET
-0000166E                           767                   
-0000166E                           768  * Prints out the content of D1 and formats it to have the length of WORD or a LONG
-0000166E                           769  * Input: number in D1 to be printed, D4 = length (0 = WORD, 1 = LONG)
-0000166E                           770  * Output: contents of D1 printed
-0000166E  48E7 6000                771  PRINTSHORTLONGNUM         MOVEM.L     D1-D2, -(SP)        ; saves D0 and D1
-00001672  103C 0003                772                            MOVE.B      #3,D0               ; prints D1
-00001676  4E4F                     773                            TRAP        #15                 ; is trap task 3
-00001678  4CDF 0003                774                            MOVEM.L     (SP)+,D0-D1         ; returns D0 and D1
-0000167C  4E75                     775                  RTS                                       ; returns from subroutine
-0000167E                           776  
-0000167E                           777  * Converts decimal number to hex format
-0000167E                           778  *DECTOHEX                  MOVE                
-0000167E                           779               
-0000167E                           780              
-0000167E                           781  * Prints contents of things between a range
-0000167E                           782  * input: A5, A6 (the range)
-0000167E                           783  * output: prints memory contents from A5 to A6 as strings   
-0000167E  48E7 C040                784  PRINTRANGE      MOVEM.L     D0-D1/A1, -(SP)  ; saves D0-D1 and A1
-00001682  224D                     785                  MOVEA.L     A5, A1           ; loads A5 into A1
-00001684  9DCD                     786                  SUB.L       A5, A6           ; subtracts A5 to A6, gets us n (number of characters)
-00001686  320E                     787                  MOVE.W      A6, D1           ; move n into D1
-00001688  103C 0001                788                  MOVE.B      #1, D0           ; display n characters of string at A1
-0000168C  4E4F                     789                  TRAP        #15              ; is trap task 1
-0000168E  4CDF 0203                790                  MOVEM.L     (SP)+, D0-D1/A1  ; restores D0-D1, A1
-00001692  4E75                     791                  RTS                          ; returns
-00001694                           792      
-00001694                           793  * Prints null terminated string
-00001694                           794  * input: string pointed to by A5
-00001694                           795  * output: prints out the null terminated string
-00001694  48E7 8040                796  PRINTNULL       MOVEM.L     D0/A1, -(SP)    ; saves D0-D1 and A1
-00001698  224D                     797                  MOVE.L      A5,A1           ; loads A5 into A1
-0000169A  103C 000E                798                  MOVE.B      #14,D0          ; prints null terminated string
-0000169E  4E4F                     799                  TRAP        #15             ; is trap task 10
-000016A0  4CDF 0201                800                  MOVEM.L     (SP)+,D0/A1     ; saves D0-D1 and A1
-000016A4  4E75                     801                  RTS                         ; returns from subroutine
-000016A6                           802                  
-000016A6  2F0D                     803  PRINTENTER      MOVE.L      A5, -(SP)       ; saves A5
-000016A8  4BF9 0000187F            804                  LEA         NEW_LINE,A5     ; Prints null
-000016AE  4EB8 1694                805                  JSR         PRINTNULL       ; prints the new line
-000016B2  2A5F                     806                  MOVE.L      (SP)+,A5        ; returns A5
-000016B4  4E75                     807                  RTS
-000016B6                           808  
-000016B6                           809  * Prints the size of the MOVE or MOVEA operation  
-000016B6                           810  * input: D0
-000016B6                           811  * output: prints out the size of a MOVE or MOVEA operation        
-000016B6  48E7 8004                812  PRINTMOVESIZE   MOVEM.L D0/A5,-(SP)         ; saves D0 and A5
-000016BA  3200                     813                  MOVE.W  D0,D1               ; stores d0 in d1
-000016BC  C07C 3000                814                  AND.W   #$3000,D0           ; gets the size
-000016C0  B07C 2000                815                  CMP.W   #$2000,D0           ; checks if is long
-000016C4  6700 001E                816                  BEQ     MOVE_LONG
-000016C8  B07C 3000                817                  CMP.W   #$3000,D0           ; checks if is word
-000016CC  6700 000C                818                  BEQ     MOVE_WORD      
-000016D0                           819                  
-000016D0  4BF9 00001986            820  MOVE_BYTE       LEA     MSG_B,A5            ; loads string pointer into a1
-000016D6  6000 0012                821                  BRA     FINISHMOVE          ; branches to FINISHMOVE
-000016DA                           822  
-000016DA  4BF9 0000198C            823  MOVE_WORD       LEA     MSG_W,A5            ; loads string pointer into a1
-000016E0  6000 0008                824                  BRA     FINISHMOVE          ; branches to FINISHMOVE
-000016E4                           825  
-000016E4  4BF9 00001992            826  MOVE_LONG       LEA     MSG_L,A5            ; loads string pointer into a1         
-000016EA                           827                  
-000016EA  4EB8 1694                828  FINISHMOVE      JSR     PRINTNULL           ; prints out the size
-000016EE  4CDF 2001                829                  MOVEM.L (SP)+,D0/A5         ; restores D0 and A5
-000016F2  4E75                     830                  RTS
-000016F4                           831  
-000016F4  43F9 00001863            832  ERROR           LEA     ERROR_MSG,A1
-000016FA  103C 000E                833                  MOVE.B  #14,D0
-000016FE  4E4F                     834                  TRAP    #15 
-00001700                           835         
-00001700                           836  * DELETE THIS: Test                
-00001700  2661                     837  DELETEME        MOVEA.L  -(A1),A3
-00001702  6700 0012                838                  BEQ      DELETEMEAGAIN  
-00001706  6F00 000E                839                  BLE      DELETEMEAGAIN
-0000170A  6E00 000A                840                  BGT      DELETEMEAGAIN
-0000170E                           841  
-0000170E  E44A                     842                  LSR.W      #2,D2
-00001710  E2E2                     843                  LSR.W      -(A2)
-00001712  E2DA                     844                  LSR.W      (A2)+
-00001714  E46A                     845                  LSR.W      D2,D2        
-00001716                           846                  
-00001716                           847  DELETEMEAGAIN                 
-00001716                           848            
-00001716  FFFF FFFF                849      SIMHALT             ; halt simulator
-0000171A                           850  
-0000171A                           851  * Put variables and constants here
-0000171A                           852  
-0000171A  =0000000D                853  CR                              EQU     $0D
-0000171A  =0000000A                854  LF                              EQU     $0A 
-0000171A  =00000009                855  TAB                             EQU     $09  
-0000171A                           856  
-0000171A                           857  * Addressing Modes
-0000171A  =00000000                858  Dn                              EQU     0
-0000171A  =00000001                859  An                              EQU     1
-0000171A  =00000002                860  AnIndirect                      EQU     2
-0000171A  =00000003                861  AnPost                          EQU     3
-0000171A  =00000004                862  AnPre                           EQU     4
-0000171A  =00000007                863  Other                           EQU     7           ; short, long, immediate
-0000171A                           864  
-0000171A                           865  * Xn
-0000171A  =00000000                866  ABSShort                        EQU     0
-0000171A  =00000001                867  ABSLong                         EQU     1
-0000171A  =00000004                868  XnImmediate                     EQU     4
-0000171A                           869  
-0000171A                           870  * Valid Addressing Modes
-0000171A= 00 01 02 03 04 07 FF     871  VALIDEA_ALL                     DC.B    Dn,An,AnIndirect,AnPost,AnPre,Other,-1          
-00001721                           872  ; MOVE (source),MOVEA, ADD, ADDA, ADDQ, and SUB
-00001721= 00 01 02 03 04 07 FF     873  VALIDEA_MOVE_DEST               DC.B    Dn,An,AnIndirect,AnPost,AnPre,Other,-1 * DELETE THIS, REPLACE WITH VALIDEA_ALL
-00001728= 00 02 03 04 07 FF        874  VALIDEA_MOVEQ                   DC.B    Dn,AnIndirect,AnPost,AnPre,Other,-1
-0000172E= 02 04 07 FF              875  VALIDEA_MOVEM                   DC.B    AnIndirect,AnPre,Other,-1
-00001732= 02 03 07 FF              876  VALIDEA_MOVEM_MEMTOREG          DC.B    AnIndirect,AnPost,Other,-1
-00001736= 02 03 04 07 FF           877  VALIDEA_ADDSUB_DESTOPERAND      DC.B    AnIndirect,AnPost,AnPre,Other,-1
-0000173B= 00 02 03 04 07 FF        878  VALIDEA_MULSDIVU                DC.B    Dn,AnIndirect,AnPost,AnPre,Other,-1
-00001741= 01 07 FF                 879  VALIDEA_LEA                     DC.B    An,Other,-1
-00001744= 00 02 03 04 07 FF        880  VALIDEA_ANDORNOT                DC.B    Dn,AnIndirect,AnPost,AnPre,Other,-1
-0000174A= 02 03 04 07 FF           881  VALIDEA_ANDOR_DESTOPERAND       DC.B    AnIndirect,AnPost,AnPre,Other,-1
-0000174F= 02 03 04 07 FF           882  VALIDEA_SHIFT                   DC.B    AnIndirect,AnPost,AnPre,Other,-1                ; LSL, LSR, ASL, ASR
-00001754= 02 07 FF                 883  VALIDEA_JSR                     DC.B    AnIndirect, Other,-1
-00001757                           884  
-00001757                           885  * Valid Xn
-00001757= 00 01 04 FF              886  VALIDXN_ALL                     DC.B    ABSShort,ABSLong,XnImmediate,-1                 
-0000175B                           887  ; MOVE (source), MOVEA, ADD, ADDA, SUB, MULS, DIVU, AND, OR, 
-0000175B= 00 01 FF                 888  VALIDXN_SHORTLONG               DC.B    ABSShort,ABSLong,-1                             
-0000175E                           889  ; MOVE (dest), MOVEM, ADD (destination operand), ADDQ, SUB (destination operand), LEA, AND (destination operand),
-0000175E                           890  ; OR (destination operand), NOT, LSL/R, ASL/R, JSR
-0000175E                           891  
-0000175E                           892  * posible memory ASd/LSd rotation values
-0000175E  =00000000                893  ASd_MEM                         EQU     0   
-0000175E  =00000001                894  LSd_MEM                         EQU     1 
-0000175E  =00000003                895  ROR_MEM                         EQU     3
-0000175E                           896   
-0000175E  =00000000                897  ASd_REG                         EQU     0   
-0000175E  =00000001                898  LSd_REG                         EQU     1 
-0000175E  =00000003                899  ROR_REG                         EQU     3
-0000175E                           900  
-0000175E                           901  * Starting messages
-0000175E= 57 65 6C 63 6F 6D ...    902  WELCOME                         DC.B    'Welcome to Team Big Blue Disassembler',CR,LF
-00001785= 46 6F 72 6D 61 74 ...    903                                  DC.B    'Format: 8 digit address in hexadecimal format. Letters must be capital case.',CR,LF,0
-000017D4= 50 6C 65 61 73 65 ...    904  STARTING                        DC.B    'Please enter a starting location in the above format',CR,LF,0
-0000180B= 50 6C 65 61 73 65 ...    905  ENDING                          DC.B    'Please enter an ending location in the above format',CR,LF,0
-00001841= 49 6E 76 61 6C 69 ...    906  BAD_INPUT                       DC.B    'Invalid input. Please try again',CR,LF,0
-00001863= 45 72 72 6F 72 20 ...    907  ERROR_MSG                       DC.B    'Error while disassembling',CR,LF,0
-0000187F= 0D 0A 00                 908  NEW_LINE                        DC.B    CR,LF,0
-00001882= 09 09 09 00              909  THREE_TAB                       DC.B    TAB,TAB,TAB,0
-00001886                           910  
-00001886                           911  * Opcode Messages
-00001886= 09 4E 4F 50 00           912  MSG_NOP                         DC.B    TAB,'NOP',0
-0000188B= 09 4D 4F 56 45 00        913  MSG_MOVE                        DC.B    TAB,'MOVE',0  
-00001891= 09 4D 4F 56 45 41 00     914  MSG_MOVEA                       DC.B    TAB,'MOVEA',0
-00001898= 09 4D 4F 56 45 51 00     915  MSG_MOVEQ                       DC.B    TAB,'MOVEQ',0
-0000189F= 09 4D 4F 56 45 4D 00     916  MSG_MOVEM                       DC.B    TAB,'MOVEM',0
-000018A6= 09 41 44 44 00           917  MSG_ADD                         DC.B    TAB,'ADD',0
-000018AB= 09 41 44 44 41 00        918  MSG_ADDA                        DC.B    TAB,'ADDA',0
-000018B1= 09 41 44 44 51 00        919  MSG_ADDQ                        DC.B    TAB,'ADDQ',0
-000018B7= 09 53 55 42 00           920  MSG_SUB                         DC.B    TAB,'SUB',0
-000018BC= 09 4D 55 4C 53 00        921  MSG_MULS                        DC.B    TAB,'MULS',0
-000018C2= 09 44 49 56 55 00        922  MSG_DIVU                        DC.B    TAB,'DIVU',0
-000018C8= 09 4C 45 41 09 09 ...    923  MSG_LEA                         DC.B    TAB,'LEA',TAB,TAB,TAB,0
-000018D0= 09 41 4E 44 00           924  MSG_AND                         DC.B    TAB,'AND',0
-000018D5= 09 4F 52 00              925  MSG_OR                          DC.B    TAB,'OR',0
-000018D9= 09 4E 4F 54 00           926  MSG_NOT                         DC.B    TAB,'NOT',0
-000018DE= 09 4C 53 00              927  MSG_LSd                         DC.B    TAB,'LS',0
-000018E2= 09 41 53 00              928  MSG_ASd                         DC.B    TAB,'AS',0
-000018E6= 09 42 43 43 09 09 ...    929  MSG_BCC                         DC.B    TAB,'BCC',TAB,TAB,TAB,0
-000018EE= 09 42 43 53 09 09 ...    930  MSG_BCS                         DC.B    TAB,'BCS',TAB,TAB,TAB,0
-000018F6= 09 42 45 51 09 09 ...    931  MSG_BEQ                         DC.B    TAB,'BEQ',TAB,TAB,TAB,0
-000018FE= 09 42 4E 45 09 09 ...    932  MSG_BNE                         DC.B    TAB,'BNE',TAB,TAB,TAB,0
-00001906= 09 42 47 45 09 09 ...    933  MSG_BGE                         DC.B    TAB,'BGE',TAB,TAB,TAB,0
-0000190E= 09 42 47 54 09 09 ...    934  MSG_BGT                         DC.B    TAB,'BGT',TAB,TAB,TAB,0
-00001916= 09 42 48 49 09 09 ...    935  MSG_BHI                         DC.B    TAB,'BHI',TAB,TAB,TAB,0
-0000191E= 09 42 4C 45 09 09 ...    936  MSG_BLE                         DC.B    TAB,'BLE',TAB,TAB,TAB,0
-00001926= 09 42 4C 53 09 09 ...    937  MSG_BLS                         DC.B    TAB,'BLS',TAB,TAB,TAB,0
-0000192E= 09 42 4C 54 09 09 ...    938  MSG_BLT                         DC.B    TAB,'BLT',TAB,TAB,TAB,0
-00001936= 09 42 4D 49 09 09 ...    939  MSG_BMI                         DC.B    TAB,'BMI',TAB,TAB,TAB,0
-0000193E= 09 42 50 4C 09 09 ...    940  MSG_BPL                         DC.B    TAB,'BPL',TAB,TAB,TAB,0
-00001946= 09 42 56 43 09 09 ...    941  MSG_BVC                         DC.B    TAB,'BVC',TAB,TAB,TAB,0
-0000194E= 09 42 56 53 09 09 ...    942  MSG_BVS                         DC.B    TAB,'BVS',TAB,TAB,TAB,0
-00001956= 09 4A 53 52 09 09 ...    943  MSG_JSR                         DC.B    TAB,'JSR',TAB,TAB,TAB,0
-0000195E= 09 52 54 53 00           944  MSG_RTS                         DC.B    TAB,'RTS',0
-00001963= 09 42 52 41 09 09 ...    945  MSG_BRA                         DC.B    TAB,'BRA',TAB,TAB,TAB,0
-0000196B                           946  
-0000196B                           947  * Direction for LSd and ASd
-0000196B= 52 00                    948  MSG_RIGHT                       DC.B    'R',0
-0000196D= 4C 00                    949  MSG_LEFT                        DC.B    'L',0
-0000196F                           950  
-0000196F                           951  * Effective Addresses Messages
-0000196F= 44 00                    952  MSG_DR                          DC.B    'D',0
-00001971= 41 00                    953  MSG_AR                          DC.B    'A',0
-00001973= 28 00                    954  MSG_LB                          DC.B    '(',0       ; left bracket, NEVER PRINTED WITHOUT RB
-00001975= 29 00                    955  MSG_RB                          DC.B    ')',0       ; right bracket, ALWAYS FOLLOWS AFTER LB
-00001977= 2B 00                    956  MSG_PLUS                        DC.B    '+',0
-00001979= 2D 00                    957  MSG_MINUS                       DC.B    '-',0
-0000197B= 23 00                    958  MSG_POUND                       DC.B    '#',0 
-0000197D= 24 00                    959  MSG_HEX                         DC.B    '$',0 
-0000197F= 2C 20 00                 960  MSG_COMMA                       DC.B    ', ',0 
-00001982= 20 00                    961  MSG_SPACE                       DC.B    ' ',0
-00001984= 09 00                    962  MSG_TAB                         DC.B    TAB,0
-00001986                           963  
-00001986                           964  * Size Messages
-00001986= 2E 42 09 09 09 00        965  MSG_B                           DC.B    '.B',TAB,TAB,TAB,0
-0000198C= 2E 57 09 09 09 00        966  MSG_W                           DC.B    '.W',TAB,TAB,TAB,0
-00001992= 2E 4C 09 09 09 00        967  MSG_L                           DC.B    '.L',TAB,TAB,TAB,0
-00001998                           968  
-00001998                           969  * Variables
-00001998  =00000100                970  STARTING_ADDRESS                EQU     $100
-00001998  =00000150                971  ENDING_ADDRESS                  EQU     $150
-00001998  =00000200                972  CURRENT_INSTR                   EQU     $200
-00001998  =00000250                973  REG_VAR                         EQU     $250 * Hold bits 11-9
-00001998  =00000300                974  OPMODE_VAR                      EQU     $300 * Hold bits 8-6
-00001998  =00000350                975  EA_MODE                         EQU     $350 * Hold bits 5-3
-00001998  =00000400                976  EA_REG                          EQU     $400 * Hold bits 2-0
-00001998                           977  
-00001998                           978              END     START        ; last line of source
+00001198                           152  *                ; get destination
+00001198                           153  *                MOVE.W  #1,D1                   ; specifies that we are looking for dest addressing mode
+00001198                           154  *                JSR     GET_EA                  ; gets effective address, output: D1 = EA
+00001198                           155  *                MOVE.W  D1,D6                   ; saves EA to D6 so it doesn't get overwritten
+00001198                           156  *                MOVE.W  #1,D1                   ; specifies that we are looking for dest Xn
+00001198                           157  *                JSR     GET_XN                  ; Gets Xn, puts it into D1
+00001198                           158  *                MOVE.W  D1,D7                   ; saves Xn to D7 so it doesn't get overwritten
+00001198                           159  *
+00001198                           160  *CHECKDEST       LEA     VALIDEA_ALL,A5          ; load valid move EA
+00001198                           161  *                MOVE.W  D6,D1                   ; marks down that we are checking EA
+00001198                           162  *                JSR     CHECKEAXN_IFVALID       ; checks if EA is valid
+00001198                           163  *                CMP.W   #2,D1                   ; checks if it is Xn
+00001198                           164  *                BEQ     CHECKMOVE_XN            ; branches to CHECKXn if it is
+00001198                           165  *                CMP.W   #1,D1                   ; Checks if it is invalid
+00001198                           166  *                BEQ     EAMOVE_INVALID          ; branches to CHECKXn if it is
+00001198                           167                  
+00001198                           168  *                ; get source
+00001198                           169  *EAMOVE_VALID    MOVE.W  #0,D1                   ; specifies that we are looking for source addressing mode
+00001198                           170  *                JSR     GET_EA                  ; gets effective address, output: D1 = EA
+00001198                           171  *                MOVE.W  D1,D4                   ; saves EA to D6 so it doesn't get overwritten
+00001198                           172  *                MOVE.W  #0,D1                   ; specifies that we are looking for source Xn
+00001198                           173  *                JSR     GET_XN                  ; Gets Xn, puts it into D1
+00001198                           174  *                MOVE.W  D1,D5                   ; saves Xn to D7 so it doesn't get overwritten
+00001198                           175                  
+00001198                           176                  ; Check source
+00001198  4BF9 000018F6            177                  LEA     VALIDEA_ALL,A5           ; Loads valid EA types in A5
+0000119E  4DF9 0000192C            178                  LEA     VALIDXN_ALL,A6           ; Loads valid Xn types in A6
+000011A4  3E3C 0000                179                  MOVE.W  #0,D7                    ; Marks D7 as "Source" for CHECKGETEAXN
+000011A8  4EB9 0000160E            180                  JSR     CHECKGET_EAXN            ; getting if its valid (D1), EA (D2), and Xn (D3)
+000011AE  B27C 0001                181                  CMP.W   #1,D1                    ; checks if invalid
+000011B2  6700 0402                182                  BEQ     CASE_DATA                ; branches to CASE_DATA if invalid
+000011B6  3802                     183                  MOVE.W  D2,D4                    ; Moves D2 (source effective address) to D4
+000011B8  3A03                     184                  MOVE.W  D3,D5                    ; Moves D3 (source Xn if applicable) to D5
+000011BA                           185                  
+000011BA                           186                  ; Check destination
+000011BA  4BF9 000018F6            187                  LEA     VALIDEA_ALL,A5           ; Loads valid EA types in A5
+000011C0  4DF9 00001930            188                  LEA     VALIDXN_SHORTLONG,A6     ; Loads valid Xn types in A6
+000011C6  3E3C 0001                189                  MOVE.W  #1,D7                    ; Marks D7 as "Source" for CHECKGETEAXN
+000011CA  4EB9 0000160E            190                  JSR     CHECKGET_EAXN            ; getting if its valid (D1), EA (D2), and Xn (D3)
+000011D0  B27C 0001                191                  CMP.W   #1,D1                    ; checks if invalid
+000011D4  6700 03E0                192                  BEQ     CASE_DATA                ; branches to CASE_DATA if invalid
+000011D8  3C02                     193                  MOVE.W  D2,D6                    ; Moves D2 (source effective address) to D6
+000011DA  3E03                     194                  MOVE.W  D3,D7                    ; Moves D3 (source Xn if applicable) to D7
+000011DC                           195                  
+000011DC  3200                     196                  MOVE.W  D0,D1                    ; stores d0 in d1
+000011DE  C27C 01C0                197                  AND.W   #$01C0, D1               ; appplies a bitmask to get 3 bits, check if its 001
+000011E2  B27C 0040                198                  CMP.W   #$0040, D1               ; confirms if it is a MOVEA
+000011E6  6700 000C                199                  BEQ     INSERTA                  ; branches to MOVEA, otherwise it is a normal MOVE
+000011EA                           200   
+000011EA  4BF9 00001A60            201                  LEA     MSG_MOVE,A5              ; loads string pointer for MOVE into A5
+000011F0  6000 0008                202                  BRA     PRINTMOVE                ; Branches to print move
+000011F4                           203                  
+000011F4  4BF9 00001A66            204  INSERTA         LEA     MSG_MOVEA,A5             ; loads string pointer for MOVEA into A5
+000011FA                           205   
+000011FA  4EB9 00001858            206  PRINTMOVE       JSR     PRINTNULL                ; prints out MOVE/MOVEA
+00001200  4EB9 0000187A            207                  JSR     PRINTMOVESIZE            ; prints out the size  
+00001206  3404                     208                  MOVE.W  D4,D2                    ; Moves D4 (source effective address) to D2
+00001208  3605                     209                  MOVE.W  D5,D3                    ; Moves D5 (source Xn if applicable) to D3 
+0000120A  4EB9 000016CA            210                  JSR     EA_TO_STRING             ; outputs it into a string
+00001210                           211                  
+00001210                           212                  ; prints a comma to seperate
+00001210  4BF9 00001B58            213                  LEA     MSG_COMMA,A5             ; loads string pointer into A5
+00001216  4EB9 00001858            214                  JSR     PRINTNULL                ; prints out MOVE
+0000121C                           215                  
+0000121C                           216                  ; print destination
+0000121C  3406                     217                  MOVE.W  D6,D2                    ; Moves D6 (dest effective address) to D2
+0000121E  3607                     218                  MOVE.W  D7,D3                    ; Moves D7 (dest Xn if applicable) to D3 
+00001220  4EB9 000016CA            219                  JSR     EA_TO_STRING             ; outputs it into a string
+00001226  4E75                     220                  RTS                              ; exits subroutine                 
+00001228                           221  
+00001228                           222  *CHECKMOVE_Xn    LEA     VALIDXN_SHORTLONG,A5    ; Loads Xn into A5
+00001228                           223  *                MOVE.W  D7,D1                   ; Loads D7 into D1 to check the Xn
+00001228                           224  *                JSR     CHECKEAXN_IFVALID       ; checks if the Xn is valid, put result in D1
+00001228                           225  *                TST.W   D1                      ; checks if it is valid
+00001228                           226  *                BEQ     EAMOVE_VALID            ; go to EA_VALID to print
+00001228                           227  *                BRA     EAMOVE_INVALID          ; branches to EA_INVALID if not              
+00001228                           228                  
+00001228  3200                     229  CASE_MOVEM      MOVE.W  D0,D1                   ; copies instruction word to D1
+0000122A  C27C FB80                230                  AND.W   #$FB80,D1               ; check bitmask for MOVEM (1111 1011 1000 0000)
+0000122E  B27C 4880                231                  CMP.W   #$4880,D1               ; sees if it matches MOVEM (0100 1000 1000 0000)
+00001232  6600 005A                232                  BNE     CASE_MOVEQ                   ; checks MOVEQ if its not MOVEM
+00001236                           233                  
+00001236                           234                  ; loads EA and XN
+00001236  323C 0000                235                  MOVE.W  #0,D1                   ; copies instruction word to D1
+0000123A  4EB9 000015BA            236                  JSR     GET_EA                  ; gets EA and puts in D1
+00001240  3401                     237                  MOVE.W  D1,D2                   ; copies EA to D1 so it won't be overwritten
+00001242  323C 0000                238                  MOVE.W  #0,D1                   ; copies instruction word to D1
+00001246  4EB9 000015E4            239                  JSR     GET_XN                  ; gets XN and puts in D1
+0000124C  3601                     240                  MOVE.W  D1,D3                   ; copies EA to D1 so it won't be overwritten
+0000124E                           241                  
+0000124E                           242                  ; Check D
+0000124E  3200                     243                  MOVE.W  D0,D1                   ; copies instruction word to D1
+00001250  C27C 0400                244                  AND.W   #$0400,D1               ; check bitmask for D in MOVEM (0000 0100 0000 0000)
+00001254  3E01                     245                  MOVE.W  D1,D7                   ; stores D1 in D7 so it doesn't get overwritten
+00001256  B27C 0400                246                  CMP.W   #$0400,D1               ; checks if value is 1
+0000125A  6700 0032                247                  BEQ     MOVEM_MEM2REG           ; if value is 1, then it is Memory to Register   
+0000125E                           248  
+0000125E  4BF9 00001903            249  MOVEM_REG2MEM   LEA     VALIDEA_MOVEM_REGTOMEM,A5       ; loads valid addresses
+00001264  3202                     250                  MOVE.W  D2,D1                           ; Loads D2 into D1 to check the number representing EA
+00001266  4EB9 00001696            251                  JSR     CHECKEAXN_IFVALID               ; checks if the EA is valid
+0000126C  B27C 0001                252                  CMP.W   #1,D1                           ; checks if D1 invalid
+00001270  6700 0344                253                  BEQ     CASE_DATA                       ; if invalid go to CASE_DATA
+00001274  B27C 0002                254                  CMP.W   #2,D1                           ; checks if we need to check Xn
+00001278                           255                  
+00001278  4BF9 00001903            256  REG2MEMXNCHECK  LEA     VALIDEA_MOVEM_REGTOMEM,A5       ; loads valid addresses
+0000127E  3203                     257                  MOVE.W  D3,D1                           ; Loads D2 into D1 to check the number representing EA
+00001280  4EB9 00001696            258                  JSR     CHECKEAXN_IFVALID               ; checks if the EA is valid
+00001286  B27C 0001                259                  CMP.W   #1,D1                           ; checks if D1 invalid
+0000128A  6700 032A                260                  BEQ     CASE_DATA                       ; if invalid go to CASE_DATA
+0000128E                           261  
+0000128E                           262                  
+0000128E                           263  
+0000128E                           264  MOVEM_MEM2REG    
+0000128E                           265                          
+0000128E                           266  
+0000128E                           267  
+0000128E                           268  CASE_MOVEQ  
+0000128E                           269  
+0000128E                           270  *CASE_ADD        LEA         MSG_ADDA,A1
+0000128E                           271  *                MOVE.B      #14,D0
+0000128E                           272  *                TRAP        #15 
+0000128E                           273  *
+0000128E                           274  *CASE_ADDA       LEA         MSG_ADDA,A1
+0000128E                           275  *                MOVE.B      #14,D0
+0000128E                           276  *                TRAP        #15                 ; print "ADDA"
+0000128E                           277  *                MOVE.W      OPMODE_VAR,D3
+0000128E                           278  *                JSR         ADDA_SIZE
+0000128E                           279  *                JSR         ADDR_MODE_JUMP_TABLE
+0000128E                           280  *                    
+0000128E                           281  *            
+0000128E                           282  *ADDA_SIZE       CMP.W       #%111,D3
+0000128E                           283  *                BEQ         PRINT_WORD 
+0000128E                           284  *                BRA         PRINT_LONG          
+0000128E                           285                  
+0000128E                           286  
+0000128E                           287  CASE_ADDQ
+0000128E                           288  
+0000128E                           289  CASE_SUB
+0000128E                           290  
+0000128E  3200                     291  CASE_LEA        MOVE.W  D0,D1                                ; Copies instruction word to D1
+00001290  C27C F000                292                  AND.W   #$F000,D1                            ; Applies a bitmask to get first 4 bits                
+00001294  B27C 4000                293                  CMP.W   #$4000,D1                            ; Checks if it fits the first four bits of LEA opcode
+00001298  6600 0066                294                  BNE.W   CASE_AND                             ; If its not, check AND
+0000129C  3200                     295                  MOVE.W  D0,D1                                ; Copies instruction word to D1
+0000129E  C27C 01C0                296                  AND.W   #$01C0,D1                            ; Applies a bitmask to get 3 bits from places 6 to 8             
+000012A2  B27C 01C0                297                  CMP.W   #$01C0,D1                            ; Checks if it matches 111/#3
+000012A6  6600 0058                298                  BNE.W   CASE_AND                             ; If its not, check AND
+000012AA                           299                  
+000012AA  4BF9 00001A9D            300                  LEA     MSG_LEA,A5                           ; loads string pointer for LEA into A5
+000012B0  4EB9 00001858            301                  JSR     PRINTNULL                            ; prints LEA
+000012B6                           302                  
+000012B6                           303                   ; source
+000012B6  323C 0000                304                  MOVE.W  #0,D1                                ; specifies that we are looking for source addressing mode
+000012BA  4EB9 000015BA            305                  JSR     GET_EA                               ; gets effective address, output: D1 = EA
+000012C0  3401                     306                  MOVE.W  D1,D2                                ; saves EA to D2 so it doesn't get overwritten
+000012C2  323C 0000                307                  MOVE.W  #0,D1                                ; specifies that we are looking for source Xn
+000012C6  4EB9 000015E4            308                  JSR     GET_XN                               ; Gets Xn, puts it into D1
+000012CC  3601                     309                  MOVE.W  D1,D3                                ; saves Xn to D3 so it doesn't get overwritten
+000012CE  4EB9 000016CA            310                  JSR     EA_TO_STRING                         ; Prints out the EA
+000012D4                           311                  
+000012D4                           312                  ; comma
+000012D4  4BF9 00001B58            313                  LEA     MSG_COMMA,A5                         ; prints out a comma for formatting
+000012DA  4EB9 00001858            314                  JSR     PRINTNULL                       
+000012E0                           315                   
+000012E0                           316                  ; register
+000012E0  4BF9 00001B4A            317                  LEA     MSG_AR,A5                            ; loads A into A5 (we already checked for it)
+000012E6  4EB9 00001858            318                  JSR     PRINTNULL 
+000012EC  3401                     319                  MOVE.W  D1,D2                                ; saves Xn to D3 so it doesn't get overwritten
+000012EE  323C 0001                320                  MOVE.W  #1,D1                                ; specifies that we are looking for destination Xn
+000012F2  4EB9 000015E4            321                  JSR     GET_XN                               ; Gets Xn, puts it into D1
+000012F8  4EB9 00001822            322                  JSR     PRINTNUM                             ; Prints the number in D1
+000012FE  4E75                     323                  RTS
+00001300                           324  
+00001300                           325  **---------------AND opcode----------------------
+00001300                           326  CASE_AND
+00001300                           327  *CASE_AND        LEA         MSG_AND,A1
+00001300                           328  *                MOVE.B      #14,D0
+00001300                           329  *                TRAP        #15 
+00001300                           330  *                JSR         GET_VARS
+00001300                           331  *                JSR         AND_SIZE                        ; .B, .W, or .L  
+00001300                           332  *                MOVE.W      CURRENT_INSTR, D5                         
+00001300                           333  *                LSL.W       #7, D5                        
+00001300                           334  *                LSR.W       #8, D5                   
+00001300                           335  *                LSR.W       #7, D5                     
+00001300                           336  *                CMP.B       #00, D5                         ; check if destination is a Dn?
+00001300                           337  *                BEQ         DEST_DN                         ; Yes it is, go to DEST_DN
+00001300                           338  *                CMP.B       #$01,D5                         ; Is the destination not a Dn?
+00001300                           339  *                BEQ         DEST_EA                         ; branch to DEST_EA            
+00001300                           340  *                RTS
+00001300                           341     
+00001300                           342  *AND_SIZE        CMP.B       #%00,OPMODE_VAR       
+00001300                           343  *                BEQ         PRINT_BYTE
+00001300                           344  *                CMP.B       #$01, OPMODE_VAR
+00001300                           345  *                BEQ         PRINT_WORD
+00001300                           346  *                CMP.B       #$02, OPMODE_VAR
+00001300                           347  *                BEQ         PRINT_LONG    
+00001300                           348  *    
+00001300                           349  *DEST_DN         MOVE.W      CURRENT_INSTR, D5               
+00001300                           350  *                LSL.W       #6,D5
+00001300                           351  *                LSL.W       #4,D5
+00001300                           352  *                LSR.W       #6,D5
+00001300                           353  *                LSR.W       #4,D5
+00001300                           354  *                LSR.W       #3,D5                           ; d5 stores EA mode                
+00001300                           355  *                  
+00001300                           356  *                MOVE.W      CURRENT_INSTR, D6               
+00001300                           357  *                LSL.W       #6,D5
+00001300                           358  *                LSL.W       #4,D5
+00001300                           359  *                LSL.W       #3,D6
+00001300                           360  *                LSR.W       #6,D6
+00001300                           361  *                LSR.W       #4,D6
+00001300                           362  *                LSR.W       #3,D6                           ; d6 stores EA register
+00001300                           363  *                JSR         FIND_EA
+00001300                           364  *
+00001300                           365  *                
+00001300                           366  *                MOVE.W      CURRENT_INSTR, D5               
+00001300                           367  *                LSL.W       #4, D5                         
+00001300                           368  *                LSR.W       #8, D5                          ; shift bits to get register
+00001300                           369  *                LSR.W       #5, D5                          ; D5 contains register
+00001300                           370  *                LEA         MSG_COMMA, A1                   
+00001300                           371  *                MOVE.B      #14,D0
+00001300                           372  *                TRAP        #15                             ; print comma
+00001300                           373  *                LEA         MSG_DR, A1                      ; print D
+00001300                           374  *                MOVE.B      #14,D0
+00001300                           375  *                TRAP        #15
+00001300                           376  *                MOVEA.L     D5,A1
+00001300                           377  *                MOVE.B      #14,D0
+00001300                           378  *                TRAP        #15                              
+00001300                           379  *                RTS        
+00001300                           380  *
+00001300                           381  *FIND_EA        CMP.W       #%010,D5
+00001300                           382  *                BEQ         CASE_ARI
+00001300                           383  *                CMP.W       #%011,D5
+00001300                           384  *                BEQ         CASE_ARIPOST
+00001300                           385  *                CMP.W       #%100,D5
+00001300                           386  *                BEQ         CASE_ARIPRE
+00001300                           387  *                CMP.W       #%111,D5
+00001300                           388  *                BEQ         CASE_OTHER
+00001300                           389  *                BRA         ERROR    
+00001300                           390  *                                     
+00001300                           391  *DEST_EA         MOVE.W      CURRENT_INSTR, D5               
+00001300                           392  *                LSL.W       #4, D5                         
+00001300                           393  *                LSR.W       #8, D5                          ; shift bits to get register
+00001300                           394  *                LSR.W       #5, D5                          ; D5 contains register
+00001300                           395  *
+00001300                           396  *                LEA         MSG_DR, A1                   
+00001300                           397  *                MOVE.B      #14,D0
+00001300                           398  *                TRAP        #15                             ; print D
+00001300                           399  *                MOVEA.L     D5,A1  
+00001300                           400  *                MOVE.B      #14,D0                          ; print register
+00001300                           401  *                TRAP        #15
+00001300                           402  *                
+00001300                           403  *                LEA         MSG_COMMA, A1                   
+00001300                           404  *                MOVE.B      #14,D0
+00001300                           405  *                TRAP        #15                             ; print comma
+00001300                           406  *                
+00001300                           407  *                MOVE.W      CURRENT_INSTR, D5               
+00001300                           408  *                LSL.W       #6,D5
+00001300                           409  *                LSL.W       #4,D5
+00001300                           410  *                LSR.W       #6,D5
+00001300                           411  *                LSR.W       #4,D5
+00001300                           412  *                LSR.W       #3,D5                           ; d5 stores EA mode                
+00001300                           413  *                  
+00001300                           414  *                MOVE.W      CURRENT_INSTR, D6               
+00001300                           415  *                LSL.W       #6,D6
+00001300                           416  *                LSL.W       #4,D6
+00001300                           417  *                LSL.W       #3,D6
+00001300                           418  *                LSR.W       #6,D6
+00001300                           419  *                LSR.W       #4,D6
+00001300                           420  *                LSR.W       #3,D6                           ; d6 stores EA register
+00001300                           421  *                JSR         FIND_EA                          
+00001300                           422  *                RTS                                     Return full instruction   
+00001300                           423              
+00001300                           424  CASE_OR
+00001300                           425  
+00001300                           426  CASE_NOT
+00001300                           427  
+00001300  3200                     428  CASE_LSDASD     MOVE.W      D0,D1                            ; copies D0 to D1
+00001302  C27C F000                429                  AND.W       #$F000, D1                       ; gets first 4 bits
+00001306  B27C E000                430                  CMP.W       #$E000,D1                        ; checks if next 4 bits is E (confirm if ASd/LSd)
+0000130A  6600 0210                431                  BNE         CASE_BRA                         ; if not equal ASd/LSd check BRA
+0000130E  3400                     432                  MOVE.W      D0,D2                            ; copies D0 to D2
+00001310  4EB9 00001686            433                  JSR         GETROTATIONSIZE                  ; gets the rotation size
+00001316  B47C 0003                434                  CMP.W       #$3, D2                          ; checks if it is memory or register option
+0000131A  6600 00C8                435                  BNE         CASE_SHIFTREG                    ; if rotation size not equal to 3, go to shift reg         
+0000131E                           436                  
+0000131E  3400                     437  CASE_SHIFTMEM   MOVE.W      D0,D2                            ; copies D0 to D2
+00001320  4EB9 00001674            438                  JSR         GETROTATION                      ; gets rotation value of D2
+00001326  B47C 0000                439                  CMP.W       #ASd_MEM,D2                      ; checks if rotation value is ASdMem
+0000132A  6700 0014                440                  BEQ         CASE_ASdMEM                      ; branches to ASd_MEM if value matches
+0000132E  B47C 0003                441                  CMP.W       #ROd_MEM,D2                      ; checks if rotation value is ASdMem
+00001332  6700 0016                442                  BEQ         CASE_ROdMEM                      ; branches to ASd_MEM if value matches
+00001336                           443                  
+00001336  4BF9 00001AB3            444  CASE_LSdMEM     LEA         MSG_LSd,A5                       ; loads LS into A5
+0000133C  6000 0012                445                  BRA         PRINTSHIFTMEM                    ; branches to PRINTSHIFTMEM
+00001340                           446  
+00001340  4BF9 00001AB7            447  CASE_ASdMEM     LEA         MSG_ASd,A5                       ; loads AS into A5  
+00001346  6000 0008                448                  BRA         PRINTSHIFTMEM                    ; branches to PRINTSHIFTMEM
+0000134A                           449  
+0000134A  4BF9 00001ABB            450  CASE_ROdMEM     LEA         MSG_ROd,A5                       ; loads AS into A5          
+00001350                           451                  
+00001350  4EB9 00001858            452  PRINTSHIFTMEM   JSR         PRINTNULL                        ; Prints LS or AS   
+00001356  3400                     453                  MOVE.W      D0,D2                            ; copies D0 to D2
+00001358  4EB9 0000167E            454                  JSR         GETDIRECTION                     ; gets direction
+0000135E  B47C 0000                455                  CMP.W       #0,D2                            ; checking if its right
+00001362  6700 000C                456                  BEQ         CASE_RIGHTMEM                    ; shifts to the right 
+00001366                           457  
+00001366  4BF9 00001B46            458  CASE_LEFTMEM    LEA         MSG_LEFT,A5                      ; loads L into A5 
+0000136C  6000 0008                459                  BRA         PRINT_MEMDIR                     ; branches for printing
+00001370                           460          
+00001370  4BF9 00001B44            461  CASE_RIGHTMEM   LEA         MSG_RIGHT,A5                     ; loads R into A5  
+00001376                           462  
+00001376  4EB9 00001858            463  PRINT_MEMDIR    JSR         PRINTNULL                        ; Prints L or R
+0000137C  4BF9 00001B65            464                  LEA         MSG_W,A5                         ; loads .W into A5
+00001382  4EB9 00001858            465                  JSR         PRINTNULL                        ; Prints .W
+00001388  6000 0002                466                  BRA         GETMEMSOURCE                     ; checks the source 
+0000138C                           467                  
+0000138C                           468  ; get source addressing mode       
+0000138C                           469  GETMEMSOURCE                                                 
+0000138C  323C 0000                470                  MOVE.W      #0,D1                            ; specifies that we are looking for source addressing mode
+00001390  4EB9 000015BA            471                  JSR         GET_EA                           ; gets effective address, output: D1 = EA
+00001396  3801                     472                  MOVE.W      D1,D4                            ; saves EA to D4 so it doesn't get overwritten
+00001398  323C 0000                473                  MOVE.W      #0,D1                            ; specifies that we are looking for source Xn
+0000139C  4EB9 000015E4            474                  JSR         GET_XN                           ; Gets Xn, puts it into D1
+000013A2  3A01                     475                  MOVE.W      D1,D5                            ; saves Xn to D5 so it doesn't get overwritten
+000013A4                           476  
+000013A4  4BF9 00001924            477  CHECKMEMSOURE   LEA         VALIDEA_SHIFT,A5                 ; load valid move EA
+000013AA  3204                     478                  MOVE.W      D4,D1                            ; marks down that we are checking EA
+000013AC  4EB9 00001696            479                  JSR         CHECKEAXN_IFVALID                ; checks if EA is valid
+000013B2  B27C 0002                480                  CMP.W       #2,D1                            ; checks if it is Xn
+000013B6  6700 0016                481                  BEQ         CHECKSHIFT_XN                    ; branches to CHECKXn if it is
+000013BA  B27C 0001                482                  CMP.W       #1,D1                            ; Checks if it is invalid
+000013BE  6700 01F6                483                  BEQ         CASE_DATA                        ; branches to CASE_DATA if it is
+000013C2                           484  
+000013C2  3404                     485  EASHIFT_VALID   MOVE.W      D4,D2                            ; moves EA to D2
+000013C4  3605                     486                  MOVE.W      D5,D3                            ; moves EA to D3
+000013C6  4EB9 000016CA            487                  JSR         EA_TO_STRING                     ; prints out the EA
+000013CC  4E75                     488                  RTS                
+000013CE                           489                  
+000013CE                           490                  
+000013CE  4BF9 00001930            491  CHECKSHIFT_Xn   LEA         VALIDXN_SHORTLONG,A5             ; Loads Xn into A5
+000013D4  3205                     492                  MOVE.W      D5,D1                            ; Loads D5 into D1 to check the Xn
+000013D6  4EB9 00001696            493                  JSR         CHECKEAXN_IFVALID                ; checks if the Xn is valid, put result in D1
+000013DC  4A41                     494                  TST.W       D1                               ; checks if it is valid
+000013DE  67E2                     495                  BEQ         EASHIFT_VALID                    ; go to EA_SHIFT to print
+000013E0  6000 01D4                496                  BRA         CASE_DATA                        ; branches to CASE_DATA if not                
+000013E4                           497  
+000013E4                           498  
+000013E4  3602                     499  CASE_SHIFTREG   MOVE.W      D2,D3                            ; copies D2 to D3
+000013E6  3200                     500                  MOVE.W      D0,D1                            ; copies D0 to D1
+000013E8  C27C 0018                501                  AND.W       #$0018,D1                        ; gets bits representing type (bitmask: 0000 0000 0001 1000)
+000013EC  E649                     502                  LSR.W       #3,D1                            ; shifts 3 bits to the right so we only have 2 bits left   
+000013EE  B27C 0000                503                  CMP.W       #ASd_REG,D1                      ; Compares D1 to 0, if it is 0, it is ASd
+000013F2  6700 0014                504                  BEQ         CASE_ASdReg                      ; goes to ASd case if so    
+000013F6  B27C 0003                505                  CMP.W       #ROd_REG,D1                      ; Compares D1 to 0, if it is 0, it is ASd
+000013FA  6700 0016                506                  BEQ         CASE_ROdReg                      ; goes to ASd case if so                 
+000013FE                           507                  
+000013FE  4BF9 00001AB3            508  CASE_LSdREG     LEA         MSG_LSd,A5                       ; loads LS into A5
+00001404  6000 0012                509                  BRA         PRINTSHIFTREG                    ; branches to PRINTSHIFTREG
+00001408                           510  
+00001408  4BF9 00001AB7            511  CASE_ASdREG     LEA         MSG_ASd,A5                       ; loads AS into A5
+0000140E  6000 0008                512                  BRA         PRINTSHIFTREG                    ; branches to PRINTSHIFTREG
+00001412                           513  
+00001412  4BF9 00001ABB            514  CASE_ROdREG     LEA         MSG_ROd,A5                       ; loads AS into A5          
+00001418                           515                  
+00001418  4EB9 00001858            516  PRINTSHIFTREG   JSR         PRINTNULL                        ; Prints LS or AS   
+0000141E  3400                     517                  MOVE.W      D0,D2                            ; copies D0 to D2
+00001420  4EB9 0000167E            518                  JSR         GETDIRECTION                     ; gets direction
+00001426  B47C 0000                519                  CMP.W       #0,D2                            ; checking if its right
+0000142A  6700 000C                520                  BEQ         CASE_RIGHTREG                    ; shifts to the right 
+0000142E                           521  
+0000142E  4BF9 00001B46            522  CASE_LEFTREG    LEA         MSG_LEFT,A5                      ; loads L into A5 
+00001434  6000 000C                523                  BRA         PRINT_REGDIR                     ; branches for printing
+00001438                           524          
+00001438  4BF9 00001B44            525  CASE_RIGHTREG   LEA         MSG_RIGHT,A5                     ; loads R into A5 
+0000143E  6000 0002                526                  BRA         PRINT_REGDIR                     ; branches for printing
+00001442                           527                  
+00001442  4EB9 00001858            528  PRINT_REGDIR    JSR         PRINTNULL                        ; Prints L or R
+00001448                           529  
+00001448  3400                     530  PRINTREGSIZE    MOVE.W      D0,D2                            ; loads D0 into D2 to get unmodified instruction word
+0000144A  4EB9 00001686            531                  JSR         GETROTATIONSIZE                  ; gets the rotation size
+00001450  B47C 0001                532                  CMP.W       #1,D2                            ; Checks if it is word size
+00001454  6700 0014                533                  BEQ         REG_WORD                         ; Prints .W
+00001458  B47C 0002                534                  CMP.W       #2,D2                            ; Checks if it is long size
+0000145C  6700 0016                535                  BEQ         REG_LONG                         ; Prints .L
+00001460                           536  
+00001460  4BF9 00001B5F            537  REG_BYTE        LEA         MSG_B,A5                         ; loads .B into A5
+00001466  6000 0012                538                  BRA         PRINTREGEA      
+0000146A                           539  
+0000146A  4BF9 00001B65            540  REG_WORD        LEA         MSG_W,A5                         ; loads .W into A5
+00001470  6000 0008                541                  BRA         PRINTREGEA      
+00001474                           542                             
+00001474  4BF9 00001B6B            543  REG_LONG        LEA         MSG_L,A5                         ; loads .L into A5
+0000147A                           544  
+0000147A  4EB9 00001858            545  PRINTREGEA      JSR         PRINTNULL                        ; Prints size
+00001480  3400                     546                  MOVE.W      D0,D2                            ; copies D0 to D1
+00001482  4EB9 0000168E            547                  JSR         GETROTATIONLOCATION              ; finds out if its immediate or register 
+00001488  B27C 0001                548                  CMP.W       #$1,D1                           ; Compares D1 to 0, if it is 0, it is a data register
+0000148C  6700 0048                549                  BEQ         REG_REGISTER                     ; goes to ASd case if so
+00001490                           550                                  
+00001490  3400                     551  REG_IMMEDIATE   MOVE.W      D0,D2                            ; copies D0 to D2
+00001492  4EB9 00001686            552                  JSR         GETROTATIONSIZE                  ; gets the rotation size
+00001498  3202                     553                  MOVE.W      D2, D1                           ; moves rotation size to D1
+0000149A  4BF9 00001B54            554                  LEA         MSG_POUND, A5                    ; loads # into A5
+000014A0  4EB9 00001858            555                  JSR         PRINTNULL                        ; prints #
+000014A6  4EB9 00001822            556                  JSR         PRINTNUM                         ; prints shift count
+000014AC  4BF9 00001B58            557                  LEA         MSG_COMMA, A5                    ; loads , into A5
+000014B2  4EB9 00001858            558                  JSR         PRINTNULL                        ; prints the comma out to divide the source and destination  
+000014B8  4BF9 00001B48            559                  LEA         MSG_DR, A5                       ; loads D into A5
+000014BE  4EB9 00001858            560                  JSR         PRINTNULL                        ; prints out D 
+000014C4  323C 0000                561                  MOVE.W      #0,D1                            ; marks that we are looking for Xn (data register number) in the source location  
+000014C8  4EB9 000015E4            562                  JSR         GET_XN                           ; gets the data register number, stores in D1
+000014CE  4EB9 00001822            563                  JSR         PRINTNUM                         ; prints data register number in D1          
+000014D4  4E75                     564                  RTS                                          ; ends subroutine to go onto the next instruction opcode
+000014D6                           565                  
+000014D6  3400                     566  REG_REGISTER    MOVE.W      D0,D2                            ; copies D0 to D2
+000014D8  4EB9 00001686            567                  JSR         GETROTATIONSIZE                  ; gets the rotation size
+000014DE  3202                     568                  MOVE.W      D2, D1                           ; moves rotation size to D1
+000014E0  4BF9 00001B48            569                  LEA         MSG_DR, A5                       ; loads D into A5
+000014E6  4EB9 00001858            570                  JSR         PRINTNULL                        ; prints D
+000014EC  4EB9 00001822            571                  JSR         PRINTNUM                         ; prints register number
+000014F2  4BF9 00001B58            572                  LEA         MSG_COMMA, A5                    ; loads , into A5
+000014F8  4EB9 00001858            573                  JSR         PRINTNULL                        ; prints the comma out to divide the source and destination  
+000014FE  4BF9 00001B48            574                  LEA         MSG_DR, A5                       ; loads D into A5
+00001504  4EB9 00001858            575                  JSR         PRINTNULL                        ; prints out D 
+0000150A  323C 0000                576                  MOVE.W      #0,D1                            ; marks that we are looking for Xn (data register number) in the source location  
+0000150E  4EB9 000015E4            577                  JSR         GET_XN                           ; gets the data register number, stores in D1
+00001514  4EB9 00001822            578                  JSR         PRINTNUM                         ; prints data register number in D1          
+0000151A  4E75                     579                  RTS                                          ; ends subroutine to go onto the next instruction opcode
+0000151C                           580               
+0000151C  3200                     581  CASE_BRA        MOVE.W  D0,D1                                ; Copies instruction word to D1
+0000151E  C27C FF00                582                  AND.W   #$FF00,D1                            ; Applies a bitmask to get first 8 bits                
+00001522  B27C 6000                583                  CMP.W   #$6000,D1                            ; Checks if it fits the BRA opcode
+00001526  6600 0018                584                  BNE.W   CASE_BCC                             ; If its not, check BCC
+0000152A                           585                  
+0000152A  4BF9 00001B3C            586                  LEA     MSG_BRA,A5                           ; loads string pointer for BRA into A5
+00001530  4EB9 00001858            587                  JSR     PRINTNULL                            ; prints BRA
+00001536                           588  
+00001536  3400                     589                  MOVE.W  D0,D2                                ; Copies instruction word to D1
+00001538  4EB9 00001656            590                  JSR     GETDISPLACEMENT                      ; finds the displacement
+0000153E  4E75                     591                  RTS
+00001540                           592                  
+00001540                           593  ; DO NOT MOVE THIS FORM UNDER CASE_BRA. IS DEPENDENT ON RESULTS OF BRA
+00001540                           594  ; DELETE THIS NOTE: NEED TO FIX LSL/LSR SHIFT TO ENSURE THE BCC CODES GET PRINTED 
+00001540  3200                     595  CASE_BCC        MOVE.W  D0,D1                                ; copies instruction word from D0 to D1
+00001542  C27C F000                596                  AND.W   #$F000,D1                            ; get top 4 bits
+00001546  B27C 6000                597                  CMP.W   #$6000,D1                            ; make sure top 4 bits are 6
+0000154A  6600 0054                598                  BNE.W   CASE_JSR                             ; checks next case if not Bcc
+0000154E  3200                     599                  MOVE.W  D0,D1                                ; copies instruction word from D0 to D1
+00001550  C27C 0F00                600                  AND.W   #$0F00,D1                            ; get next 4 bits, condition code
+00001554  E049                     601                  LSR.W   #8,D1                                ; shifts 8 bits to the right
+00001556                           602                  
+00001556  B27C 000E                603                  CMP.W   #$E,D1                               ; checks if D1 is BGT (1 1 1 0)
+0000155A  6700 002A                604                  BEQ     CASE_BGT                             ; branches to BGT if it is
+0000155E                           605                  
+0000155E  B27C 000F                606                  CMP.W   #$F,D1                               ; checks if D1 is BLE (1 1 1 1)
+00001562  6700 0018                607                  BEQ     CASE_BLE                             ; branches to BLE if it is
+00001566                           608                      
+00001566  B27C 0007                609                  CMP.W   #$7,D1                               ; checks if D1 is BEQ (0 1 1 1)
+0000156A  6700 0006                610                  BEQ     CASE_BEQ                             ; branches to BEQ if it is
+0000156E  6000 0046                611                  BRA     CASE_DATA                            ; BCC condition code not in the system
+00001572                           612     
+00001572  4BF9 00001ACF            613  CASE_BEQ        LEA     MSG_BEQ,A5                           ; loads string pointer for BEQ into A5
+00001578  6000 0016                614                  BRA     PRINTBCC
+0000157C                           615  
+0000157C  4BF9 00001AF7            616  CASE_BLE        LEA     MSG_BLE,A5                           ; loads string pointer for BLE into A5
+00001582  6000 000C                617                  BRA     PRINTBCC
+00001586                           618                  
+00001586  4BF9 00001AE7            619  CASE_BGT        LEA     MSG_BGT,A5                           ; loads string pointer for BGT into A5
+0000158C  6000 0002                620                  BRA     PRINTBCC
+00001590                           621  
+00001590  4EB9 00001858            622  PRINTBCC        JSR     PRINTNULL                            ; prints BEQ/BLE/BGT
+00001596  3400                     623                  MOVE.W  D0,D2                                ; Copies instruction word to D1
+00001598  4EB9 00001656            624                  JSR     GETDISPLACEMENT                      ; finds the displacement
+0000159E  4E75                     625                  RTS              
+000015A0                           626                  
+000015A0                           627  
+000015A0                           628  CASE_JSR       
+000015A0                           629  
+000015A0  B07C 4E75                630  CASE_RTS        CMP.W   #$4E75,D0           ; compares to RTS opcode in hex
+000015A4  6600 FBE0                631                  BNE     CASE_MOVE           ; checks the next case if not equal
+000015A8  4BF9 00001B37            632                  LEA     MSG_RTS,A5          ; loads string pointer into A5
+000015AE  4EB9 00001858            633                  JSR     PRINTNULL           ; prints RTS                
+000015B4  4E75                     634                  RTS                         ; returns from the subroutine
+000015B6                           635  
+000015B6                           636                  
+000015B6                           637  
+000015B6                           638  CASE_DATA           
+000015B6  4E75                     639                      RTS               
+000015B8                           640  
+000015B8  4E75                     641  CASE_EPICFAIL       RTS
+000015BA                           642  
+000015BA                           643  
+000015BA                           644  * Finds the EA type
+000015BA                           645  * Inputs: D0 = the instruction word, D1 = 0 (source EA), 1 (dest EA)
+000015BA                           646  * Output: Addressing Mode (3 bits, 0 to 7) in D1
+000015BA  48E7 3000                647  GET_EA              MOVEM.L   D2-D3, -(SP)          ; stores D2 and D3
+000015BE  4A41                     648                      TST.W     D1                    ; compares D1 to 0
+000015C0  6700 000E                649                      BEQ       SOURCEEA              ; branch to SOURCEEA if it is 0
+000015C4                           650                      
+000015C4  343C 01C0                651  DESTEA              MOVE.W    #$01C0,D2             ; stores bitmask to get the destination EA into D2
+000015C8  363C 0006                652                      MOVE.W    #6,D3                 ; stores the shift amount to D3
+000015CC  6000 000A                653                      BRA       FINDTYPEEA            
+000015D0                           654  
+000015D0  343C 0038                655  SOURCEEA            MOVE.W    #$0038,D2             ; stores bitmask to get the source EA into D2
+000015D4  363C 0003                656                      MOVE.W    #3,D3                 ; stores the shift amount to D3
+000015D8                           657  
+000015D8                           658  
+000015D8  3200                     659  FINDTYPEEA          MOVE.W    D0,D1                 ; copies D0 in D1
+000015DA  C242                     660                      AND.W     D2,D1                 ; applies bitmask to D1
+000015DC  E669                     661                      LSR.W     D3,D1                 ; shifts D1, moves the result to the end
+000015DE  4CDF 000C                662                      MOVEM.L   (SP)+,D2-D3           ; restores D2 and D3
+000015E2  4E75                     663                      RTS                             ; returns from subroutine    
+000015E4                           664                      
+000015E4                           665  * Finds Xn type
+000015E4                           666  * Inputs: D0 = the instruction word, D1 = 0 (source Xn), 1 (dest Xn)
+000015E4                           667  * Output: Addressing Mode (3 bits, 0 to 7) in D1
+000015E4  48E7 3000                668  GET_XN              MOVEM.L   D2-D3, -(SP)          ; stores D2 and D3
+000015E8  4A41                     669                      TST.W     D1                    ; compares D1 to 0
+000015EA  6700 000E                670                      BEQ       SOURCEXN              ; branch to SOURCEEA if it is 0
+000015EE                           671  
+000015EE  343C 0E00                672  DESTXN              MOVE.W    #$0E00,D2             ; stores bitmask to get the destination Xn into D2
+000015F2  363C 0009                673                      MOVE.W    #9,D3                 ; stores the shift amount to D3
+000015F6  6000 000A                674                      BRA       FINDTYPEXN            ; finds the type of Xn
+000015FA                           675  
+000015FA  343C 0007                676  SOURCEXN            MOVE.W    #$0007,D2             ; applies bitmask to D2
+000015FE  363C 0000                677                      MOVE.W    #0,D3                 ; stores the shift amount to D3
+00001602                           678                      
+00001602  3200                     679  FINDTYPEXN          MOVE.W    D0,D1                 ; copies D0 in D1
+00001604  C242                     680                      AND.W     D2,D1                 ; applies bitmask to D1
+00001606  E669                     681                      LSR.W     D3,D1                 ; shifts D1, moves the result to the end
+00001608  4CDF 000C                682                      MOVEM.L   (SP)+,D2-D3           ; restores D2 and D3
+0000160C  4E75                     683                      RTS                             ; returns from subroutine 
+0000160E                           684                      
+0000160E                           685  * Checks and gets the EA and Xn
+0000160E                           686  * Input: A5 = EA LIST, A6 = Xn LIST, D0 = INSTRUCTION WORD,  D7 = 0 (source EA/Xn), 1 (dest EA/Xn) 
+0000160E                           687  * Output: D1(0 = VALID, 1 = INVALID), D2 = EA, D3 = Xn
+0000160E  3207                     688  CHECKGET_EAXN   MOVE.W  D7,D1                   ; loads value representing position of EA     
+00001610  4EB8 15BA                689                  JSR     GET_EA                  ; Gets EA
+00001614  3401                     690                  MOVE.W  D1,D2                   ; Stores EA in D2
+00001616  3207                     691                  MOVE.W  D7,D1                   ; loads value representing position of EA   
+00001618  4EB8 15E4                692                  JSR     GET_XN                  ; Gets Xn
+0000161C  3601                     693                  MOVE.W  D1,D3                   ; Stores Xn in D3
+0000161E  3202                     694                  MOVE.W  D2,D1                   ; Stores EA in D1 for comparisons
+00001620                           695                  
+00001620  4EB9 00001696            696                  JSR     CHECKEAXN_IFVALID       ; checks if EA is valid
+00001626  B27C 0002                697                  CMP.W   #2,D1                   ; checks if it is Xn
+0000162A  6700 0012                698                  BEQ     CHECK_XN                ; branches to CHECKXn if it is
+0000162E  B27C 0001                699                  CMP.W   #1,D1                   ; Checks if it is invalid
+00001632  6700 001C                700                  BEQ     EAXN_INVALID            ; branches to CHECKXn if it is
+00001636                           701                  
+00001636                           702                  
+00001636  323C 0000                703  EAXN_VALID      MOVE.W  #0,D1                   ; loads 0 (VALID) into D1
+0000163A  6000 0018                704                  BRA     END_CHECKGET
+0000163E                           705        
+0000163E                           706  ; need XN
+0000163E  2A4E                     707  CHECK_Xn        MOVEA.L A6,A5                   ; Loads Xn into A5  
+00001640  3203                     708                  MOVE.W  D3,D1                   ; MOves Xn to D1 to be checked
+00001642  4EB9 00001696            709                  JSR     CHECKEAXN_IFVALID       ; checks if Xn is valid
+00001648  4A41                     710                  TST.W   D1                      ; checks if it is valid
+0000164A  67EA                     711                  BEQ     EAXN_VALID              ; go to EA_VALID to print
+0000164C  6000 0002                712                  BRA     EAXN_INVALID            ; branches to EA_INVALID if not  
+00001650                           713   
+00001650  323C 0001                714  EAXN_INVALID    MOVE.W  #1,D1                   ; loads 1 (INVALID) into D
+00001654                           715  
+00001654  4E75                     716  END_CHECKGET    RTS          
+00001656                           717                                            
+00001656                           718                                            
+00001656                           719  * Gets the displacement and pritns it 
+00001656                           720  * Inputs: D2 = instruction word, A2 = address of next word
+00001656                           721  * Outputs: prints out displacement
+00001656  48E7 4004                722  GETDISPLACEMENT     MOVEM.L    D1/A5, -(SP)         ; saves D1
+0000165A  3A4A                     723                      MOVE.W    A2,A5                 ; copies A2 to A5
+0000165C  C47C 00FF                724                      AND.W     #$00FF,D2             ; applies a bitmask to get rid of the first 8 bits
+00001660  6600 0004                725                      BNE       PRINTADDRESS          ; prints address if not 0
+00001664  341A                     726                      MOVE.W    (A2)+,D2               ; gets 16 bit displacement                    
+00001666                           727                      
+00001666  D44D                     728  PRINTADDRESS        ADD.W     A5,D2                 ; Adds address to D2 to get displacement
+00001668  3202                     729                      MOVE.W    D2,D1                 ; moves address to D1 to print it
+0000166A  4EB9 00001822            730                      JSR       PRINTNUM              ; prints address
+00001670                           731                      
+00001670  4CDF 2002                732                      MOVEM.L    (SP)+,D1/A5              ; restores D1
+00001674                           733                      ; DELETE LATER. NOTE: WE DONT HAVE HEX YET, PRINT HEX SIGN BEFORE NUM, BUT WILL NEED TO ADD THIS LATER
+00001674                           734  
+00001674                           735  * Gets the rotation value for ASd and LSd
+00001674                           736  * Input: D2 = instruction word copy (of D0)                                    
+00001674                           737  * Output: rotation  value in D2             
+00001674  C47C 0E00                738  GETROTATION         AND.W      #$0E00,D2             ; gets the rotation bits
+00001678  E04A                     739                      LSR.W      #8,D2                ; shifts 8 bits to the right to only have the rotation bits
+0000167A  E24A                     740                      LSR.W      #1,D2                ; shifts 1 bits to the right to only have the rotation bits
+0000167C  4E75                     741                      RTS                             ; return from subroutine
+0000167E                           742  
+0000167E                           743  * Gets the direction value for ASd and LSd
+0000167E                           744  * Input: D2 = instruction word copy (of D0)                                    
+0000167E                           745  * Output: direction value in D2             
+0000167E  C47C 0100                746  GETDIRECTION        AND.W      #$0100,D2             ; gets the rotation bits
+00001682  E04A                     747                      LSR.W      #8,D2                ; shifts 8 bits to the right to only have the rotation bits
+00001684  4E75                     748                      RTS                             ; return from subroutine
+00001686                           749  
+00001686                           750  * Gets the rotation size value for ASd and LSd
+00001686                           751  * Input: D2 = instruction word copy (of D0)                                    
+00001686                           752  * Output: rotation size value in D2             
+00001686  C47C 00C0                753  GETROTATIONSIZE     AND.W      #$00C0,D2            ; gets the rotation bits
+0000168A  EC4A                     754                      LSR.W      #6,D2                ; shifts 6 bits to the right to only have the rotation bits
+0000168C  4E75                     755                      RTS                             ; return from subroutine
+0000168E                           756  
+0000168E                           757  * Gets the rotation location  value for ASd and LSd
+0000168E                           758  * Input: D2 = instruction word copy (of D0)                                    
+0000168E                           759  * Output: rotation location value in D2             
+0000168E  C47C 0020                760  GETROTATIONLOCATION AND.W      #$0020,D2            ; gets the rotation location bits
+00001692  EA4A                     761                      LSR.W      #5,D2                ; shifts 6 bits to the right to only have the rotation bits
+00001694  4E75                     762                      RTS                             ; return from subroutine
+00001696                           763  
+00001696                           764                          
+00001696                           765  * Checks if EA or Xn is valid
+00001696                           766  * Inputs: A5 = Pointer to -1 terminated list of valid addressing modes, D1 = Addressing Mode (3 bit)
+00001696                           767  * Outputs: D1 (0 = Valid, 1 = Invalid, 2 = Check Xn)                   
+00001696  2F02                     768  CHECKEAXN_IFVALID  MOVE.L     D2,-(SP)              ; saves D2
+00001698                           769  
+00001698  141D                     770  CHECKEAMLOOP       MOVE.B     (A5)+,D2              ; load possible EA
+0000169A  B43C 00FF                771                     CMP.B      #-$1,D2               ; compares to -1 to see if loop is over
+0000169E  6700 000A                772                     BEQ        INVALIDEA             ; branches to INVALIDEA if its over
+000016A2  B202                     773                     CMP.B      D2,D1                 ; check addressing mode, check if current one is one of those
+000016A4  6700 000C                774                     BEQ        VALIDEA               ; branches to valid EA
+000016A8  60EE                     775                     BRA        CHECKEAMLOOP          ; loops if it isn't valid
+000016AA                           776                     
+000016AA  323C 0001                777  INVALIDEA          MOVE.W     #$1,D1                ; marks that it is invalid
+000016AE  6000 0016                778                     BRA        CHECKEAEXIT           ; exists the subroutine        
+000016B2                           779                    
+000016B2  B43C 0007                780  VALIDEA            CMP.B      #Other,D2             ; check if its Xn
+000016B6  6700 000A                781                     BEQ        OTHEREA               ; branches to OTHEREA if it is Xn
+000016BA  323C 0000                782                     MOVE.W     #$0,D1                ; marks that it is valid
+000016BE  6000 0006                783                     BRA        CHECKEAEXIT           ; exits the subroutine
+000016C2                           784  
+000016C2  323C 0002                785  OTHEREA            MOVE.W     #$2,D1                ; marks that it is invalid
+000016C6                           786  
+000016C6  241F                     787  CHECKEAEXIT        MOVE.L    (SP)+,D2               ; restores D2
+000016C8  4E75                     788                     RTS                              ; returns from subroutine
+000016CA                           789  
+000016CA                           790  * Converts EA and Xn into a string                                
+000016CA                           791  * Inputs: D2 = EA, D3 = Xn, A2 = NEXT INSTRUCTION WORD
+000016CA                           792  * Outputs: Prints out EA and Xn into a string
+000016CA  48E7 C004                793  EA_TO_STRING       MOVEM.L  D0-D1/A5,-(SP)          ; saves D1, D0, and A5
+000016CE  B47C 0001                794                     CMP.W    #An,D2                  ; checks if it is An
+000016D2  6700 003A                795                     BEQ      CASE_AR                 ; branches to CASE_AR if address register
+000016D6                           796                     
+000016D6  B47C 0002                797                     CMP.W    #AnIndirect,D2          ; checks if it is (An)
+000016DA  6700 004A                798                     BEQ      CASE_ARI                ; branches to CASE_ARI if address register indirect
+000016DE                           799                     
+000016DE  B47C 0003                800                     CMP.W    #AnPost,D2              ; checks if it is (An)+
+000016E2  6700 0072                801                     BEQ      CASE_ARIPOST            ; branches to CASE_ARIPOST if address register indirect post increment
+000016E6                           802                     
+000016E6  B47C 0004                803                     CMP.W    #AnPre,D2               ; checks if it is -(An)
+000016EA  6700 00A6                804                     BEQ      CASE_ARIPRE             ; branches to CASE_ARIPRE if address register indirect pre increment
+000016EE                           805                     
+000016EE  B47C 0007                806                     CMP.W    #Other,D2               ; checks if it is other (has an Xn/D3)
+000016F2  6700 00DA                807                     BEQ      CASE_OTHER              ; branches to CASE_AR if address register
+000016F6                           808                     ; otherwise assumes D2 = #Dn which means its a data register                   
+000016F6                           809  
+000016F6                           810  * data register, Dn
+000016F6  4BF9 00001B48            811  CASE_DR            LEA      MSG_DR,A5               ; Loads D into A5
+000016FC  4EB9 00001858            812                     JSR      PRINTNULL               ; Prints D
+00001702  3203                     813                     MOVE.W   D3, D1                  ; Loads D3 (the Xn) into D1 for printing 
+00001704  4EB9 00001822            814                     JSR      PRINTNUM                ; Prints the Xn
+0000170A  6000 0110                815                     BRA      EA_TO_STRING_EXIT       ; exits           
+0000170E                           816  
+0000170E                           817  
+0000170E                           818  * address register
+0000170E  4BF9 00001B4A            819  CASE_AR            LEA      MSG_AR,A5               ; Loads A into A5
+00001714  4EB9 00001858            820                     JSR      PRINTNULL               ; Prints A
+0000171A  3203                     821                     MOVE.W   D3, D1                  ; Loads D3 (the Xn) into D1 for printing 
+0000171C  4EB9 00001822            822                     JSR      PRINTNUM                ; Prints the Xn
+00001722  6000 00F8                823                     BRA      EA_TO_STRING_EXIT       ; exits
+00001726                           824  
+00001726                           825  * address register indirect
+00001726  4BF9 00001B4C            826  CASE_ARI           LEA      MSG_LB,A5               ; Loads ( into A5
+0000172C  4EB9 00001858            827                     JSR      PRINTNULL               ; Prints (
+00001732  4BF9 00001B4A            828                     LEA      MSG_AR,A5               ; Loads A into A5
+00001738  4EB9 00001858            829                     JSR      PRINTNULL               ; Prints A
+0000173E  3203                     830                     MOVE.W   D3, D1                  ; Loads D3 (the Xn) into D1 for printing 
+00001740  4EB9 00001822            831                     JSR      PRINTNUM                ; Prints the Xn
+00001746  4BF9 00001B4E            832                     LEA      MSG_RB,A5               ; Loads ) into A5
+0000174C  4EB9 00001858            833                     JSR      PRINTNULL               ; Prints )
+00001752  6000 00C8                834                     BRA      EA_TO_STRING_EXIT       ; exits
+00001756                           835  
+00001756                           836  * address register indirect post increment
+00001756  4BF9 00001B4C            837  CASE_ARIPOST       LEA      MSG_LB,A5               ; Loads ( into A5
+0000175C  4EB9 00001858            838                     JSR      PRINTNULL               ; Prints (
+00001762  4BF9 00001B4A            839                     LEA      MSG_AR,A5               ; Loads A into A5
+00001768  4EB9 00001858            840                     JSR      PRINTNULL               ; Prints A
+0000176E  3203                     841                     MOVE.W   D3, D1                  ; Loads D3 (the Xn) into D1 for printing 
+00001770  4EB9 00001822            842                     JSR      PRINTNUM                ; Prints the Xn
+00001776  4BF9 00001B4E            843                     LEA      MSG_RB,A5               ; Loads ) into A5
+0000177C  4EB9 00001858            844                     JSR      PRINTNULL               ; Prints )
+00001782  4BF9 00001B50            845                     LEA      MSG_PLUS,A5             ; Loads + into A5
+00001788  4EB9 00001858            846                     JSR      PRINTNULL               ; Prints +
+0000178E  6000 008C                847                     BRA      EA_TO_STRING_EXIT       ; exits
+00001792                           848  
+00001792                           849  
+00001792                           850  * address register indirect pre increment
+00001792  4BF9 00001B52            851  CASE_ARIPRE        LEA      MSG_MINUS,A5            ; Loads - into A5
+00001798  4EB9 00001858            852                     JSR      PRINTNULL               ; Prints -
+0000179E  4BF9 00001B4C            853                     LEA      MSG_LB,A5               ; Loads ( into A5
+000017A4  4EB9 00001858            854                     JSR      PRINTNULL               ; Prints (
+000017AA  4BF9 00001B4A            855                     LEA      MSG_AR,A5               ; Loads A into A5
+000017B0  4EB9 00001858            856                     JSR      PRINTNULL               ; Prints A
+000017B6  3203                     857                     MOVE.W   D3, D1                  ; Loads D3 (the Xn) into D1 for printing 
+000017B8  4EB9 00001822            858                     JSR      PRINTNUM                ; Prints the Xn
+000017BE  4BF9 00001B4E            859                     LEA      MSG_RB,A5               ; Loads ) into A5
+000017C4  4EB9 00001858            860                     JSR      PRINTNULL               ; Prints )
+000017CA  6000 0050                861                     BRA      EA_TO_STRING_EXIT       ; exits
+000017CE                           862  
+000017CE                           863  * other (long, short, immediate) with Xn yes
+000017CE  301A                     864  CASE_OTHER         MOVE     (A2)+, D0               ; Moves next instruction word into D1 since A2 is auxilliary instruction word 
+000017D0  B67C 0000                865                     CMP.W    #ABSShort,D3            ; checks if it is a word
+000017D4  6700 0022                866                     BEQ      CASE_WORD               ; branches to CASE_WORD if is a short
+000017D8                           867                     
+000017D8  B67C 0001                868                     CMP.W    #ABSLong,D3             ; checks if it is (An)
+000017DC  6700 002A                869                     BEQ      CASE_LONG               ; branches to CASE_LONG if is a long
+000017E0                           870  
+000017E0                           871  * NOTE DELETE LATER: update to print num as HEX and add NEGATIVE NUMBER CHECK
+000017E0                           872  * immediate
+000017E0  4BF9 00001B54            873  CASE_IMMEDIATE     LEA      MSG_POUND,A5            ; Loads # into A5
+000017E6  4EB9 00001858            874                     JSR      PRINTNULL               ; Prints #  
+000017EC                           875                     * uncomment after converting to hex 
+000017EC                           876                     *LEA      MSG_HEX,A5              ; Loads $ into A5
+000017EC                           877                     *JSR      PRINTNULL               ; Prints $
+000017EC  3200                     878                     MOVE.W   D0, D1                  ; moves instruction word into d1
+000017EE  4EB9 00001822            879                     JSR      PRINTNUM 
+000017F4  6000 0026                880                     BRA      EA_TO_STRING_EXIT       ; exits subroutine                  
+000017F8                           881                     
+000017F8                           882  ; DELETE LATER: convert to hex andwrite code to make them print out a total of 4 and 8 characters, add 0's                      
+000017F8                           883  
+000017F8                           884  * word address
+000017F8                           885  CASE_WORD          
+000017F8                           886                     *LEA      MSG_HEX,A5              ; Loads $ into A5
+000017F8                           887                     *JSR      PRINTNULL               ; Prints $
+000017F8  3200                     888                     MOVE.W   D0, D1                  ; moves instruction word into d1
+000017FA  383C 0000                889                     MOVE.W   #0, D4                  ; moves length size (word) into d4
+000017FE  4EB9 00001822            890                     JSR      PRINTNUM               ; reformats the number to the proper length and prints out the number
+00001804  6000 0016                891                     BRA      EA_TO_STRING_EXIT       ; exits subroutine
+00001808                           892  
+00001808                           893  * long address 
+00001808                           894  CASE_LONG          
+00001808                           895                     *LEA      MSG_HEX,A5              ; Loads $ into A5
+00001808                           896                     *JSR      PRINTNULL               ; Prints $
+00001808  3200                     897                     MOVE.W   D0, D1                  ; moves instruction word into d1
+0000180A  383C 0001                898                     MOVE.W   #1, D4                  ; moves length size (long) into d4
+0000180E  4EB9 00001822            899                     JSR      PRINTNUM                ; reformats the number to the proper length and prints out the number
+00001814  321A                     900                     MOVE     (A2)+, D1               ; Moves next instruction word into D1 since A2 is auxilliary instruction word
+00001816  4EB9 00001822            901                     JSR      PRINTNUM                ; reformats the number to the proper length and prints out the number
+0000181C                           902  
+0000181C                           903  
+0000181C                           904  * exits subroutine
+0000181C  4CDF 2003                905  EA_TO_STRING_EXIT   MOVEM.L  (SP)+,D0-D1/A5          ; restoers D1, D0, and A5
+00001820  4E75                     906                      RTS                              ; returns from subroutine
+00001822                           907  
+00001822                           908  * DELETE LATER: sorry the formatting is weird here we can fix it later or whenever you want  im just lazy for now
+00001822                           909  
+00001822                           910  * Prints out the content of D1
+00001822                           911  * Input: number in D1 to be printed
+00001822                           912  * Output: contents of D1 printed
+00001822  48E7 C000                913  PRINTNUM         MOVEM.L     D0-D1, -(SP)        ; saves D0 and D1
+00001826  103C 0003                914                   MOVE.B      #3,D0               ; prints D1
+0000182A  4E4F                     915                   TRAP        #15                 ; is trap task 3
+0000182C                           916              
+0000182C  4CDF 0003                917                   MOVEM.L     (SP)+,D0-D1         ; returns D0 and D1
+00001830  4E75                     918                   RTS                             ; returns from subroutine
+00001832                           919                   
+00001832                           920  * DELETE LATER: THIS IS A  WIP AND DOESNT ACHIEVE PROPER FUNCTIONALITY YET
+00001832                           921                   
+00001832                           922  * Prints out the content of D1 and formats it to have the length of WORD or a LONG
+00001832                           923  * Input: number in D1 to be printed, D4 = length (0 = WORD, 1 = LONG)
+00001832                           924  * Output: contents of D1 printed
+00001832  48E7 6000                925  PRINTSHORTLONGNUM         MOVEM.L     D1-D2, -(SP)        ; saves D0 and D1
+00001836  103C 0003                926                            MOVE.B      #3,D0               ; prints D1
+0000183A  4E4F                     927                            TRAP        #15                 ; is trap task 3
+0000183C  4CDF 0003                928                            MOVEM.L     (SP)+,D0-D1         ; returns D0 and D1
+00001840  4E75                     929                  RTS                                       ; returns from subroutine    
+00001842                           930               
+00001842                           931              
+00001842                           932  * Prints contents of things between a range
+00001842                           933  * input: A5, A6 (the range)
+00001842                           934  * output: prints memory contents from A5 to A6 as strings   
+00001842  48E7 C040                935  PRINTRANGE      MOVEM.L     D0-D1/A1, -(SP)  ; saves D0-D1 and A1
+00001846  224D                     936                  MOVEA.L     A5, A1           ; loads A5 into A1
+00001848  9DCD                     937                  SUB.L       A5, A6           ; subtracts A5 to A6, gets us n (number of characters)
+0000184A  320E                     938                  MOVE.W      A6, D1           ; move n into D1
+0000184C  103C 0001                939                  MOVE.B      #1, D0           ; display n characters of string at A1
+00001850  4E4F                     940                  TRAP        #15              ; is trap task 1
+00001852  4CDF 0203                941                  MOVEM.L     (SP)+, D0-D1/A1  ; restores D0-D1, A1
+00001856  4E75                     942                  RTS                          ; returns
+00001858                           943      
+00001858                           944  * Prints null terminated string
+00001858                           945  * input: string pointed to by A5
+00001858                           946  * output: prints out the null terminated string
+00001858  48E7 8040                947  PRINTNULL       MOVEM.L     D0/A1, -(SP)    ; saves D0-D1 and A1
+0000185C  224D                     948                  MOVE.L      A5,A1           ; loads A5 into A1
+0000185E  103C 000E                949                  MOVE.B      #14,D0          ; prints null terminated string
+00001862  4E4F                     950                  TRAP        #15             ; is trap task 10
+00001864  4CDF 0201                951                  MOVEM.L     (SP)+,D0/A1     ; saves D0-D1 and A1
+00001868  4E75                     952                  RTS                         ; returns from subroutine
+0000186A                           953                  
+0000186A  2F0D                     954  PRINTENTER      MOVE.L      A5, -(SP)       ; saves A5
+0000186C  4BF9 00001A54            955                  LEA         NEW_LINE,A5     ; Prints null
+00001872  4EB8 1858                956                  JSR         PRINTNULL       ; prints the new line
+00001876  2A5F                     957                  MOVE.L      (SP)+,A5        ; returns A5
+00001878  4E75                     958                  RTS
+0000187A                           959  
+0000187A                           960  * Prints the size of the MOVE or MOVEA operation  
+0000187A                           961  * input: D0
+0000187A                           962  * output: prints out the size of a MOVE or MOVEA operation        
+0000187A  48E7 8004                963  PRINTMOVESIZE   MOVEM.L D0/A5,-(SP)         ; saves D0 and A5
+0000187E  3200                     964                  MOVE.W  D0,D1               ; stores d0 in d1
+00001880  C07C 3000                965                  AND.W   #$3000,D0           ; gets the size
+00001884  B07C 2000                966                  CMP.W   #$2000,D0           ; checks if is long
+00001888  6700 001E                967                  BEQ     MOVE_LONG
+0000188C  B07C 3000                968                  CMP.W   #$3000,D0           ; checks if is word
+00001890  6700 000C                969                  BEQ     MOVE_WORD      
+00001894                           970                  
+00001894  4BF9 00001B5F            971  MOVE_BYTE       LEA     MSG_B,A5            ; loads string pointer into a1
+0000189A  6000 0012                972                  BRA     FINISHMOVE          ; branches to FINISHMOVE
+0000189E                           973  
+0000189E  4BF9 00001B65            974  MOVE_WORD       LEA     MSG_W,A5            ; loads string pointer into a1
+000018A4  6000 0008                975                  BRA     FINISHMOVE          ; branches to FINISHMOVE
+000018A8                           976  
+000018A8  4BF9 00001B6B            977  MOVE_LONG       LEA     MSG_L,A5            ; loads string pointer into a1         
+000018AE                           978                  
+000018AE  4EB8 1858                979  FINISHMOVE      JSR     PRINTNULL           ; prints out the size
+000018B2  4CDF 2001                980                  MOVEM.L (SP)+,D0/A5         ; restores D0 and A5
+000018B6  4E75                     981                  RTS
+000018B8                           982  
+000018B8  43F9 00001A38            983  ERROR           LEA     ERROR_MSG,A1
+000018BE  103C 000E                984                  MOVE.B  #14,D0
+000018C2  4E4F                     985                  TRAP    #15 
+000018C4                           986         
+000018C4                           987  * DELETE THIS: Test                
+000018C4  2661                     988  DELETEME        MOVEA.L  -(A1),A3
+000018C6  6700 002A                989                  BEQ      DELETEMEAGAIN  
+000018CA  6F00 0026                990                  BLE      DELETEMEAGAIN
+000018CE  6E00 0022                991                  BGT      DELETEMEAGAIN
+000018D2                           992  
+000018D2  E40A                     993                  LSR.B      #2,D2
+000018D4  E2E2                     994                  LSR.W      -(A2)
+000018D6  E2DA                     995                  LSR.W      (A2)+
+000018D8  E4AA                     996                  LSR.L      D2,D2 
+000018DA  E50A                     997                  LSL.B      #2,D2
+000018DC  E3E2                     998                  LSL.W      -(A2)
+000018DE  E3DA                     999                  LSL.W      (A2)+
+000018E0  E5AA                    1000                  LSL.L      D2,D2
+000018E2  E51A                    1001                  ROL.B      #2,D2
+000018E4  E7E2                    1002                  ROL.W      -(A2)
+000018E6  E7DA                    1003                  ROL.W      (A2)+
+000018E8  E5BA                    1004                  ROL.L      D2,D2
+000018EA  E41A                    1005                  ROR.B      #2,D2
+000018EC  E6E2                    1006                  ROR.W      -(A2)
+000018EE  E6DA                    1007                  ROR.W      (A2)+
+000018F0  E4BA                    1008                  ROR.L      D2,D2
+000018F2                          1009                         
+000018F2                          1010                  
+000018F2                          1011  DELETEMEAGAIN                 
+000018F2                          1012            
+000018F2  FFFF FFFF               1013      SIMHALT             ; halt simulator
+000018F6                          1014  
+000018F6                          1015  * Put variables and constants here
+000018F6                          1016  
+000018F6  =0000000D               1017  CR                              EQU     $0D
+000018F6  =0000000A               1018  LF                              EQU     $0A 
+000018F6  =00000009               1019  TAB                             EQU     $09  
+000018F6                          1020  
+000018F6                          1021  * Addressing Modes
+000018F6  =00000000               1022  Dn                              EQU     0
+000018F6  =00000001               1023  An                              EQU     1
+000018F6  =00000002               1024  AnIndirect                      EQU     2
+000018F6  =00000003               1025  AnPost                          EQU     3
+000018F6  =00000004               1026  AnPre                           EQU     4
+000018F6  =00000007               1027  Other                           EQU     7           ; short, long, immediate
+000018F6                          1028  
+000018F6                          1029  * Xn
+000018F6  =00000000               1030  ABSShort                        EQU     0
+000018F6  =00000001               1031  ABSLong                         EQU     1
+000018F6  =00000004               1032  XnImmediate                     EQU     4
+000018F6                          1033  
+000018F6                          1034  * Valid Addressing Modes
+000018F6= 00 01 02 03 04 07 FF    1035  VALIDEA_ALL                     DC.B    Dn,An,AnIndirect,AnPost,AnPre,Other,-1          
+000018FD                          1036  ; MOVE (source),MOVEA, ADD, ADDA, ADDQ, and SUB
+000018FD= 00 02 03 04 07 FF       1037  VALIDEA_MOVEQ                   DC.B    Dn,AnIndirect,AnPost,AnPre,Other,-1
+00001903= 02 04 07 FF             1038  VALIDEA_MOVEM_REGTOMEM          DC.B    AnIndirect,AnPre,Other,-1
+00001907= 02 03 07 FF             1039  VALIDEA_MOVEM_MEMTOREG          DC.B    AnIndirect,AnPost,Other,-1
+0000190B= 02 03 04 07 FF          1040  VALIDEA_ADDSUB_DESTOPERAND      DC.B    AnIndirect,AnPost,AnPre,Other,-1
+00001910= 00 02 03 04 07 FF       1041  VALIDEA_MULSDIVU                DC.B    Dn,AnIndirect,AnPost,AnPre,Other,-1
+00001916= 01 07 FF                1042  VALIDEA_LEA                     DC.B    An,Other,-1
+00001919= 00 02 03 04 07 FF       1043  VALIDEA_ANDORNOT                DC.B    Dn,AnIndirect,AnPost,AnPre,Other,-1
+0000191F= 02 03 04 07 FF          1044  VALIDEA_ANDOR_DESTOPERAND       DC.B    AnIndirect,AnPost,AnPre,Other,-1
+00001924= 02 03 04 07 FF          1045  VALIDEA_SHIFT                   DC.B    AnIndirect,AnPost,AnPre,Other,-1                ; LSL, LSR, ASL, ASR
+00001929= 02 07 FF                1046  VALIDEA_JSR                     DC.B    AnIndirect, Other,-1
+0000192C                          1047  
+0000192C                          1048  * Valid Xn
+0000192C= 00 01 04 FF             1049  VALIDXN_ALL                     DC.B    ABSShort,ABSLong,XnImmediate,-1                 
+00001930                          1050  ; MOVE (source), MOVEA, ADD, ADDA, SUB, MULS, DIVU, AND, OR, 
+00001930= 00 01 FF                1051  VALIDXN_SHORTLONG               DC.B    ABSShort,ABSLong,-1                             
+00001933                          1052  ; MOVE (dest), MOVEM, ADD (destination operand), ADDQ, SUB (destination operand), LEA, AND (destination operand),
+00001933                          1053  ; OR (destination operand), NOT, LSL/R, ASL/R, JSR
+00001933                          1054  
+00001933                          1055  * posible memory ASd/LSd rotation values
+00001933  =00000000               1056  ASd_MEM                         EQU     0   
+00001933  =00000001               1057  LSd_MEM                         EQU     1 
+00001933  =00000003               1058  ROd_MEM                         EQU     3
+00001933                          1059   
+00001933  =00000000               1060  ASd_REG                         EQU     0   
+00001933  =00000001               1061  LSd_REG                         EQU     1 
+00001933  =00000003               1062  ROd_REG                         EQU     3
+00001933                          1063  
+00001933                          1064  * Starting messages
+00001933= 57 65 6C 63 6F 6D ...   1065  WELCOME                         DC.B    'Welcome to Team Big Blue Disassembler',CR,LF
+0000195A= 46 6F 72 6D 61 74 ...   1066                                  DC.B    'Format: 8 digit address in hexadecimal format. Letters must be capital case.',CR,LF,0
+000019A9= 50 6C 65 61 73 65 ...   1067  STARTING                        DC.B    'Please enter a starting location in the above format',CR,LF,0
+000019E0= 50 6C 65 61 73 65 ...   1068  ENDING                          DC.B    'Please enter an ending location in the above format',CR,LF,0
+00001A16= 49 6E 76 61 6C 69 ...   1069  BAD_INPUT                       DC.B    'Invalid input. Please try again',CR,LF,0
+00001A38= 45 72 72 6F 72 20 ...   1070  ERROR_MSG                       DC.B    'Error while disassembling',CR,LF,0
+00001A54= 0D 0A 00                1071  NEW_LINE                        DC.B    CR,LF,0
+00001A57= 09 09 09 00             1072  THREE_TAB                       DC.B    TAB,TAB,TAB,0
+00001A5B                          1073  
+00001A5B                          1074  * Opcode Messages
+00001A5B= 09 4E 4F 50 00          1075  MSG_NOP                         DC.B    TAB,'NOP',0
+00001A60= 09 4D 4F 56 45 00       1076  MSG_MOVE                        DC.B    TAB,'MOVE',0  
+00001A66= 09 4D 4F 56 45 41 00    1077  MSG_MOVEA                       DC.B    TAB,'MOVEA',0
+00001A6D= 09 4D 4F 56 45 51 00    1078  MSG_MOVEQ                       DC.B    TAB,'MOVEQ',0
+00001A74= 09 4D 4F 56 45 4D 00    1079  MSG_MOVEM                       DC.B    TAB,'MOVEM',0
+00001A7B= 09 41 44 44 00          1080  MSG_ADD                         DC.B    TAB,'ADD',0
+00001A80= 09 41 44 44 41 00       1081  MSG_ADDA                        DC.B    TAB,'ADDA',0
+00001A86= 09 41 44 44 51 00       1082  MSG_ADDQ                        DC.B    TAB,'ADDQ',0
+00001A8C= 09 53 55 42 00          1083  MSG_SUB                         DC.B    TAB,'SUB',0
+00001A91= 09 4D 55 4C 53 00       1084  MSG_MULS                        DC.B    TAB,'MULS',0
+00001A97= 09 44 49 56 55 00       1085  MSG_DIVU                        DC.B    TAB,'DIVU',0
+00001A9D= 09 4C 45 41 09 09 ...   1086  MSG_LEA                         DC.B    TAB,'LEA',TAB,TAB,TAB,0
+00001AA5= 09 41 4E 44 00          1087  MSG_AND                         DC.B    TAB,'AND',0
+00001AAA= 09 4F 52 00             1088  MSG_OR                          DC.B    TAB,'OR',0
+00001AAE= 09 4E 4F 54 00          1089  MSG_NOT                         DC.B    TAB,'NOT',0
+00001AB3= 09 4C 53 00             1090  MSG_LSd                         DC.B    TAB,'LS',0
+00001AB7= 09 41 53 00             1091  MSG_ASd                         DC.B    TAB,'AS',0
+00001ABB= 09 52 4F 00             1092  MSG_ROd                         DC.B    TAB,'RO',0
+00001ABF= 09 42 43 43 09 09 ...   1093  MSG_BCC                         DC.B    TAB,'BCC',TAB,TAB,TAB,0
+00001AC7= 09 42 43 53 09 09 ...   1094  MSG_BCS                         DC.B    TAB,'BCS',TAB,TAB,TAB,0
+00001ACF= 09 42 45 51 09 09 ...   1095  MSG_BEQ                         DC.B    TAB,'BEQ',TAB,TAB,TAB,0
+00001AD7= 09 42 4E 45 09 09 ...   1096  MSG_BNE                         DC.B    TAB,'BNE',TAB,TAB,TAB,0
+00001ADF= 09 42 47 45 09 09 ...   1097  MSG_BGE                         DC.B    TAB,'BGE',TAB,TAB,TAB,0
+00001AE7= 09 42 47 54 09 09 ...   1098  MSG_BGT                         DC.B    TAB,'BGT',TAB,TAB,TAB,0
+00001AEF= 09 42 48 49 09 09 ...   1099  MSG_BHI                         DC.B    TAB,'BHI',TAB,TAB,TAB,0
+00001AF7= 09 42 4C 45 09 09 ...   1100  MSG_BLE                         DC.B    TAB,'BLE',TAB,TAB,TAB,0
+00001AFF= 09 42 4C 53 09 09 ...   1101  MSG_BLS                         DC.B    TAB,'BLS',TAB,TAB,TAB,0
+00001B07= 09 42 4C 54 09 09 ...   1102  MSG_BLT                         DC.B    TAB,'BLT',TAB,TAB,TAB,0
+00001B0F= 09 42 4D 49 09 09 ...   1103  MSG_BMI                         DC.B    TAB,'BMI',TAB,TAB,TAB,0
+00001B17= 09 42 50 4C 09 09 ...   1104  MSG_BPL                         DC.B    TAB,'BPL',TAB,TAB,TAB,0
+00001B1F= 09 42 56 43 09 09 ...   1105  MSG_BVC                         DC.B    TAB,'BVC',TAB,TAB,TAB,0
+00001B27= 09 42 56 53 09 09 ...   1106  MSG_BVS                         DC.B    TAB,'BVS',TAB,TAB,TAB,0
+00001B2F= 09 4A 53 52 09 09 ...   1107  MSG_JSR                         DC.B    TAB,'JSR',TAB,TAB,TAB,0
+00001B37= 09 52 54 53 00          1108  MSG_RTS                         DC.B    TAB,'RTS',0
+00001B3C= 09 42 52 41 09 09 ...   1109  MSG_BRA                         DC.B    TAB,'BRA',TAB,TAB,TAB,0
+00001B44                          1110  
+00001B44                          1111  * Direction for LSd and ASd
+00001B44= 52 00                   1112  MSG_RIGHT                       DC.B    'R',0
+00001B46= 4C 00                   1113  MSG_LEFT                        DC.B    'L',0
+00001B48                          1114  
+00001B48                          1115  * Effective Addresses Messages
+00001B48= 44 00                   1116  MSG_DR                          DC.B    'D',0
+00001B4A= 41 00                   1117  MSG_AR                          DC.B    'A',0
+00001B4C= 28 00                   1118  MSG_LB                          DC.B    '(',0       ; left bracket, NEVER PRINTED WITHOUT RB
+00001B4E= 29 00                   1119  MSG_RB                          DC.B    ')',0       ; right bracket, ALWAYS FOLLOWS AFTER LB
+00001B50= 2B 00                   1120  MSG_PLUS                        DC.B    '+',0
+00001B52= 2D 00                   1121  MSG_MINUS                       DC.B    '-',0
+00001B54= 23 00                   1122  MSG_POUND                       DC.B    '#',0 
+00001B56= 24 00                   1123  MSG_HEX                         DC.B    '$',0 
+00001B58= 2C 20 00                1124  MSG_COMMA                       DC.B    ', ',0 
+00001B5B= 20 00                   1125  MSG_SPACE                       DC.B    ' ',0
+00001B5D= 09 00                   1126  MSG_TAB                         DC.B    TAB,0
+00001B5F                          1127  
+00001B5F                          1128  * Size Messages
+00001B5F= 2E 42 09 09 09 00       1129  MSG_B                           DC.B    '.B',TAB,TAB,TAB,0
+00001B65= 2E 57 09 09 09 00       1130  MSG_W                           DC.B    '.W',TAB,TAB,TAB,0
+00001B6B= 2E 4C 09 09 09 00       1131  MSG_L                           DC.B    '.L',TAB,TAB,TAB,0
+00001B71                          1132  
+00001B71                          1133  * Variables
+00001B71  =00000100               1134  STARTING_ADDRESS                EQU     $100
+00001B71  =00000150               1135  ENDING_ADDRESS                  EQU     $150
+00001B71  =00000200               1136  CURRENT_INSTR                   EQU     $200
+00001B71  =00000250               1137  REG_VAR                         EQU     $250 * Hold bits 11-9
+00001B71  =00000300               1138  OPMODE_VAR                      EQU     $300 * Hold bits 8-6
+00001B71  =00000350               1139  EA_MODE                         EQU     $350 * Hold bits 5-3
+00001B71  =00000400               1140  EA_REG                          EQU     $400 * Hold bits 2-0
+00001B71                          1141  
+00001B71                          1142              END     START        ; last line of source
 
 No errors detected
 No warnings generated
@@ -996,203 +1160,210 @@ ANPOST              3
 ANPRE               4
 ASD_MEM             0
 ASD_REG             0
-BAD_INPUT           1841
-CASE_ADDQ           124E
-CASE_AR             1552
-CASE_ARI            156A
-CASE_ARIPOST        159A
-CASE_ARIPRE         15D6
-CASE_ASDMEM         1286
-CASE_ASDREG         1338
-CASE_BCC            13CE
-CASE_BEQ            13FE
-CASE_BGT            1412
-CASE_BLE            1408
-CASE_BRA            13AA
-CASE_DATA           1442
-CASE_DIVU           124E
-CASE_DR             153A
-CASE_EPICFAIL       1444
-CASE_IMMEDIATE      1624
-CASE_JSR            142C
-CASE_LEA            124E
-CASE_LEFTMEM        12A2
-CASE_LEFTREG        1354
-CASE_LONG           164C
-CASE_LSDASD         124E
-CASE_LSDMEM         127C
-CASE_LSDREG         132E
+BAD_INPUT           1A16
+CASE_ADDQ           128E
+CASE_AND            1300
+CASE_AR             170E
+CASE_ARI            1726
+CASE_ARIPOST        1756
+CASE_ARIPRE         1792
+CASE_ASDMEM         1340
+CASE_ASDREG         1408
+CASE_BCC            1540
+CASE_BEQ            1572
+CASE_BGT            1586
+CASE_BLE            157C
+CASE_BRA            151C
+CASE_DATA           15B6
+CASE_DR             16F6
+CASE_EPICFAIL       15B8
+CASE_IMMEDIATE      17E0
+CASE_JSR            15A0
+CASE_LEA            128E
+CASE_LEFTMEM        1366
+CASE_LEFTREG        142E
+CASE_LONG           1808
+CASE_LSDASD         1300
+CASE_LSDMEM         1336
+CASE_LSDREG         13FE
 CASE_MOVE           1186
-CASE_MOVEM          124E
-CASE_MOVEQ          124E
-CASE_MULS           124E
+CASE_MOVEM          1228
+CASE_MOVEQ          128E
 CASE_NOP            1170
-CASE_NOT            124E
-CASE_OR             124E
-CASE_OTHER          1612
-CASE_RIGHTMEM       12AC
-CASE_RIGHTREG       135E
-CASE_RTS            142C
-CASE_SHIFTMEM       126C
-CASE_SHIFTREG       131C
-CASE_SUB            124E
-CASE_WORD           163C
-CHECKDEST           11B0
-CHECKEAEXIT         150A
-CHECKEAMLOOP        14DC
-CHECKEAXN_IFVALID   14DA
-CHECKMEMSOURE       12DC
-CHECKMOVE_XN        1238
-CHECKSHIFT_XN       1306
+CASE_NOT            1300
+CASE_OR             1300
+CASE_OTHER          17CE
+CASE_RIGHTMEM       1370
+CASE_RIGHTREG       1438
+CASE_RODMEM         134A
+CASE_RODREG         1412
+CASE_RTS            15A0
+CASE_SHIFTMEM       131E
+CASE_SHIFTREG       13E4
+CASE_SUB            128E
+CASE_WORD           17F8
+CHECKEAEXIT         16C6
+CHECKEAMLOOP        1698
+CHECKEAXN_IFVALID   1696
+CHECKGET_EAXN       160E
+CHECKMEMSOURE       13A4
+CHECKSHIFT_XN       13CE
 CHECK_LENGTH        10CA
 CHECK_ODD           1160
 CHECK_ORDER         109A
+CHECK_XN            163E
 CONCAT              1112
 CONVERT             10DC
 CR                  D
 CURRENT_INSTR       200
-DELETEME            1700
-DELETEMEAGAIN       1716
-DESTEA              1450
-DESTXN              147A
+DELETEME            18C4
+DELETEMEAGAIN       18F2
+DESTEA              15C4
+DESTXN              15EE
 DISASSEMBLE         10A4
 DN                  0
-EAMOVE_INVALID      1232
-EAMOVE_VALID        11CE
-EASHIFT_VALID       12FA
+EASHIFT_VALID       13C2
+EAXN_INVALID        1650
+EAXN_VALID          1636
 EA_MODE             350
 EA_REG              400
-EA_TO_STRING        150E
-EA_TO_STRING_EXIT   1658
-ENDING              180B
+EA_TO_STRING        16CA
+EA_TO_STRING_EXIT   181C
+ENDING              19E0
 ENDING_ADDRESS      150
-ERROR               16F4
-ERROR_MSG           1863
-FINDTYPEEA          1464
-FINDTYPEXN          148E
-FINISHMOVE          16EA
-GETDIRECTION        14C2
-GETDISPLACEMENT     149A
-GETROTATION         14B8
-GETROTATIONLOCATION  14D2
-GETROTATIONSIZE     14CA
-GET_EA              1446
-GET_XN              1470
+END_CHECKGET        1654
+ERROR               18B8
+ERROR_MSG           1A38
+FINDTYPEEA          15D8
+FINDTYPEXN          1602
+FINISHMOVE          18AE
+GETDIRECTION        167E
+GETDISPLACEMENT     1656
+GETMEMSOURCE        138C
+GETROTATION         1674
+GETROTATIONLOCATION  168E
+GETROTATIONSIZE     1686
+GET_EA              15BA
+GET_XN              15E4
 INPUT1              100C
 INPUT2              1052
-INSERTA             11FE
+INSERTA             11F4
 INVALID             112A
-INVALIDEA           14EE
+INVALIDEA           16AA
 ISNUMBER            10F2
 LF                  A
 LSD_MEM             1
 LSD_REG             1
-MOVE_BYTE           16D0
-MOVE_LONG           16E4
-MOVE_WORD           16DA
-MSG_ADD             18A6
-MSG_ADDA            18AB
-MSG_ADDQ            18B1
-MSG_AND             18D0
-MSG_AR              1971
-MSG_ASD             18E2
-MSG_B               1986
-MSG_BCC             18E6
-MSG_BCS             18EE
-MSG_BEQ             18F6
-MSG_BGE             1906
-MSG_BGT             190E
-MSG_BHI             1916
-MSG_BLE             191E
-MSG_BLS             1926
-MSG_BLT             192E
-MSG_BMI             1936
-MSG_BNE             18FE
-MSG_BPL             193E
-MSG_BRA             1963
-MSG_BVC             1946
-MSG_BVS             194E
-MSG_COMMA           197F
-MSG_DIVU            18C2
-MSG_DR              196F
-MSG_HEX             197D
-MSG_JSR             1956
-MSG_L               1992
-MSG_LB              1973
-MSG_LEA             18C8
-MSG_LEFT            196D
-MSG_LSD             18DE
-MSG_MINUS           1979
-MSG_MOVE            188B
-MSG_MOVEA           1891
-MSG_MOVEM           189F
-MSG_MOVEQ           1898
-MSG_MULS            18BC
-MSG_NOP             1886
-MSG_NOT             18D9
-MSG_OR              18D5
-MSG_PLUS            1977
-MSG_POUND           197B
-MSG_RB              1975
-MSG_RIGHT           196B
-MSG_RTS             195E
-MSG_SPACE           1982
-MSG_SUB             18B7
-MSG_TAB             1984
-MSG_W               198C
-NEW_LINE            187F
+MOVEM_MEM2REG       128E
+MOVEM_REG2MEM       125E
+MOVE_BYTE           1894
+MOVE_LONG           18A8
+MOVE_WORD           189E
+MSG_ADD             1A7B
+MSG_ADDA            1A80
+MSG_ADDQ            1A86
+MSG_AND             1AA5
+MSG_AR              1B4A
+MSG_ASD             1AB7
+MSG_B               1B5F
+MSG_BCC             1ABF
+MSG_BCS             1AC7
+MSG_BEQ             1ACF
+MSG_BGE             1ADF
+MSG_BGT             1AE7
+MSG_BHI             1AEF
+MSG_BLE             1AF7
+MSG_BLS             1AFF
+MSG_BLT             1B07
+MSG_BMI             1B0F
+MSG_BNE             1AD7
+MSG_BPL             1B17
+MSG_BRA             1B3C
+MSG_BVC             1B1F
+MSG_BVS             1B27
+MSG_COMMA           1B58
+MSG_DIVU            1A97
+MSG_DR              1B48
+MSG_HEX             1B56
+MSG_JSR             1B2F
+MSG_L               1B6B
+MSG_LB              1B4C
+MSG_LEA             1A9D
+MSG_LEFT            1B46
+MSG_LSD             1AB3
+MSG_MINUS           1B52
+MSG_MOVE            1A60
+MSG_MOVEA           1A66
+MSG_MOVEM           1A74
+MSG_MOVEQ           1A6D
+MSG_MULS            1A91
+MSG_NOP             1A5B
+MSG_NOT             1AAE
+MSG_OR              1AAA
+MSG_PLUS            1B50
+MSG_POUND           1B54
+MSG_RB              1B4E
+MSG_RIGHT           1B44
+MSG_ROD             1ABB
+MSG_RTS             1B37
+MSG_SPACE           1B5B
+MSG_SUB             1A8C
+MSG_TAB             1B5D
+MSG_W               1B65
+NEW_LINE            1A54
 NOTNUMBER           10FA
 OPCODE_DECODE       1168
 OPMODE_VAR          300
 OTHER               7
-OTHEREA             1506
-PRINTADDRESS        14AA
-PRINTBCC            141C
-PRINTENTER          16A6
-PRINTMOVE           1204
-PRINTMOVESIZE       16B6
-PRINTNULL           1694
-PRINTNUM            165E
-PRINTRANGE          167E
-PRINTREGEA          1394
-PRINTSHIFTMEM       128C
-PRINTSHIFTREG       133E
-PRINTSHORTLONGNUM   166E
-PRINT_MEMDIR        12B2
-PRINT_REGDIR        1364
-REG_BYTE            137A
-REG_IMMEDIATE       13A8
-REG_LONG            138E
-REG_REGISTER        13A8
+OTHEREA             16C2
+PRINTADDRESS        1666
+PRINTBCC            1590
+PRINTENTER          186A
+PRINTMOVE           11FA
+PRINTMOVESIZE       187A
+PRINTNULL           1858
+PRINTNUM            1822
+PRINTRANGE          1842
+PRINTREGEA          147A
+PRINTREGSIZE        1448
+PRINTSHIFTMEM       1350
+PRINTSHIFTREG       1418
+PRINTSHORTLONGNUM   1832
+PRINT_MEMDIR        1376
+PRINT_REGDIR        1442
+REG2MEMXNCHECK      1278
+REG_BYTE            1460
+REG_IMMEDIATE       1490
+REG_LONG            1474
+REG_REGISTER        14D6
 REG_VAR             250
-REG_WORD            1384
+REG_WORD            146A
 RESET_INPUT         10C2
 RETURN              1128
-ROR_MEM             3
-ROR_REG             3
-SOURCEEA            145C
-SOURCEXN            1486
+ROD_MEM             3
+ROD_REG             3
+SOURCEEA            15D0
+SOURCEXN            15FA
 START               1000
-STARTING            17D4
+STARTING            19A9
 STARTING_ADDRESS    100
 STOP                10BC
 TAB                 9
 TEST_RANGE          1148
-THREE_TAB           1882
-VALIDEA             14F6
-VALIDEA_ADDSUB_DESTOPERAND  1736
-VALIDEA_ALL         171A
-VALIDEA_ANDORNOT    1744
-VALIDEA_ANDOR_DESTOPERAND  174A
-VALIDEA_JSR         1754
-VALIDEA_LEA         1741
-VALIDEA_MOVEM       172E
-VALIDEA_MOVEM_MEMTOREG  1732
-VALIDEA_MOVEQ       1728
-VALIDEA_MOVE_DEST   1721
-VALIDEA_MULSDIVU    173B
-VALIDEA_SHIFT       174F
-VALIDXN_ALL         1757
-VALIDXN_SHORTLONG   175B
-WELCOME             175E
+THREE_TAB           1A57
+VALIDEA             16B2
+VALIDEA_ADDSUB_DESTOPERAND  190B
+VALIDEA_ALL         18F6
+VALIDEA_ANDORNOT    1919
+VALIDEA_ANDOR_DESTOPERAND  191F
+VALIDEA_JSR         1929
+VALIDEA_LEA         1916
+VALIDEA_MOVEM_MEMTOREG  1907
+VALIDEA_MOVEM_REGTOMEM  1903
+VALIDEA_MOVEQ       18FD
+VALIDEA_MULSDIVU    1910
+VALIDEA_SHIFT       1924
+VALIDXN_ALL         192C
+VALIDXN_SHORTLONG   1930
+WELCOME             1933
 XNIMMEDIATE         4

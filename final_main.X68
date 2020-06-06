@@ -145,74 +145,125 @@ CASE_NOP        CMP.W   #$4E71,D0               ; compares to NOP opcode in hex
                 * if first two bits are 00, next two are not 00
 CASE_MOVE       MOVE.W  D0,D1                   ; stores d0 in d1
                 AND.W   #$C000, D1              ; applies a bitmask to get 4 bits, want 00XX
-                BNE     CASE_MOVEQ              ; if not 0, not a  move instruction
+                BNE     CASE_MOVEM              ; if not 0, not a  move instruction
                 CMP.W   #$0FFF, D0              ; checks if it exceeds 0FFF
-                BLE     CASE_MOVEQ              ; if less than or equal to, not a move             
+                BLE     CASE_MOVEM              ; if less than or equal to, not a move             
                 
-                ; get destination
-                MOVE.W  #1,D1                   ; specifies that we are looking for dest addressing mode
-                JSR     GET_EA                  ; gets effective address, output: D1 = EA
-                MOVE.W  D1,D6                   ; saves EA to D6 so it doesn't get overwritten
-                MOVE.W  #1,D1                   ; specifies that we are looking for dest Xn
-                JSR     GET_XN                  ; Gets Xn, puts it into D1
-                MOVE.W  D1,D7                   ; saves Xn to D7 so it doesn't get overwritten
-
-CHECKDEST       LEA     VALIDEA_ALL,A5    ; load valid move EA
-                MOVE.W  D6,D1                   ; marks down that we are checking EA
-                JSR     CHECKEAXN_IFVALID       ; checks if EA is valid
-                CMP.W   #2,D1                   ; checks if it is Xn
-                BEQ     CHECKMOVE_XN            ; branches to CHECKXn if it is
-                CMP.W   #1,D1                   ; Checks if it is invalid
-                BEQ     EAMOVE_INVALID          ; branches to CHECKXn if it is
+*                ; get destination
+*                MOVE.W  #1,D1                   ; specifies that we are looking for dest addressing mode
+*                JSR     GET_EA                  ; gets effective address, output: D1 = EA
+*                MOVE.W  D1,D6                   ; saves EA to D6 so it doesn't get overwritten
+*                MOVE.W  #1,D1                   ; specifies that we are looking for dest Xn
+*                JSR     GET_XN                  ; Gets Xn, puts it into D1
+*                MOVE.W  D1,D7                   ; saves Xn to D7 so it doesn't get overwritten
+*
+*CHECKDEST       LEA     VALIDEA_ALL,A5          ; load valid move EA
+*                MOVE.W  D6,D1                   ; marks down that we are checking EA
+*                JSR     CHECKEAXN_IFVALID       ; checks if EA is valid
+*                CMP.W   #2,D1                   ; checks if it is Xn
+*                BEQ     CHECKMOVE_XN            ; branches to CHECKXn if it is
+*                CMP.W   #1,D1                   ; Checks if it is invalid
+*                BEQ     EAMOVE_INVALID          ; branches to CHECKXn if it is
                 
-                ; get source
-EAMOVE_VALID    MOVE.W  #0,D1                   ; specifies that we are looking for source addressing mode
-                JSR     GET_EA                  ; gets effective address, output: D1 = EA
-                MOVE.W  D1,D4                   ; saves EA to D6 so it doesn't get overwritten
-                MOVE.W  #0,D1                   ; specifies that we are looking for source Xn
-                JSR     GET_XN                  ; Gets Xn, puts it into D1
-                MOVE.W  D1,D5                   ; saves Xn to D7 so it doesn't get overwritten
+*                ; get source
+*EAMOVE_VALID    MOVE.W  #0,D1                   ; specifies that we are looking for source addressing mode
+*                JSR     GET_EA                  ; gets effective address, output: D1 = EA
+*                MOVE.W  D1,D4                   ; saves EA to D6 so it doesn't get overwritten
+*                MOVE.W  #0,D1                   ; specifies that we are looking for source Xn
+*                JSR     GET_XN                  ; Gets Xn, puts it into D1
+*                MOVE.W  D1,D5                   ; saves Xn to D7 so it doesn't get overwritten
                 
-                ; print source
-                MOVE.W  D0,D1                   ; stores d0 in d1
-                AND.W   #$01C0, D1              ; appplies a bitmask to get 3 bits, check if its 001
-                CMP.W   #$0040, D1              ; confirms if it is a MOVEA
-                BEQ     INSERTA                 ; branches to MOVEA, otherwise it is a normal MOVE
+                ; Check source
+                LEA     VALIDEA_ALL,A5           ; Loads valid EA types in A5
+                LEA     VALIDXN_ALL,A6           ; Loads valid Xn types in A6
+                MOVE.W  #0,D7                    ; Marks D7 as "Source" for CHECKGETEAXN
+                JSR     CHECKGET_EAXN            ; getting if its valid (D1), EA (D2), and Xn (D3)
+                CMP.W   #1,D1                    ; checks if invalid
+                BEQ     CASE_DATA                ; branches to CASE_DATA if invalid
+                MOVE.W  D2,D4                    ; Moves D2 (source effective address) to D4
+                MOVE.W  D3,D5                    ; Moves D3 (source Xn if applicable) to D5
+                
+                ; Check destination
+                LEA     VALIDEA_ALL,A5           ; Loads valid EA types in A5
+                LEA     VALIDXN_SHORTLONG,A6     ; Loads valid Xn types in A6
+                MOVE.W  #1,D7                    ; Marks D7 as "Source" for CHECKGETEAXN
+                JSR     CHECKGET_EAXN            ; getting if its valid (D1), EA (D2), and Xn (D3)
+                CMP.W   #1,D1                    ; checks if invalid
+                BEQ     CASE_DATA                ; branches to CASE_DATA if invalid
+                MOVE.W  D2,D6                    ; Moves D2 (source effective address) to D6
+                MOVE.W  D3,D7                    ; Moves D3 (source Xn if applicable) to D7
+                
+                MOVE.W  D0,D1                    ; stores d0 in d1
+                AND.W   #$01C0, D1               ; appplies a bitmask to get 3 bits, check if its 001
+                CMP.W   #$0040, D1               ; confirms if it is a MOVEA
+                BEQ     INSERTA                  ; branches to MOVEA, otherwise it is a normal MOVE
  
-                LEA     MSG_MOVE,A5             ; loads string pointer for MOVE into A5
-                BRA     PRINTMOVE               ; Branches to print move
+                LEA     MSG_MOVE,A5              ; loads string pointer for MOVE into A5
+                BRA     PRINTMOVE                ; Branches to print move
                 
-INSERTA         LEA     MSG_MOVEA,A5            ; loads string pointer for MOVEA into A5
-
-PRINTMOVE       JSR     PRINTNULL               ; prints out MOVE
-                JSR     PRINTMOVESIZE           ; prints out the size  
-                MOVE.W  D4,D2                   ; Moves D6 (dest effective address) to D2
-                MOVE.W  D5,D3                   ; Moves D7 (dest Xn if applicable) to D3 
-                JSR     EA_TO_STRING            ; outputs it into a string
+INSERTA         LEA     MSG_MOVEA,A5             ; loads string pointer for MOVEA into A5
+ 
+PRINTMOVE       JSR     PRINTNULL                ; prints out MOVE/MOVEA
+                JSR     PRINTMOVESIZE            ; prints out the size  
+                MOVE.W  D4,D2                    ; Moves D4 (source effective address) to D2
+                MOVE.W  D5,D3                    ; Moves D5 (source Xn if applicable) to D3 
+                JSR     EA_TO_STRING             ; outputs it into a string
                 
                 ; prints a comma to seperate
-                LEA     MSG_COMMA,A5            ; loads string pointer into A5
-                JSR     PRINTNULL               ; prints out MOVE
+                LEA     MSG_COMMA,A5             ; loads string pointer into A5
+                JSR     PRINTNULL                ; prints out MOVE
                 
                 ; print destination
-                MOVE.W  D6,D2                   ; Moves D6 (dest effective address) to D2
-                MOVE.W  D7,D3                   ; Moves D7 (dest Xn if applicable) to D3 
-                JSR     EA_TO_STRING            ; outputs it into a string
-                RTS                             ; exits subroutine
-                     
-                               
-EAMOVE_INVALID  JSR     CASE_DATA               ; prints out the data                    
+                MOVE.W  D6,D2                    ; Moves D6 (dest effective address) to D2
+                MOVE.W  D7,D3                    ; Moves D7 (dest Xn if applicable) to D3 
+                JSR     EA_TO_STRING             ; outputs it into a string
+                RTS                              ; exits subroutine                 
 
-CHECKMOVE_Xn    LEA     VALIDXN_SHORTLONG,A5    ; Loads Xn into A5
-                MOVE.W  D7,D1                   ; Loads D2 into D1 to check the Xn
-                JSR     CHECKEAXN_IFVALID       ; checks if the Xn is valid, put result in D1
-                TST.W   D1                      ; checks if it is valid
-                BEQ     EAMOVE_VALID            ; go to EA_VALID to print
-                BRA     EAMOVE_INVALID          ; branches to EA_INVALID if not              
+*CHECKMOVE_Xn    LEA     VALIDXN_SHORTLONG,A5    ; Loads Xn into A5
+*                MOVE.W  D7,D1                   ; Loads D7 into D1 to check the Xn
+*                JSR     CHECKEAXN_IFVALID       ; checks if the Xn is valid, put result in D1
+*                TST.W   D1                      ; checks if it is valid
+*                BEQ     EAMOVE_VALID            ; go to EA_VALID to print
+*                BRA     EAMOVE_INVALID          ; branches to EA_INVALID if not              
                 
-                RTS                             ; returns from subroutine     
+CASE_MOVEM      MOVE.W  D0,D1                   ; copies instruction word to D1
+                AND.W   #$FB80,D1               ; check bitmask for MOVEM (1111 1011 1000 0000)
+                CMP.W   #$4880,D1               ; sees if it matches MOVEM (0100 1000 1000 0000)
+                BNE     CASE_MOVEQ                   ; checks MOVEQ if its not MOVEM
+                
+                ; loads EA and XN
+                MOVE.W  #0,D1                   ; copies instruction word to D1
+                JSR     GET_EA                  ; gets EA and puts in D1
+                MOVE.W  D1,D2                   ; copies EA to D1 so it won't be overwritten
+                MOVE.W  #0,D1                   ; copies instruction word to D1
+                JSR     GET_XN                  ; gets XN and puts in D1
+                MOVE.W  D1,D3                   ; copies EA to D1 so it won't be overwritten
+                
+                ; Check D
+                MOVE.W  D0,D1                   ; copies instruction word to D1
+                AND.W   #$0400,D1               ; check bitmask for D in MOVEM (0000 0100 0000 0000)
+                MOVE.W  D1,D7                   ; stores D1 in D7 so it doesn't get overwritten
+                CMP.W   #$0400,D1               ; checks if value is 1
+                BEQ     MOVEM_MEM2REG           ; if value is 1, then it is Memory to Register   
 
-CASE_MOVEM  
+MOVEM_REG2MEM   LEA     VALIDEA_MOVEM_REGTOMEM,A5       ; loads valid addresses
+                MOVE.W  D2,D1                           ; Loads D2 into D1 to check the number representing EA
+                JSR     CHECKEAXN_IFVALID               ; checks if the EA is valid
+                CMP.W   #1,D1                           ; checks if D1 invalid
+                BEQ     CASE_DATA                       ; if invalid go to CASE_DATA
+                CMP.W   #2,D1                           ; checks if we need to check Xn
+                
+REG2MEMXNCHECK  LEA     VALIDEA_MOVEM_REGTOMEM,A5       ; loads valid addresses
+                MOVE.W  D3,D1                           ; Loads D2 into D1 to check the number representing EA
+                JSR     CHECKEAXN_IFVALID               ; checks if the EA is valid
+                CMP.W   #1,D1                           ; checks if D1 invalid
+                BEQ     CASE_DATA                       ; if invalid go to CASE_DATA
+
+                
+
+MOVEM_MEM2REG    
+                        
+
 
 CASE_MOVEQ  
 
@@ -237,13 +288,42 @@ CASE_ADDQ
 
 CASE_SUB
 
-CASE_MULS
-
-CASE_DIVU
-
-CASE_LEA
+CASE_LEA        MOVE.W  D0,D1                                ; Copies instruction word to D1
+                AND.W   #$F000,D1                            ; Applies a bitmask to get first 4 bits                
+                CMP.W   #$4000,D1                            ; Checks if it fits the first four bits of LEA opcode
+                BNE.W   CASE_AND                             ; If its not, check AND
+                MOVE.W  D0,D1                                ; Copies instruction word to D1
+                AND.W   #$01C0,D1                            ; Applies a bitmask to get 3 bits from places 6 to 8             
+                CMP.W   #$01C0,D1                            ; Checks if it matches 111/#3
+                BNE.W   CASE_AND                             ; If its not, check AND
+                
+                LEA     MSG_LEA,A5                           ; loads string pointer for LEA into A5
+                JSR     PRINTNULL                            ; prints LEA
+                
+                 ; source
+                MOVE.W  #0,D1                                ; specifies that we are looking for source addressing mode
+                JSR     GET_EA                               ; gets effective address, output: D1 = EA
+                MOVE.W  D1,D2                                ; saves EA to D2 so it doesn't get overwritten
+                MOVE.W  #0,D1                                ; specifies that we are looking for source Xn
+                JSR     GET_XN                               ; Gets Xn, puts it into D1
+                MOVE.W  D1,D3                                ; saves Xn to D3 so it doesn't get overwritten
+                JSR     EA_TO_STRING                         ; Prints out the EA
+                
+                ; comma
+                LEA     MSG_COMMA,A5                         ; prints out a comma for formatting
+                JSR     PRINTNULL                       
+                 
+                ; register
+                LEA     MSG_AR,A5                            ; loads A into A5 (we already checked for it)
+                JSR     PRINTNULL 
+                MOVE.W  D1,D2                                ; saves Xn to D3 so it doesn't get overwritten
+                MOVE.W  #1,D1                                ; specifies that we are looking for destination Xn
+                JSR     GET_XN                               ; Gets Xn, puts it into D1
+                JSR     PRINTNUM                             ; Prints the number in D1
+                RTS
 
 **---------------AND opcode----------------------
+CASE_AND
 *CASE_AND        LEA         MSG_AND,A1
 *                MOVE.B      #14,D0
 *                TRAP        #15 
@@ -356,13 +436,18 @@ CASE_LSDASD     MOVE.W      D0,D1                            ; copies D0 to D1
                 
 CASE_SHIFTMEM   MOVE.W      D0,D2                            ; copies D0 to D2
                 JSR         GETROTATION                      ; gets rotation value of D2
-                CMP.W       #ASd_Mem,D2                      ; checks if rotation value is ASdMem
+                CMP.W       #ASd_MEM,D2                      ; checks if rotation value is ASdMem
                 BEQ         CASE_ASdMEM                      ; branches to ASd_MEM if value matches
+                CMP.W       #ROd_MEM,D2                      ; checks if rotation value is ASdMem
+                BEQ         CASE_ROdMEM                      ; branches to ASd_MEM if value matches
                 
 CASE_LSdMEM     LEA         MSG_LSd,A5                       ; loads LS into A5
                 BRA         PRINTSHIFTMEM                    ; branches to PRINTSHIFTMEM
 
-CASE_ASdMEM     LEA         MSG_ASd,A5                       ; loads AS into A5             
+CASE_ASdMEM     LEA         MSG_ASd,A5                       ; loads AS into A5  
+                BRA         PRINTSHIFTMEM                    ; branches to PRINTSHIFTMEM
+
+CASE_ROdMEM     LEA         MSG_ROd,A5                       ; loads AS into A5          
                 
 PRINTSHIFTMEM   JSR         PRINTNULL                        ; Prints LS or AS   
                 MOVE.W      D0,D2                            ; copies D0 to D2
@@ -378,8 +463,10 @@ CASE_RIGHTMEM   LEA         MSG_RIGHT,A5                     ; loads R into A5
 PRINT_MEMDIR    JSR         PRINTNULL                        ; Prints L or R
                 LEA         MSG_W,A5                         ; loads .W into A5
                 JSR         PRINTNULL                        ; Prints .W
+                BRA         GETMEMSOURCE                     ; checks the source 
                 
-                ; get source addressing mode
+; get source addressing mode       
+GETMEMSOURCE                                                 
                 MOVE.W      #0,D1                            ; specifies that we are looking for source addressing mode
                 JSR         GET_EA                           ; gets effective address, output: D1 = EA
                 MOVE.W      D1,D4                            ; saves EA to D4 so it doesn't get overwritten
@@ -413,13 +500,18 @@ CASE_SHIFTREG   MOVE.W      D2,D3                            ; copies D2 to D3
                 MOVE.W      D0,D1                            ; copies D0 to D1
                 AND.W       #$0018,D1                        ; gets bits representing type (bitmask: 0000 0000 0001 1000)
                 LSR.W       #3,D1                            ; shifts 3 bits to the right so we only have 2 bits left   
-                CMP.W       #$0,D1                           ; Compares D1 to 0, if it is 0, it is ASd
-                BEQ         CASE_ASdReg                      ; goes to ASd case if so                 
+                CMP.W       #ASd_REG,D1                      ; Compares D1 to 0, if it is 0, it is ASd
+                BEQ         CASE_ASdReg                      ; goes to ASd case if so    
+                CMP.W       #ROd_REG,D1                      ; Compares D1 to 0, if it is 0, it is ASd
+                BEQ         CASE_ROdReg                      ; goes to ASd case if so                 
                 
 CASE_LSdREG     LEA         MSG_LSd,A5                       ; loads LS into A5
                 BRA         PRINTSHIFTREG                    ; branches to PRINTSHIFTREG
 
-CASE_ASdREG     LEA         MSG_ASd,A5                       ; loads AS into A5             
+CASE_ASdREG     LEA         MSG_ASd,A5                       ; loads AS into A5
+                BRA         PRINTSHIFTREG                    ; branches to PRINTSHIFTREG
+
+CASE_ROdREG     LEA         MSG_ROd,A5                       ; loads AS into A5          
                 
 PRINTSHIFTREG   JSR         PRINTNULL                        ; Prints LS or AS   
                 MOVE.W      D0,D2                            ; copies D0 to D2
@@ -430,12 +522,16 @@ PRINTSHIFTREG   JSR         PRINTNULL                        ; Prints LS or AS
 CASE_LEFTREG    LEA         MSG_LEFT,A5                      ; loads L into A5 
                 BRA         PRINT_REGDIR                     ; branches for printing
         
-CASE_RIGHTREG   LEA         MSG_RIGHT,A5                     ; loads R into A5  
-
+CASE_RIGHTREG   LEA         MSG_RIGHT,A5                     ; loads R into A5 
+                BRA         PRINT_REGDIR                     ; branches for printing
+                
 PRINT_REGDIR    JSR         PRINTNULL                        ; Prints L or R
-                CMP.W       #1,D3                            ; Checks if it is word size
+
+PRINTREGSIZE    MOVE.W      D0,D2                            ; loads D0 into D2 to get unmodified instruction word
+                JSR         GETROTATIONSIZE                  ; gets the rotation size
+                CMP.W       #1,D2                            ; Checks if it is word size
                 BEQ         REG_WORD                         ; Prints .W
-                CMP.W       #2,D3                            ; Checks if it is long size
+                CMP.W       #2,D2                            ; Checks if it is long size
                 BEQ         REG_LONG                         ; Prints .L
 
 REG_BYTE        LEA         MSG_B,A5                         ; loads .B into A5
@@ -443,23 +539,44 @@ REG_BYTE        LEA         MSG_B,A5                         ; loads .B into A5
 
 REG_WORD        LEA         MSG_W,A5                         ; loads .W into A5
                 BRA         PRINTREGEA      
-                
-                
+                           
 REG_LONG        LEA         MSG_L,A5                         ; loads .L into A5
 
 PRINTREGEA      JSR         PRINTNULL                        ; Prints size
-                MOVE.W      D0,D1                            ; copies D0 to D1
-                AND.W       #$0020,D1                        ; gets bits representing if it is immediate or register (bitmask: 0000 0000 0010 0000)
-                LSR.W       #5,D1                            ; shifts 5 bits to the right so we only have 2 bits left   
-                CMP.W       #$0,D1                           ; Compares D1 to 0, if it is 0, it is ASd
-                BEQ         CASE_ASdReg                      ; goes to ASd case if so
+                MOVE.W      D0,D2                            ; copies D0 to D1
+                JSR         GETROTATIONLOCATION              ; finds out if its immediate or register 
+                CMP.W       #$1,D1                           ; Compares D1 to 0, if it is 0, it is a data register
+                BEQ         REG_REGISTER                     ; goes to ASd case if so
+                                
+REG_IMMEDIATE   MOVE.W      D0,D2                            ; copies D0 to D2
+                JSR         GETROTATIONSIZE                  ; gets the rotation size
+                MOVE.W      D2, D1                           ; moves rotation size to D1
+                LEA         MSG_POUND, A5                    ; loads # into A5
+                JSR         PRINTNULL                        ; prints #
+                JSR         PRINTNUM                         ; prints shift count
+                LEA         MSG_COMMA, A5                    ; loads , into A5
+                JSR         PRINTNULL                        ; prints the comma out to divide the source and destination  
+                LEA         MSG_DR, A5                       ; loads D into A5
+                JSR         PRINTNULL                        ; prints out D 
+                MOVE.W      #0,D1                            ; marks that we are looking for Xn (data register number) in the source location  
+                JSR         GET_XN                           ; gets the data register number, stores in D1
+                JSR         PRINTNUM                         ; prints data register number in D1          
+                RTS                                          ; ends subroutine to go onto the next instruction opcode
                 
-REG_IMMEDIATE
-
-REG_REGISTER
-                
-                
-                RTS  
+REG_REGISTER    MOVE.W      D0,D2                            ; copies D0 to D2
+                JSR         GETROTATIONSIZE                  ; gets the rotation size
+                MOVE.W      D2, D1                           ; moves rotation size to D1
+                LEA         MSG_DR, A5                       ; loads D into A5
+                JSR         PRINTNULL                        ; prints D
+                JSR         PRINTNUM                         ; prints register number
+                LEA         MSG_COMMA, A5                    ; loads , into A5
+                JSR         PRINTNULL                        ; prints the comma out to divide the source and destination  
+                LEA         MSG_DR, A5                       ; loads D into A5
+                JSR         PRINTNULL                        ; prints out D 
+                MOVE.W      #0,D1                            ; marks that we are looking for Xn (data register number) in the source location  
+                JSR         GET_XN                           ; gets the data register number, stores in D1
+                JSR         PRINTNUM                         ; prints data register number in D1          
+                RTS                                          ; ends subroutine to go onto the next instruction opcode
              
 CASE_BRA        MOVE.W  D0,D1                                ; Copies instruction word to D1
                 AND.W   #$FF00,D1                            ; Applies a bitmask to get first 8 bits                
@@ -478,7 +595,8 @@ CASE_BRA        MOVE.W  D0,D1                                ; Copies instructio
 CASE_BCC        MOVE.W  D0,D1                                ; copies instruction word from D0 to D1
                 AND.W   #$F000,D1                            ; get top 4 bits
                 CMP.W   #$6000,D1                            ; make sure top 4 bits are 6
-                BNE.W   CASE_JSR                             ;
+                BNE.W   CASE_JSR                             ; checks next case if not Bcc
+                MOVE.W  D0,D1                                ; copies instruction word from D0 to D1
                 AND.W   #$0F00,D1                            ; get next 4 bits, condition code
                 LSR.W   #8,D1                                ; shifts 8 bits to the right
                 
@@ -563,6 +681,40 @@ FINDTYPEXN          MOVE.W    D0,D1                 ; copies D0 in D1
                     LSR.W     D3,D1                 ; shifts D1, moves the result to the end
                     MOVEM.L   (SP)+,D2-D3           ; restores D2 and D3
                     RTS                             ; returns from subroutine 
+                    
+* Checks and gets the EA and Xn
+* Input: A5 = EA LIST, A6 = Xn LIST, D0 = INSTRUCTION WORD,  D7 = 0 (source EA/Xn), 1 (dest EA/Xn) 
+* Output: D1(0 = VALID, 1 = INVALID), D2 = EA, D3 = Xn
+CHECKGET_EAXN   MOVE.W  D7,D1                   ; loads value representing position of EA     
+                JSR     GET_EA                  ; Gets EA
+                MOVE.W  D1,D2                   ; Stores EA in D2
+                MOVE.W  D7,D1                   ; loads value representing position of EA   
+                JSR     GET_XN                  ; Gets Xn
+                MOVE.W  D1,D3                   ; Stores Xn in D3
+                MOVE.W  D2,D1                   ; Stores EA in D1 for comparisons
+                
+                JSR     CHECKEAXN_IFVALID       ; checks if EA is valid
+                CMP.W   #2,D1                   ; checks if it is Xn
+                BEQ     CHECK_XN                ; branches to CHECKXn if it is
+                CMP.W   #1,D1                   ; Checks if it is invalid
+                BEQ     EAXN_INVALID            ; branches to CHECKXn if it is
+                
+                
+EAXN_VALID      MOVE.W  #0,D1                   ; loads 0 (VALID) into D1
+                BRA     END_CHECKGET
+      
+; need XN
+CHECK_Xn        MOVEA.L A6,A5                   ; Loads Xn into A5  
+                MOVE.W  D3,D1                   ; MOves Xn to D1 to be checked
+                JSR     CHECKEAXN_IFVALID       ; checks if Xn is valid
+                TST.W   D1                      ; checks if it is valid
+                BEQ     EAXN_VALID              ; go to EA_VALID to print
+                BRA     EAXN_INVALID            ; branches to EA_INVALID if not  
+ 
+EAXN_INVALID    MOVE.W  #1,D1                   ; loads 1 (INVALID) into D
+
+END_CHECKGET    RTS          
+                                          
                                           
 * Gets the displacement and pritns it 
 * Inputs: D2 = instruction word, A2 = address of next word
@@ -598,20 +750,20 @@ GETDIRECTION        AND.W      #$0100,D2             ; gets the rotation bits
 * Gets the rotation size value for ASd and LSd
 * Input: D2 = instruction word copy (of D0)                                    
 * Output: rotation size value in D2             
-GETROTATIONSIZE     AND.W      #$00C0,D2             ; gets the rotation bits
+GETROTATIONSIZE     AND.W      #$00C0,D2            ; gets the rotation bits
                     LSR.W      #6,D2                ; shifts 6 bits to the right to only have the rotation bits
                     RTS                             ; return from subroutine
 
 * Gets the rotation location  value for ASd and LSd
 * Input: D2 = instruction word copy (of D0)                                    
 * Output: rotation location value in D2             
-GETROTATIONLOCATION AND.W      #$0020,D2             ; gets the rotation location bits
+GETROTATIONLOCATION AND.W      #$0020,D2            ; gets the rotation location bits
                     LSR.W      #5,D2                ; shifts 6 bits to the right to only have the rotation bits
                     RTS                             ; return from subroutine
 
                         
-* Checks if EA is valid
-* Inputs: A5 = Pointer to -1 terminated list of valid addressing modes, D1 = Addressing Mode (3 bit), 
+* Checks if EA or Xn is valid
+* Inputs: A5 = Pointer to -1 terminated list of valid addressing modes, D1 = Addressing Mode (3 bit)
 * Outputs: D1 (0 = Valid, 1 = Invalid, 2 = Check Xn)                   
 CHECKEAXN_IFVALID  MOVE.L     D2,-(SP)              ; saves D2
 
@@ -708,7 +860,7 @@ CASE_ARIPRE        LEA      MSG_MINUS,A5            ; Loads - into A5
                    JSR      PRINTNULL               ; Prints )
                    BRA      EA_TO_STRING_EXIT       ; exits
 
-* other (long, short, immediate) with Xn
+* other (long, short, immediate) with Xn yes
 CASE_OTHER         MOVE     (A2)+, D0               ; Moves next instruction word into D1 since A2 is auxilliary instruction word 
                    CMP.W    #ABSShort,D3            ; checks if it is a word
                    BEQ      CASE_WORD               ; branches to CASE_WORD if is a short
@@ -735,7 +887,7 @@ CASE_WORD
                    *JSR      PRINTNULL               ; Prints $
                    MOVE.W   D0, D1                  ; moves instruction word into d1
                    MOVE.W   #0, D4                  ; moves length size (word) into d4
-                   JSR      PRINTSHORTLONGNUM       ; reformats the number to the proper length and prints out the number
+                   JSR      PRINTNUM               ; reformats the number to the proper length and prints out the number
                    BRA      EA_TO_STRING_EXIT       ; exits subroutine
 
 * long address 
@@ -744,7 +896,9 @@ CASE_LONG
                    *JSR      PRINTNULL               ; Prints $
                    MOVE.W   D0, D1                  ; moves instruction word into d1
                    MOVE.W   #1, D4                  ; moves length size (long) into d4
-                   JSR      PRINTSHORTLONGNUM       ; reformats the number to the proper length and prints out the number
+                   JSR      PRINTNUM                ; reformats the number to the proper length and prints out the number
+                   MOVE     (A2)+, D1               ; Moves next instruction word into D1 since A2 is auxilliary instruction word
+                   JSR      PRINTNUM                ; reformats the number to the proper length and prints out the number
 
 
 * exits subroutine
@@ -772,10 +926,7 @@ PRINTSHORTLONGNUM         MOVEM.L     D1-D2, -(SP)        ; saves D0 and D1
                           MOVE.B      #3,D0               ; prints D1
                           TRAP        #15                 ; is trap task 3
                           MOVEM.L     (SP)+,D0-D1         ; returns D0 and D1
-                RTS                                       ; returns from subroutine
-
-* Converts decimal number to hex format
-*DECTOHEX                  MOVE                
+                RTS                                       ; returns from subroutine    
              
             
 * Prints contents of things between a range
@@ -839,10 +990,23 @@ DELETEME        MOVEA.L  -(A1),A3
                 BLE      DELETEMEAGAIN
                 BGT      DELETEMEAGAIN
 
-                LSR.W      #2,D2
+                LSR.B      #2,D2
                 LSR.W      -(A2)
                 LSR.W      (A2)+
-                LSR.W      D2,D2        
+                LSR.L      D2,D2 
+                LSL.B      #2,D2
+                LSL.W      -(A2)
+                LSL.W      (A2)+
+                LSL.L      D2,D2
+                ROL.B      #2,D2
+                ROL.W      -(A2)
+                ROL.W      (A2)+
+                ROL.L      D2,D2
+                ROR.B      #2,D2
+                ROR.W      -(A2)
+                ROR.W      (A2)+
+                ROR.L      D2,D2
+                       
                 
 DELETEMEAGAIN                 
           
@@ -870,9 +1034,8 @@ XnImmediate                     EQU     4
 * Valid Addressing Modes
 VALIDEA_ALL                     DC.B    Dn,An,AnIndirect,AnPost,AnPre,Other,-1          
 ; MOVE (source),MOVEA, ADD, ADDA, ADDQ, and SUB
-VALIDEA_MOVE_DEST               DC.B    Dn,An,AnIndirect,AnPost,AnPre,Other,-1 * DELETE THIS, REPLACE WITH VALIDEA_ALL
 VALIDEA_MOVEQ                   DC.B    Dn,AnIndirect,AnPost,AnPre,Other,-1
-VALIDEA_MOVEM                   DC.B    AnIndirect,AnPre,Other,-1
+VALIDEA_MOVEM_REGTOMEM          DC.B    AnIndirect,AnPre,Other,-1
 VALIDEA_MOVEM_MEMTOREG          DC.B    AnIndirect,AnPost,Other,-1
 VALIDEA_ADDSUB_DESTOPERAND      DC.B    AnIndirect,AnPost,AnPre,Other,-1
 VALIDEA_MULSDIVU                DC.B    Dn,AnIndirect,AnPost,AnPre,Other,-1
@@ -892,11 +1055,11 @@ VALIDXN_SHORTLONG               DC.B    ABSShort,ABSLong,-1
 * posible memory ASd/LSd rotation values
 ASd_MEM                         EQU     0   
 LSd_MEM                         EQU     1 
-ROR_MEM                         EQU     3
+ROd_MEM                         EQU     3
  
 ASd_REG                         EQU     0   
 LSd_REG                         EQU     1 
-ROR_REG                         EQU     3
+ROd_REG                         EQU     3
 
 * Starting messages
 WELCOME                         DC.B    'Welcome to Team Big Blue Disassembler',CR,LF
@@ -926,6 +1089,7 @@ MSG_OR                          DC.B    TAB,'OR',0
 MSG_NOT                         DC.B    TAB,'NOT',0
 MSG_LSd                         DC.B    TAB,'LS',0
 MSG_ASd                         DC.B    TAB,'AS',0
+MSG_ROd                         DC.B    TAB,'RO',0
 MSG_BCC                         DC.B    TAB,'BCC',TAB,TAB,TAB,0
 MSG_BCS                         DC.B    TAB,'BCS',TAB,TAB,TAB,0
 MSG_BEQ                         DC.B    TAB,'BEQ',TAB,TAB,TAB,0
@@ -976,6 +1140,8 @@ EA_MODE                         EQU     $350 * Hold bits 5-3
 EA_REG                          EQU     $400 * Hold bits 2-0
 
             END     START        ; last line of source
+
+
 
 
 *~Font name~Courier New~
