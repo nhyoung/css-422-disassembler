@@ -236,7 +236,35 @@ MOVEM_MEM2REG
                         
 
 
-CASE_MOVEQ  
+CASE_MOVEQ      MOVE.W  D0,D1
+                AND.W   #$F100,D1
+                CMP.W   #$7000,D1
+                BNE     CASE_ADD
+                
+                ;loads Register
+                MOVE.W  #1,D1                           ; copies instruction word to D1
+                JSR     GET_XN                          ; gets XN and puts in D1
+                MOVE.W  D1,D2                           ; copies Xn to D2 so it won't be overwritten
+                
+                ;loads DATA
+                MOVE.W  D0,D1
+                AND.W   #$00FF,D1                       ;bit mask to get DATA
+                MOVE.W  #D1,D3                          ;copy data into D3
+                                                        ;must convert bits to hex
+                
+                
+PRINT_MOVEQ     LEA     MSG_MOVEQ,A5                    ;PRINT MOVEQ
+                JSR     PRINT_NULL  
+                
+                LEA     MSG_L,A5                        ;PRINT SIZE L
+                JSR     PRINT_NULL
+    
+                LEA     THREE_TAB,A5                ;PRINT THREE TABS
+                JSR     PRINT_NULL
+                
+                LEA     MSG_HASHTAG                     ;PRINT HASHTAG
+                JSR     PRINT_NULL
+
 
 *CASE_ADD        LEA         MSG_ADDA,A1
 *                MOVE.B      #14,D0
@@ -1123,6 +1151,7 @@ EA_MODE                         EQU     $350 * Hold bits 5-3
 EA_REG                          EQU     $400 * Hold bits 2-0
 
             END     START        ; last line of source
+
 
 
 
