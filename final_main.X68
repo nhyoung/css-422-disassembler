@@ -1,7 +1,7 @@
 *-----------------------------------------------------------
 * Title      : Final Project
 * Written by : Nick Young, Audrey Nguyen, Khiam Rehman
-* Date       : 6/1/20
+* Date       : 6/5/20
 * Description: Final Project
 *-----------------------------------------------------------
     ORG    $1000
@@ -149,30 +149,6 @@ CASE_MOVE       MOVE.W  D0,D1                   ; stores d0 in d1
                 CMP.W   #$0FFF, D0              ; checks if it exceeds 0FFF
                 BLE     CASE_MOVEM              ; if less than or equal to, not a move             
                 
-*                ; get destination
-*                MOVE.W  #1,D1                   ; specifies that we are looking for dest addressing mode
-*                JSR     GET_EA                  ; gets effective address, output: D1 = EA
-*                MOVE.W  D1,D6                   ; saves EA to D6 so it doesn't get overwritten
-*                MOVE.W  #1,D1                   ; specifies that we are looking for dest Xn
-*                JSR     GET_XN                  ; Gets Xn, puts it into D1
-*                MOVE.W  D1,D7                   ; saves Xn to D7 so it doesn't get overwritten
-*
-*CHECKDEST       LEA     VALIDEA_ALL,A5          ; load valid move EA
-*                MOVE.W  D6,D1                   ; marks down that we are checking EA
-*                JSR     CHECKEAXN_IFVALID       ; checks if EA is valid
-*                CMP.W   #2,D1                   ; checks if it is Xn
-*                BEQ     CHECKMOVE_XN            ; branches to CHECKXn if it is
-*                CMP.W   #1,D1                   ; Checks if it is invalid
-*                BEQ     EAMOVE_INVALID          ; branches to CHECKXn if it is
-                
-*                ; get source
-*EAMOVE_VALID    MOVE.W  #0,D1                   ; specifies that we are looking for source addressing mode
-*                JSR     GET_EA                  ; gets effective address, output: D1 = EA
-*                MOVE.W  D1,D4                   ; saves EA to D6 so it doesn't get overwritten
-*                MOVE.W  #0,D1                   ; specifies that we are looking for source Xn
-*                JSR     GET_XN                  ; Gets Xn, puts it into D1
-*                MOVE.W  D1,D5                   ; saves Xn to D7 so it doesn't get overwritten
-                
                 ; Check source
                 LEA     VALIDEA_ALL,A5           ; Loads valid EA types in A5
                 LEA     VALIDXN_ALL,A6           ; Loads valid Xn types in A6
@@ -193,6 +169,7 @@ CASE_MOVE       MOVE.W  D0,D1                   ; stores d0 in d1
                 MOVE.W  D2,D6                    ; Moves D2 (source effective address) to D6
                 MOVE.W  D3,D7                    ; Moves D3 (source Xn if applicable) to D7
                 
+                ; Checking if it is MOVEA
                 MOVE.W  D0,D1                    ; stores d0 in d1
                 AND.W   #$01C0, D1               ; appplies a bitmask to get 3 bits, check if its 001
                 CMP.W   #$0040, D1               ; confirms if it is a MOVEA
@@ -206,7 +183,7 @@ INSERTA         LEA     MSG_MOVEA,A5             ; loads string pointer for MOVE
 PRINTMOVE       JSR     PRINTNULL                ; prints out MOVE/MOVEA
                 JSR     PRINTMOVESIZE            ; prints out the size  
                 MOVE.W  D4,D2                    ; Moves D4 (source effective address) to D2
-                MOVE.W  D5,D3                    ; Moves D5 (source Xn if applicable) to D3 
+                MOVE.W  D5,D3                    ; Moves D5 (source Xn) to D3 
                 JSR     EA_TO_STRING             ; outputs it into a string
                 
                 ; prints a comma to seperate
@@ -218,33 +195,27 @@ PRINTMOVE       JSR     PRINTNULL                ; prints out MOVE/MOVEA
                 MOVE.W  D7,D3                    ; Moves D7 (dest Xn if applicable) to D3 
                 JSR     EA_TO_STRING             ; outputs it into a string
                 RTS                              ; exits subroutine                 
-
-*CHECKMOVE_Xn    LEA     VALIDXN_SHORTLONG,A5    ; Loads Xn into A5
-*                MOVE.W  D7,D1                   ; Loads D7 into D1 to check the Xn
-*                JSR     CHECKEAXN_IFVALID       ; checks if the Xn is valid, put result in D1
-*                TST.W   D1                      ; checks if it is valid
-*                BEQ     EAMOVE_VALID            ; go to EA_VALID to print
-*                BRA     EAMOVE_INVALID          ; branches to EA_INVALID if not              
+              
                 
-CASE_MOVEM      MOVE.W  D0,D1                   ; copies instruction word to D1
-                AND.W   #$FB80,D1               ; check bitmask for MOVEM (1111 1011 1000 0000)
-                CMP.W   #$4880,D1               ; sees if it matches MOVEM (0100 1000 1000 0000)
-                BNE     CASE_MOVEQ                   ; checks MOVEQ if its not MOVEM
+CASE_MOVEM      MOVE.W  D0,D1                           ; copies instruction word to D1
+                AND.W   #$FB80,D1                       ; check bitmask for MOVEM (1111 1011 1000 0000)
+                CMP.W   #$4880,D1                       ; sees if it matches MOVEM (0100 1000 1000 0000)
+                BNE     CASE_MOVEQ                      ; checks MOVEQ if its not MOVEM
                 
                 ; loads EA and XN
-                MOVE.W  #0,D1                   ; copies instruction word to D1
-                JSR     GET_EA                  ; gets EA and puts in D1
-                MOVE.W  D1,D2                   ; copies EA to D1 so it won't be overwritten
-                MOVE.W  #0,D1                   ; copies instruction word to D1
-                JSR     GET_XN                  ; gets XN and puts in D1
-                MOVE.W  D1,D3                   ; copies EA to D1 so it won't be overwritten
+                MOVE.W  #0,D1                           ; copies instruction word to D1
+                JSR     GET_EA                          ; gets EA and puts in D1
+                MOVE.W  D1,D2                           ; copies EA to D1 so it won't be overwritten
+                MOVE.W  #0,D1                           ; copies instruction word to D1
+                JSR     GET_XN                          ; gets XN and puts in D1
+                MOVE.W  D1,D3                           ; copies EA to D1 so it won't be overwritten
                 
                 ; Check D
-                MOVE.W  D0,D1                   ; copies instruction word to D1
-                AND.W   #$0400,D1               ; check bitmask for D in MOVEM (0000 0100 0000 0000)
-                MOVE.W  D1,D7                   ; stores D1 in D7 so it doesn't get overwritten
-                CMP.W   #$0400,D1               ; checks if value is 1
-                BEQ     MOVEM_MEM2REG           ; if value is 1, then it is Memory to Register   
+                MOVE.W  D0,D1                           ; copies instruction word to D1
+                AND.W   #$0400,D1                       ; check bitmask for D in MOVEM (0000 0100 0000 0000)
+                MOVE.W  D1,D7                           ; stores D1 in D7 so it doesn't get overwritten
+                CMP.W   #$0400,D1                       ; checks if value is 1
+                BEQ     MOVEM_MEM2REG                   ; if value is 1, then it is Memory to Register   
 
 MOVEM_REG2MEM   LEA     VALIDEA_MOVEM_REGTOMEM,A5       ; loads valid addresses
                 MOVE.W  D2,D1                           ; Loads D2 into D1 to check the number representing EA
@@ -297,16 +268,28 @@ CASE_LEA        MOVE.W  D0,D1                                ; Copies instructio
                 CMP.W   #$01C0,D1                            ; Checks if it matches 111/#3
                 BNE.W   CASE_AND                             ; If its not, check AND
                 
+                ; Check source
+                LEA     VALIDEA_LEA,A5                       ; Loads valid EA types in A5
+                LEA     VALIDXN_SHORTLONG,A6                 ; Loads valid Xn types in A6
+                MOVE.W  #0,D7                                ; Marks D7 as "Source" for CHECKGETEAXN
+                JSR     CHECKGET_EAXN                        ; checks the EA and XN
+                MOVE.W  D2,D4                                ; Saves D2 in D4
+                MOVE.W  D3,D5                                ; Saves D2 in D4
+                
+                ; Check destination
+                LEA     VALIDEA_LEA,A5                       ; Loads valid EA types in A5
+                LEA     VALIDXN_SHORTLONG,A6                 ; Loads valid Xn types in A6
+                MOVE.W  #1,D7                                ; Marks D7 as "destination" for CHECKGETEAXN
+                JSR     CHECKGET_EAXN                        ; checks the EA and XN
+                MOVE.W  D2,D6                                ; Saves D2 in D4
+                MOVE.W  D3,D7                                ; Saves D2 in D4
+
                 LEA     MSG_LEA,A5                           ; loads string pointer for LEA into A5
                 JSR     PRINTNULL                            ; prints LEA
                 
-                 ; source
-                MOVE.W  #0,D1                                ; specifies that we are looking for source addressing mode
-                JSR     GET_EA                               ; gets effective address, output: D1 = EA
-                MOVE.W  D1,D2                                ; saves EA to D2 so it doesn't get overwritten
-                MOVE.W  #0,D1                                ; specifies that we are looking for source Xn
-                JSR     GET_XN                               ; Gets Xn, puts it into D1
-                MOVE.W  D1,D3                                ; saves Xn to D3 so it doesn't get overwritten
+                ; print source
+                MOVE.W  D4,D2
+                MOVE.W  D5,D3
                 JSR     EA_TO_STRING                         ; Prints out the EA
                 
                 ; comma
@@ -1042,7 +1025,7 @@ VALIDEA_MULSDIVU                DC.B    Dn,AnIndirect,AnPost,AnPre,Other,-1
 VALIDEA_LEA                     DC.B    An,Other,-1
 VALIDEA_ANDORNOT                DC.B    Dn,AnIndirect,AnPost,AnPre,Other,-1
 VALIDEA_ANDOR_DESTOPERAND       DC.B    AnIndirect,AnPost,AnPre,Other,-1
-VALIDEA_SHIFT                   DC.B    AnIndirect,AnPost,AnPre,Other,-1                ; LSL, LSR, ASL, ASR
+VALIDEA_SHIFT                   DC.B    AnIndirect,AnPost,AnPre,Other,-1                ; LSL, LSR, ASL, ASR, ROR, ROL
 VALIDEA_JSR                     DC.B    AnIndirect, Other,-1
 
 * Valid Xn
