@@ -249,21 +249,21 @@ CASE_MOVEQ      MOVE.W  D0,D1
                 ;loads DATA
                 MOVE.W  D0,D1
                 AND.W   #$00FF,D1                       ;bit mask to get DATA
-                MOVE.W  #D1,D3                          ;copy data into D3
+                MOVE.W  D1,D3                          ;copy data into D3
                                                         ;must convert bits to hex
                 
                 
 PRINT_MOVEQ     LEA     MSG_MOVEQ,A5                    ;PRINT MOVEQ
-                JSR     PRINT_NULL  
+                JSR     PRINTNULL  
                 
                 LEA     MSG_L,A5                        ;PRINT SIZE L
-                JSR     PRINT_NULL
+                JSR     PRINTNULL
     
                 LEA     THREE_TAB,A5                ;PRINT THREE TABS
-                JSR     PRINT_NULL
+                JSR     PRINTNULL
                 
-                LEA     MSG_HASHTAG                     ;PRINT HASHTAG
-                JSR     PRINT_NULL
+                LEA     MSG_POUND, A5                     ;PRINT HASHTAG
+                JSR     PRINTNULL
 
 
 CASE_ADD        MOVE.W  D0,D1
@@ -308,7 +308,7 @@ CASE_ADD        MOVE.W  D0,D1
                 BRA     PRINTMOVE                ; Branches to print move
  
 
-
+CASE_ADDA 
 *
 *CASE_ADDA       LEA         MSG_ADDA,A1
 *                MOVE.B      #14,D0
@@ -1191,12 +1191,6 @@ EA_MODE                         EQU     $350 * Hold bits 5-3
 EA_REG                          EQU     $400 * Hold bits 2-0
 
             END     START        ; last line of source
-
-
-
-
-
-
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
