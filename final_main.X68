@@ -778,8 +778,11 @@ GETDISPLACEMENT     MOVEM.L    D1/A5, -(SP)         ; saves D1
                     MOVE.W    (A2)+,D2               ; gets 16 bit displacement                    
                     
 PRINTADDRESS        ADD.W     A5,D2                 ; Adds address to D2 to get displacement
-                    MOVE.W    D2,D1                 ; moves address to D1 to print it
-                    JSR       PRINTNUM              ; prints address
+                    MOVE.W    D2,D1                 ; moves address to D1 for printing
+                    MOVE.B    #0,D4                 ; marks address as word  length
+                    LEA       MSG_HEX,A5            ; loads hex sign to A5
+                    JSR       PRINTNULL             ; prints null
+                    JSR       PRINTSHORTLONGNUM     ; prints address
                     
                     MOVEM.L    (SP)+,D1/A5              ; restores D1
                     ; DELETE LATER. NOTE: WE DONT HAVE HEX YET, PRINT HEX SIGN BEFORE NUM, BUT WILL NEED TO ADD THIS LATER
