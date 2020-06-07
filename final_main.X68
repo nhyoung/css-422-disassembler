@@ -272,7 +272,7 @@ CASE_ADD        MOVE.W  D0,D1
                 CMP.W   #$D000,D1
                 BNE     CASE_ADDQ
                 
-                ; Check bits 0-6 
+                ; Check bits 0-5 
                 LEA     VALIDEA_ALL,A5           ; Loads valid EA types in A5
                 LEA     VALIDXN_ALL,A6           ; Loads valid Xn types in A6
                 MOVE.W  #0,D7                    ; Marks D7 as "Source" for CHECKGETEAXN
@@ -403,6 +403,75 @@ CASE_ADDQ       MOVE.W  D0,D1
                 AND.W   #$F000,D1       
                 CMP.W   #$5000,D1
                 BNE     CASE_SUB
+                
+                ; Check bits 0-5 
+                LEA     VALIDEA_ALL,A5           ; Loads valid EA types in A5
+                LEA     VALIDXN_ALL,A6           ; Loads valid Xn types in A6
+                MOVE.W  #0,D7                    ; Marks D7 as "Source" for CHECKGETEAXN
+                JSR     CHECKGET_EAXN            ; getting if its valid (D1), EA (D2), and Xn (D3)
+                CMP.W   #1,D1                    ; checks if invalid
+                BEQ     CASE_DATA                ; branches to CASE_DATA if invalid
+                MOVE.W  D2,D4                    ; Moves D2 (source effective address) to D4
+                MOVE.W  D3,D5                    ; Moves D3 (source Xn if applicable) to D5
+                
+                ; get bits 6-7 (size bits)
+                MOVE.W  D0,D1
+                LSL.W   #8,D1
+                LSR.W   #8,D1
+                LSR.W   #6,D1
+                MOVE.W  D1,D2
+
+                ; gets bits 9-11 (data bits)
+                LSL.W   #4,D1
+                LSR.W   #4,D1                               ; get rid of left 4 bits
+                LSR.W   #8,D1
+                LSR.W   #1,D1                               ; get rid of right 9 bits
+                
+                LEA     MSG_ADDQ,A5
+                JSR     PRINTNULL
+                
+                CMP.W   #1,D2
+                BEQ     ADDQ_WORD
+                CMP.W   #2,D2
+                BEQ     ADDQ_LONG
+                
+ADDQ_BYTE       LEA     MSG_B,A5
+                JSR     PRINTNULL
+                BRA     FINISH_ADDQ  
+
+ADDQ_WORD       LEA     MSG_W,A5
+                JSR     PRINTNULL
+                BRA     FINISH_ADDQ                 
+
+ADDQ_LONG       LEA     MSG_L,A5
+                JSR     PRINTNULL
+                BRA     FINISH_ADDQ                  
+                
+FINISH_ADDQ     JSR     PRINT_ADDQ_DATA
+
+                ; prints a comma to seperate
+                LEA     MSG_COMMA,A5             ; loads string pointer into A5
+                JSR     PRINTNULL                ; prints out MOVE
+                
+                ; prints destination
+                MOVE.W  D4,D2                    ; Moves D4 (source effective address) to D2
+                MOVE.W  D5,D3                    ; Moves D5 (source Xn) to D3 
+                JSR     EA_TO_STRING             ; outputs it into a string
+                
+                RTS
+
+
+PRINT_ADDQ_DATA LEA     MSG_POUND,A5
+                JSR     PRINTNULL
+                CMP.W   #0,D1
+                BEQ     PRINT_8
+                JSR     PRINTNUM
+                RTS 
+
+PRINT_8         MOVE.B  #8,D1
+                JSR     PRINTNUM
+                RTS           
+                
 
 CASE_SUB
 
@@ -1219,7 +1288,7 @@ DELETEME        MOVEA.L  -(A1),A3
                 ROR.W      (A2)+
                 ROR.L      D2,D2
                 
-                ADDA.W      D5,A5
+                ADDQ.W      #8,A5
                        
                 
 DELETEMEAGAIN                 
