@@ -266,12 +266,31 @@ PRINT_MOVEQ     LEA     MSG_MOVEQ,A5                    ;PRINT MOVEQ
                 LEA     MSG_POUND, A5                     ;PRINT HASHTAG
                 JSR     PRINTNULL
 
-
+* get bits 0-5, 9-11, and 12-15 first (similarities between ADD and ADDA)
 CASE_ADD        MOVE.W  D0,D1
                 AND.W   #$F000,D1
                 CMP.W   #$D000,D1
                 BNE     CASE_ADDQ
-                 
+                
+                ; Check bits 0-6 
+                LEA     VALIDEA_ALL,A5           ; Loads valid EA types in A5
+                LEA     VALIDXN_ALL,A6           ; Loads valid Xn types in A6
+                MOVE.W  #0,D7                    ; Marks D7 as "Source" for CHECKGETEAXN
+                JSR     CHECKGET_EAXN            ; getting if its valid (D1), EA (D2), and Xn (D3)
+                CMP.W   #1,D1                    ; checks if invalid
+                BEQ     CASE_DATA                ; branches to CASE_DATA if invalid
+                MOVE.W  D2,D4                    ; Moves D2 (source effective address) to D4
+                MOVE.W  D3,D5                    ; Moves D3 (source Xn if applicable) to D5
+                
+                ; get bits 9-11
+                MOVE.W  D0,D1
+                LSL.W   #4,D1                   ; get rid of left 8 bits
+                LSR.W   #4,D1
+                LSR.W   #8,D1                   ; get rid of right 6 bits
+                LSR.W   #1,D1                   ; get rid of right 6 bits
+                MOVE.W  D1,D6
+                
+                ; bits 7-8 determine if it is ADDA or ADD
                 MOVE.W  D0,D1
                 LSL.W   #8,D1                   ; get rid of left 8 bits
                 LSR.W   #8,D1
@@ -279,37 +298,75 @@ CASE_ADD        MOVE.W  D0,D1
                 CMP.W   #3,D1                   ; if bits 7-8 are 3 (11) then it is ADDA
                 BEQ     CASE_ADDA
                 
-                ; Check bits 0-6 
-                LEA     VALIDEA_ALL,A5           ; Loads valid EA types in A5
-                LEA     VALIDXN_ALL,A6           ; Loads valid Xn types in A6
-                MOVE.W  #1,D7                    ; Marks D7 as "Destination" for CHECKGETEAXN
-                JSR     CHECKGET_EAXN            ; getting if its valid (D1), EA (D2), and Xn (D3)
-                CMP.W   #1,D1                    ; checks if invalid
-                BEQ     CASE_DATA                ; branches to CASE_DATA if invalid
-                MOVE.W  D2,D4                    ; Moves D2 (source effective address) to D4
-                MOVE.W  D3,D5                    ; Moves D3 (source Xn if applicable) to D5
+                LEA     MSG_ADD,A5              ; loads string pointer for MOVE into A5
+                BRA     PRINTADD                ; Branches to print move
                 
-                ; Check destination
-                LEA     VALIDEA_ALL,A5           ; Loads valid EA types in A5
-                LEA     VALIDXN_SHORTLONG,A6     ; Loads valid Xn types in A6
-                MOVE.W  #1,D7                    ; Marks D7 as "Source" for CHECKGETEAXN
-                JSR     CHECKGET_EAXN            ; getting if its valid (D1), EA (D2), and Xn (D3)
-                CMP.W   #1,D1                    ; checks if invalid
-                BEQ     CASE_DATA                ; branches to CASE_DATA if invalid
-                MOVE.W  D2,D6                    ; Moves D2 (source effective address) to D6
-                MOVE.W  D3,D7                    ; Moves D3 (source Xn if applicable) to D7
+PRINTADD        JSR     PRINTNULL
+                MOVE.W  D0,D1                   ; bits 7-8 contain size
+                LSL.W   #8,D1
+                LSR.W   #8,D1
+                LSR.W   #6,D1
                 
-                ; Checking if it is MOVEA
-                MOVE.W  D0,D1                    ; stores d0 in d1
-                AND.W   #$01C0, D1               ; appplies a bitmask to get 3 bits, check if its 001
-                CMP.W   #$0040, D1               ; confirms if it is a MOVEA
-                BEQ     INSERTA                  ; branches to MOVEA, otherwise it is a normal MOVE
- 
-                LEA     MSG_MOVE,A5              ; loads string pointer for MOVE into A5
-                BRA     PRINTMOVE                ; Branches to print move
- 
+                CMP.W   #1,D1                   ; if 1, it is a word
+                BEQ     ADD_WORD
+                CMP.W   #2,D1                   ; if 2, it is a long
+                BEQ     ADD_LONG
+                
+ADD_BYTE        LEA     MSG_B
+                JSR     PRINTNULL
+                BRA     FINISH_ADD  
 
-CASE_ADDA 
+ADD_WORD        LEA     MSG_W
+                JSR     PRINTNULL
+                BRA     FINISH_ADD  
+                
+
+ADD_LONG        LEA     MSG_L
+                JSR     PRINTNULL
+                BRA     FINISH_ADD  
+
+FINISH_ADD      LSL.W   #7,D1
+                LSR.W   #7,D1
+                LSR.W   #8,D1
+
+                CMP.W   #1,D1
+                BRA     Dn_PLUS_EA          
+                
+                ; below is EA+Dn->Dn  
+                MOVE.W  D4,D2                    ; Moves D4 (source effective address) to D2
+                MOVE.W  D5,D3                    ; Moves D5 (source Xn) to D3 
+                JSR     EA_TO_STRING             ; outputs it into a string
+                
+                ; prints a comma to seperate
+                LEA     MSG_COMMA,A5             ; loads string pointer into A5
+                JSR     PRINTNULL                ; prints out MOVE
+                
+                ; print Data Register
+                LEA     MSG_DR
+                JSR     PRINTNULL
+                MOVE.W  D6,D1
+                JSR     PRINTNUM                
+                RTS                              ; exits subroutine 
+
+Dn_PLUS_EA      ; below is Dn+EA->EA
+                LEA     MSG_DR                  ; print data register
+                JSR     PRINTNULL
+                MOVE.W  D6,D1
+                JSR     PRINTNUM
+                
+                ; prints a comma to seperate
+                LEA     MSG_COMMA,A5             ; loads string pointer into A5
+                JSR     PRINTNULL                ; prints out MOVE
+                
+
+                ; below is Dn+EA->EA  
+                MOVE.W  D4,D2                    ; Moves D4 (source effective address) to D2
+                MOVE.W  D5,D3                    ; Moves D5 (source Xn) to D3 
+                JSR     EA_TO_STRING             ; outputs it into a string                
+                RTS                              ; exits subroutine                
+                 
+
+CASE_ADDA       
 *
 *CASE_ADDA       LEA         MSG_ADDA,A1
 *                MOVE.B      #14,D0
@@ -1274,6 +1331,7 @@ EA_MODE                         EQU     $350 * Hold bits 5-3
 EA_REG                          EQU     $400 * Hold bits 2-0
 
             END     START        ; last line of source
+
 
 *~Font name~Courier New~
 *~Font size~10~
