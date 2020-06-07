@@ -135,7 +135,6 @@ CHECK_ODD       BTST       #0,D5            ; check if input is odd
 * Outputs: Prints out dissasembled content to console and A2 will increment appropriatley
 
 OPCODE_DECODE   MOVE.W  (A2)+,D0                ; load instruction word from memory, store in D0
-                MOVE.W  D0,CURRENT_INSTR
                 
 CASE_NOP        CMP.W   #$4E71,D0               ; compares to NOP opcode in hex
                 BNE     CASE_MOVE               ; checks the next case if not equal
@@ -260,12 +259,13 @@ PRINT_MOVEQ     LEA     MSG_MOVEQ,A5                    ;PRINT MOVEQ
                 LEA     MSG_L,A5                        ;PRINT SIZE L
                 JSR     PRINTNULL
     
-                LEA     THREE_TAB,A5                ;PRINT THREE TABS
+                LEA     THREE_TAB,A5                    ;PRINT THREE TABS
                 JSR     PRINTNULL
                 
                 LEA     MSG_POUND, A5                     ;PRINT HASHTAG
                 JSR     PRINTNULL
-
+                RTS
+                
 * get bits 0-5, 9-11, and 12-15 first (similarities between ADD and ADDA)
 CASE_ADD        MOVE.W  D0,D1
                 AND.W   #$F000,D1
@@ -284,7 +284,7 @@ CASE_ADD        MOVE.W  D0,D1
                 
                 ; get bits 9-11
                 MOVE.W  D0,D1
-                LSL.W   #4,D1                   ; get rid of left 8 bits
+                LSL.W   #4,D1                   ; get rid of left 4 bits
                 LSR.W   #4,D1
                 LSR.W   #8,D1                   ; get rid of right 6 bits
                 LSR.W   #1,D1                   ; get rid of right 6 bits
@@ -305,23 +305,23 @@ PRINTADD        JSR     PRINTNULL
                 MOVE.W  D0,D1                   ; bits 7-8 contain size
                 LSL.W   #8,D1
                 LSR.W   #8,D1
-                LSR.W   #6,D1
+                LSR.W   #6,D1                   ; gets bits 7-8
                 
                 CMP.W   #1,D1                   ; if 1, it is a word
                 BEQ     ADD_WORD
                 CMP.W   #2,D1                   ; if 2, it is a long
                 BEQ     ADD_LONG
                 
-ADD_BYTE        LEA     MSG_B
+ADD_BYTE        LEA     MSG_B,A5
                 JSR     PRINTNULL
                 BRA     FINISH_ADD  
 
-ADD_WORD        LEA     MSG_W
+ADD_WORD        LEA     MSG_W,A5
                 JSR     PRINTNULL
                 BRA     FINISH_ADD  
                 
 
-ADD_LONG        LEA     MSG_L
+ADD_LONG        LEA     MSG_L,A5
                 JSR     PRINTNULL
                 BRA     FINISH_ADD  
 
@@ -332,37 +332,36 @@ FINISH_ADD      LSL.W   #7,D1
                 CMP.W   #1,D1
                 BRA     Dn_PLUS_EA          
                 
+                ; print Data Register
+                LEA     MSG_DR,A5
+                JSR     PRINTNULL
+                MOVE.W  D6,D1
+                JSR     PRINTNUM                
+                
+                ; prints a comma to seperate
+                LEA     MSG_COMMA,A5             ; loads string pointer into A5
+                JSR     PRINTNULL                ; prints out MOVE
+                
                 ; below is EA+Dn->Dn  
                 MOVE.W  D4,D2                    ; Moves D4 (source effective address) to D2
                 MOVE.W  D5,D3                    ; Moves D5 (source Xn) to D3 
                 JSR     EA_TO_STRING             ; outputs it into a string
-                
-                ; prints a comma to seperate
-                LEA     MSG_COMMA,A5             ; loads string pointer into A5
-                JSR     PRINTNULL                ; prints out MOVE
-                
-                ; print Data Register
-                LEA     MSG_DR
-                JSR     PRINTNULL
-                MOVE.W  D6,D1
-                JSR     PRINTNUM                
                 RTS                              ; exits subroutine 
 
-Dn_PLUS_EA      ; below is Dn+EA->EA
-                LEA     MSG_DR                  ; print data register
-                JSR     PRINTNULL
-                MOVE.W  D6,D1
-                JSR     PRINTNUM
+Dn_PLUS_EA      ; below is Dn+EA->EA  
+                MOVE.W  D4,D2                    ; Moves D4 (source effective address) to D2
+                MOVE.W  D5,D3                    ; Moves D5 (source Xn) to D3 
+                JSR     EA_TO_STRING             ; outputs it into a string   
                 
                 ; prints a comma to seperate
                 LEA     MSG_COMMA,A5             ; loads string pointer into A5
                 JSR     PRINTNULL                ; prints out MOVE
                 
-
-                ; below is Dn+EA->EA  
-                MOVE.W  D4,D2                    ; Moves D4 (source effective address) to D2
-                MOVE.W  D5,D3                    ; Moves D5 (source Xn) to D3 
-                JSR     EA_TO_STRING             ; outputs it into a string                
+                ; below is Dn+EA->EA
+                LEA     MSG_DR,A5                  ; print data register
+                JSR     PRINTNULL
+                MOVE.W  D6,D1
+                JSR     PRINTNUM             
                 RTS                              ; exits subroutine                
                  
 
