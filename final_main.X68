@@ -365,22 +365,44 @@ Dn_PLUS_EA      ; below is Dn+EA->EA
                 RTS                              ; exits subroutine                
                  
 
-CASE_ADDA       
-*
-*CASE_ADDA       LEA         MSG_ADDA,A1
-*                MOVE.B      #14,D0
-*                TRAP        #15                 ; print "ADDA"
-*                MOVE.W      OPMODE_VAR,D3
-*                JSR         ADDA_SIZE
-*                JSR         ADDR_MODE_JUMP_TABLE
-*                    
-*            
-*ADDA_SIZE       CMP.W       #%111,D3
-*                BEQ         PRINT_WORD 
-*                BRA         PRINT_LONG          
+CASE_ADDA       MOVE.W  D0,D1
+                LSL.W   #7,D1
+                LSR.W   #7,D1
+                LSR     #8,D1                               ; gets bit 8 (size bit)
+                
+                LEA     MSG_ADDA,A5
+                JSR     PRINTNULL
+                
+                CMP.W   #1,D1
+                BEQ     ADDA_LONG
+                
+                LEA     MSG_W,A5
+                JSR     PRINTNULL
+                BRA     FINISH_ADDA   
+                
+ADDA_LONG       LEA     MSG_L,A5
+                JSR     PRINTNULL
+                BRA     FINISH_ADDA
+                
+FINISH_ADDA     MOVE.W  D4,D2                    ; Moves D4 (source effective address) to D2
+                MOVE.W  D5,D3                    ; Moves D5 (source Xn) to D3 
+                JSR     EA_TO_STRING             ; outputs it into a string
+                
+                ; prints a comma to seperate
+                LEA     MSG_COMMA,A5             ; loads string pointer into A5
+                JSR     PRINTNULL                ; prints out MOVE
+        
+                LEA     MSG_AR,A5                ; print address register
+                JSR     PRINTNULL
+                MOVE.W  D6,D1
+                JSR     PRINTNUM             
+                RTS                              ; exits subroutine
                 
 
-CASE_ADDQ       
+CASE_ADDQ       MOVE.W  D0,D1
+                AND.W   #$F000,D1       
+                CMP.W   #$5000,D1
+                BNE     CASE_SUB
 
 CASE_SUB
 
@@ -1196,6 +1218,8 @@ DELETEME        MOVEA.L  -(A1),A3
                 ROR.W      -(A2)
                 ROR.W      (A2)+
                 ROR.L      D2,D2
+                
+                ADDA.W      D5,A5
                        
                 
 DELETEMEAGAIN                 
