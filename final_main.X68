@@ -82,22 +82,22 @@ RESTART         MOVE.B  #11, D0             Task 11 - Clear screen
                 MOVE.B  #1,D1               Visible
                 TRAP    #15
                 
-                MOVE.L  #$0000000, A0       Reset A1
-                MOVE.L  #$0000000, A1       Reset A1
-                MOVE.L  #$0000000, A2       Reset A2
-                MOVE.L  #$0000000, A3       Reset the Good Buffer
-                MOVE.L  #$0000000, A4       Reset A4
-                MOVE.L  #$0000000, A5       Reset the Starting address
-                MOVE.L  #$0000000, A6       Reset the Ending Address
-                MOVEA.L #$01000000,A7       Reset stack pointer
-                CLR.L   D1                  Reset D1
-                CLR.L   D1                  Reset D1
-                CLR.L   D2                  Reset D2
-                CLR.L   D3                  Reset D3
-                CLR.L   D4                  Reset D4
-                CLR.L   D5                  Reset D5
-                CLR.L   D6                  Reset D6
-                BRA     START               Restart the program
+                MOVE.L  #$0000000, A0       ; Reset A1
+                MOVE.L  #$0000000, A1       ; Reset A1
+                MOVE.L  #$0000000, A2       ; Reset A2
+                MOVE.L  #$0000000, A3       ; Reset A3
+                MOVE.L  #$0000000, A4       ; Reset A4
+                MOVE.L  #$0000000, A5       ; Reset A5
+                MOVE.L  #$0000000, A6       ; Reset A6
+                MOVEA.L #$01000000,A7       ; Reset A7
+                CLR.L   D1                  ; Reset D1
+                CLR.L   D1                  ; Reset D1
+                CLR.L   D2                  ; Reset D2
+                CLR.L   D3                  ; Reset D3
+                CLR.L   D4                  ; Reset D4
+                CLR.L   D5                  ; Reset D5
+                CLR.L   D6                  ; Reset D6
+                BRA     START               ; branch to start of program
 
 *--------------------SUBROUTINES------------------    
 
