@@ -1,4 +1,4 @@
-case*-----------------------------------------------------------
+*-----------------------------------------------------------
 * Title      : Final Project
 * Written by : Nick Young, Audrey Nguyen, Khiam Rehman
 * Date       : 6/5/20
@@ -162,12 +162,17 @@ CHECK_ODD       BTST       #0,D5            ; check if input is odd
                 BNE        INVALID
                 RTS
 
-PRINT_ADDR      MOVEM.L D1/D4,-(SP)             ; saves D1 and D4
+PRINT_ADDR      ;MOVEM.L D1/D4,-(SP)             ; saves D1 and D4
+*                MOVE.L  A6,D1                   ; loads current address in D1
+*                MOVE.L  #1,D4                   ; tells subroutine we want to make the address print as a long
+*                JSR     PRINTSHORTLONGNUM       ; prints out address
+*                MOVEM.L (SP)+, D1/D4            ; restores D1 and D4
+*                RTS
                 MOVE.L  A6,D1                   ; loads current address in D1
                 MOVE.L  #1,D4                   ; tells subroutine we want to make the address print as a long
                 JSR     PRINTSHORTLONGNUM       ; prints out address
-                MOVEM.L (SP)+, D1/D4            ; restores D1 and D4
                 RTS
+
 
 
 * Checks every single possible opcode we could have. Jump table
@@ -721,6 +726,8 @@ INV_INSTR       LEA         INVALID_INSTR,A5
                 MOVE.L      D0,D1
                 MOVE.W      #0,D4
                 JSR         PRINTSHORTLONGNUM
+                LEA         NEW_LINE,A5
+                JSR         PRINTNULL
                 RTS               
                 
 *---------------OR opcode----------------------            
@@ -743,7 +750,7 @@ CASE_OR         MOVE.W      D0,D1                           ; bitmask for 4 MSB
                 JSR         PRINTNULL                       ; print "OR"
                 
                 MOVE.W      D6,D1
-                JSR         OR_SIZE                         ; print ".B",".W",".L"
+                JSR         OR_SIZE                         ; print ".B",".W",".L"
                 JSR         ADD_SUB_HELP                    ; OR has the same structure as ADD and SUB
                 JSR         ADD_SUB_OPERAND                 ; print 
                 RTS
@@ -1006,7 +1013,7 @@ CASE_RTS        CMP.W   #$4E75,D0           ; compares to RTS opcode in hex
 
                 
 
-CASE_DATA           JSR INV_INSTR  
+CASE_DATA           ; JSR INV_INSTR  
                     RTS               
 
 CASE_EPICFAIL       RTS
@@ -1580,12 +1587,12 @@ ROd_REG                         EQU     3
 
 * Messages
 WELCOME                         DC.B    'Welcome to Team Big Blue Disassembler',CR,LF
-                                DC.B    'Format: 8 digit address in hexadecimal format. Numbers and letters only. Letters must be capital case.',CR,LF,0
+                                DC.B    'Format: 8 digit address in hexadecimal format. Numbers and letters only.',CR,LF, 'Letters must be capital case.',CR,LF,0
 STARTING                        DC.B    'Please enter a starting location in the above format',CR,LF,0
 ENDING                          DC.B    'Please enter an ending location in the above format',CR,LF,0
 BAD_INPUT                       DC.B    'Invalid input. Please try again',CR,LF,0
 ERROR_MSG                       DC.B    'Error while disassembling',CR,LF,0
-INVALID_INSTR                   DC.B    '1000',TAB,'DATA',TAB,'$',0
+INVALID_INSTR                   DC.B    '1000',TAB,TAB,'DATA',TAB,TAB,TAB,'$',0
 DONE                            DC.B    'Finished Disassembling. Press ENTER to restart.',CR,LF,0
 NEW_LINE                        DC.B    CR,LF,0
 THREE_TAB                       DC.B    TAB,TAB,TAB,0
