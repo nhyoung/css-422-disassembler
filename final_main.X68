@@ -683,7 +683,9 @@ FINISH_AND      JSR         ADD_SUB_HELP                    ; AND has the same s
                 
 INV_INSTR       LEA         INVALID_INSTR,A5
                 JSR         PRINTNULL
-                ;MOVE.W      D0,A1
+                MOVE.W      D0,D1
+                MOVE.W      #0,D4
+                JSR         PRINTSHORTLONGNUM
                 RTS               
                 
 *---------------OR opcode----------------------            
@@ -1486,7 +1488,7 @@ STARTING                        DC.B    'Please enter a starting location in the
 ENDING                          DC.B    'Please enter an ending location in the above format',CR,LF,0
 BAD_INPUT                       DC.B    'Invalid input. Please try again',CR,LF,0
 ERROR_MSG                       DC.B    'Error while disassembling',CR,LF,0
-INVALID_INSTR                   DC.B    '1000',TAB,'DATA',TAB,'$',CR,LF,0
+INVALID_INSTR                   DC.B    '1000',TAB,'DATA',TAB,'$',0
 DONE                            DC.B    'Finished Disassembling. Press ENTER to restart.',CR,LF,0
 NEW_LINE                        DC.B    CR,LF,0
 THREE_TAB                       DC.B    TAB,TAB,TAB,0
