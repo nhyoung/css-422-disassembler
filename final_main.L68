@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 6/7/2020 10:25:42 PM
+Created On: 6/7/2020 10:42:09 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : Final Project
@@ -687,7 +687,7 @@ Created On: 6/7/2020 10:25:42 PM
 0000178A                           683                  
 0000178A  4BF9 00002102            684  INV_INSTR       LEA         INVALID_INSTR,A5
 00001790  4EB9 00001EF8            685                  JSR         PRINTNULL
-00001796  3200                     686                  MOVE.W      D0,D1
+00001796  2200                     686                  MOVE.L      D0,D1
 00001798  383C 0000                687                  MOVE.W      #0,D4
 0000179C  4EB9 00001DD2            688                  JSR         PRINTSHORTLONGNUM
 000017A2  4E75                     689                  RTS               

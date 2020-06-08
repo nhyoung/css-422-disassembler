@@ -683,7 +683,7 @@ FINISH_AND      JSR         ADD_SUB_HELP                    ; AND has the same s
                 
 INV_INSTR       LEA         INVALID_INSTR,A5
                 JSR         PRINTNULL
-                MOVE.W      D0,D1
+                MOVE.L      D0,D1
                 MOVE.W      #0,D4
                 JSR         PRINTSHORTLONGNUM
                 RTS               
