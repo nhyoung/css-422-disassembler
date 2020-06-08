@@ -55,9 +55,9 @@ CHECK_ORDER     MOVE.L  A2,D3
                 CMP.L   D3,D4               ; make sure first input is less than second input
                 BLT     RESET_INPUT
                                
-DISASSEMBLE     MOVE.L  A2,D1               ; loads current address in D1
-                MOVE.L  #1,D4               ; tells subroutine we want to make the address print as a long
-                JSR     PRINTSHORTLONGNUM   ; prints out address                    
+DISASSEMBLE     ;MOVE.L  A2,A6               ; loads current address in D1
+                ; MOVE.L  #1,D4               ; tells subroutine we want to make the address print as a long
+                ; JSR     PRINTSHORTLONGNUM   ; prints out address                    
                 JSR     OPCODE_DECODE       ; decode the opcode
                 JSR     PRINTENTER          ; prints a new line
                 CMP.L   A3, A2              ; checks if A2 has reached A3
@@ -129,17 +129,26 @@ CHECK_ODD       BTST       #0,D5            ; check if input is odd
                 BNE        INVALID
                 RTS
 
+PRINT_ADDR      MOVE.L  A6,D1                   ; loads current address in D1
+                MOVE.L  #1,D4                   ; tells subroutine we want to make the address print as a long
+                JSR     PRINTSHORTLONGNUM       ; prints out address
+                RTS
+
 
 * Checks every single possible opcode we could have. Jump table
 * Inputs: (A2) which is a pointer to intruction word to be translated
 * Outputs: Prints out dissasembled content to console and A2 will increment appropriatley
 
-OPCODE_DECODE   MOVE.W  (A2)+,D0                ; load instruction word from memory, store in D0
-
+OPCODE_DECODE   MOVE.W  A2,A6
+                MOVE.W  (A2)+,D0                ; load instruction word from memory, store in D0
+                
 
 *---------------NOP opcode----------------------                
 CASE_NOP        CMP.W   #$4E71,D0               ; compares to NOP opcode in hex
                 BNE     CASE_MOVE               ; checks the next case if not equal
+                
+                JSR     PRINT_ADDR
+                
                 LEA     MSG_NOP,A5              ; loads string pointer into A5
                 JSR     PRINTNULL               ; prints NOP                
                 RTS                             ; returns from the subroutine
@@ -177,6 +186,8 @@ CASE_MOVE       MOVE.W  D0,D1                   ; stores d0 in d1
                 AND.W   #$01C0, D1               ; appplies a bitmask to get 3 bits, check if its 001
                 CMP.W   #$0040, D1               ; confirms if it is a MOVEA
                 BEQ     INSERTA                  ; branches to MOVEA, otherwise it is a normal MOVE
+                
+                JSR     PRINT_ADDR              ; print address
  
                 LEA     MSG_MOVE,A5              ; loads string pointer for MOVE into A5
                 BRA     PRINTMOVE                ; Branches to print move
@@ -255,7 +266,9 @@ CASE_MOVEQ      MOVE.W  D0,D1
                 MOVE.W  D1,D3                          ;copy data into D3
                                                       ;must convert bits to hex
                                 
-PRINT_MOVEQ     LEA     MSG_MOVEQ,A5                    ;PRINT MOVEQ
+PRINT_MOVEQ     JSR     PRINT_ADDR                      ; print address
+
+                LEA     MSG_MOVEQ,A5                    ;PRINT MOVEQ
                 JSR     PRINTNULL  
                 
                 LEA     MSG_L,A5                        ;PRINT SIZE L
@@ -275,6 +288,8 @@ CASE_ADD        MOVE.W  D0,D1
                 CMP.W   #$D000,D1
                 BNE     CASE_ADDQ
                 
+                JSR     PRINT_ADDR              ; print address
+                
                 JSR     ADD_SUB_HELP
                 
                 ; bits 7-8 determine if it is ADDA or ADD
@@ -285,8 +300,7 @@ CASE_ADD        MOVE.W  D0,D1
                 CMP.W   #3,D1                   ; if bits 7-8 are 3 (11) then it is ADDA
                 BEQ     CASE_ADDA
                 
-                LEA     MSG_ADD,A5              ; loads string pointer for MOVE into A5
-                BRA     PRINTADD                ; Branches to print move
+                BRA     PRINTADD                ; Branches to print add
                 
                 ; Check bits 0-5 
 ADD_SUB_HELP    LEA         VALIDEA_ALL,A5           ; Loads valid EA types in A5
@@ -310,7 +324,8 @@ ADD_SUB_HELP    LEA         VALIDEA_ALL,A5           ; Loads valid EA types in A
   
                 RTS                
                   
-PRINTADD        JSR         PRINTNULL
+PRINTADD        LEA         MSG_ADD,A5              ; loads string pointer for MOVE into A5
+                JSR         PRINTNULL               ; print ADD
                 MOVE.W      D0,D1                   ; bits 7-8 contain size
                 JSR         ADD_SUB_SIZE
                 BRA         FINISH_ADD
@@ -382,12 +397,13 @@ Dn_PLUS_EA      ; below is Dn+EA->EA
                 RTS                                  ; exits subroutine          
                       
 *---------------ADDA opcode----------------------
-CASE_ADDA       MOVE.W      D0,D1
+CASE_ADDA       ; gets bit 8 (size bit)
+                MOVE.W      D0,D1
                 LSL.W       #7,D1
                 LSR.W       #7,D1
-                LSR         #8,D1                               ; gets bit 8 (size bit)
+                LSR         #8,D1                   
                 
-                LEA         MSG_ADDA,A5
+                LEA         MSG_ADDA,A5             ; print ADDA
                 JSR         PRINTNULL
                  
                 CMP.W       #1,D1
@@ -420,7 +436,18 @@ CASE_ADDQ       MOVE.W      D0,D1
                 AND.W       #$F000,D1       
                 CMP.W       #$5000,D1
                 BNE         CASE_SUB
-                 
+                                                 
+                JSR         PRINT_ADDR              ; print address  
+                LEA         MSG_ADDQ,A5             ; print ADDQ
+                JSR         PRINTNULL
+                
+                ; get bits 6-7 (size bits)
+                MOVE.W      D0,D1
+                LSL.W       #8,D1
+                LSR.W       #8,D1
+                LSR.W       #6,D1
+                MOVE.W      D1,D2
+                
                 ; Check bits 0-5 
                 LEA         VALIDEA_ALL,A5           ; Loads valid EA types in A5
                 LEA         VALIDXN_ALL,A6           ; Loads valid Xn types in A6
@@ -429,24 +456,8 @@ CASE_ADDQ       MOVE.W      D0,D1
                 CMP.W       #1,D1                    ; checks if invalid
                 BEQ         CASE_DATA                ; branches to CASE_DATA if invalid
                 MOVE.W      D2,D4                    ; Moves D2 (source effective address) to D4
-                MOVE.W      D3,D5                    ; Moves D3 (source Xn if applicable) to D5
-                  
-                ; get bits 6-7 (size bits)
-                MOVE.W      D0,D1
-                LSL.W       #8,D1
-                LSR.W       #8,D1
-                LSR.W       #6,D1
-                MOVE.W      D1,D2
-  
-                ; gets bits 9-11 (data bits)
-                LSL.W       #4,D1
-                LSR.W       #4,D1                               ; get rid of left 4 bits
-                LSR.W       #8,D1
-                LSR.W       #1,D1                               ; get rid of right 9 bits
-                  
-                LEA         MSG_ADDQ,A5
-                JSR         PRINTNULL
-                  
+                MOVE.W      D3,D5                    ; Moves D3 (source Xn if applicable) to D5  
+                
                 CMP.W       #1,D2
                 BEQ         ADDQ_WORD
                 CMP.W       #2,D2
@@ -479,6 +490,12 @@ FINISH_ADDQ     JSR         PRINT_ADDQ_DATA
  
 PRINT_ADDQ_DATA LEA         MSG_POUND,A5
                 JSR         PRINTNULL
+                ; gets bits 9-11 (data bits)
+                LSL.W       #4,D1
+                LSR.W       #4,D1                               ; get rid of left 4 bits
+                LSR.W       #8,D1
+                LSR.W       #1,D1                               ; get rid of right 9 bits
+                
                 CMP.W       #0,D1
                 BEQ         PRINT_8
                 JSR         PRINTNUM
@@ -495,11 +512,12 @@ CASE_SUB        MOVE.W      D0,D1                                ; Copies instru
                 BNE         CASE_LEA
                
                 JSR         ADD_SUB_HELP
-                               
-                LEA         MSG_SUB,A5                          ; loads string pointer for MOVE into A5
+                JSR         PRINT_ADDR                          ; print address               
+                
                 BRA         PRINTSUB                            ; Branches to print move
 
-PRINTSUB        JSR         PRINTNULL
+PRINTSUB        LEA         MSG_SUB,A5                          ; loads string pointer for MOVE into A5
+                JSR         PRINTNULL
                 MOVE.W      D0,D1                               ; bits 6-7 contain size
                 JSR         ADD_SUB_SIZE
                 MOVE.W      D0,D1
@@ -593,19 +611,20 @@ CASE_AND        MOVE.W      D0,D1                           ; bitmask for 4 MSB
                 AND.W       #$F000,D1       
                 CMP.W       #$C000,D1
                 BNE         CASE_OR
-                              
-                JSR         ADD_SUB_HELP                    ; AND has the same structure as ADD and SUB
                 
                 MOVE.W      D0,D1
                 LSL.W       #8,D1
                 LSR.W       #8,D1
                 LSR.W       #6,D1                           ; get bits 6-7 (size)
-                CMP.W       #3,D1
+                MOVE.W      D1,D6
+                CMP.W       #3,D6
                 BEQ         INV_INSTR
                 
-                LEA         MSG_AND,A5
+                JSR         PRINT_ADDR                      ; print address
+                LEA         MSG_AND,A5                      ; print AND
                 JSR         PRINTNULL
                 
+                MOVE.W      D6,D1
                 CMP.W       #0,D1
                 BEQ         AND_BYTE
                 CMP.W       #1,D1                   ; if 1, it is a word
@@ -625,11 +644,13 @@ AND_LONG        LEA         MSG_L,A5
                 JSR         PRINTNULL
                 BRA         FINISH_AND
       
-FINISH_AND      JSR         ADD_SUB_OPERAND
+FINISH_AND      JSR         ADD_SUB_HELP                    ; AND has the same structure as ADD and SUB
+                JSR         ADD_SUB_OPERAND
                 RTS
                 
 INV_INSTR       LEA         INVALID_INSTR,A5
                 JSR         PRINTNULL
+                ;MOVE.W      D0,A1
                 RTS               
                 
 *---------------OR opcode----------------------            
@@ -637,20 +658,23 @@ CASE_OR         MOVE.W      D0,D1                           ; bitmask for 4 MSB
                 AND.W       #$F000,D1       
                 CMP.W       #$8000,D1
                 BNE         CASE_NOT
-                              
-                JSR         ADD_SUB_HELP                    ; OR has the same structure as ADD and SUB
-                
+                                              
                 MOVE.W      D0,D1
                 LSL.W       #8,D1
                 LSR.W       #8,D1
                 LSR.W       #6,D1                           ; get bits 6-7 (size)
                 CMP.W       #3,D1
+                MOVE.W      D1,D6
                 BEQ         INV_INSTR
+                
+                JSR         PRINT_ADDR                      ; print address
                 
                 LEA         MSG_OR,A5
                 JSR         PRINTNULL                       ; print "OR"
                 
+                MOVE.W      D6,D1
                 JSR         OR_SIZE                         ; print ".B",".W",".L"
+                JSR         ADD_SUB_HELP                    ; OR has the same structure as ADD and SUB
                 JSR         ADD_SUB_OPERAND                 ; print 
                 RTS
 
@@ -672,13 +696,18 @@ CASE_NOT        MOVE.W      D0,D1                           ; bitmask for 4 MSB
                 MOVE.W      D0,D1
                 LSL.W       #8,D1
                 LSR.W       #8,D1
-                LSR.W       #6,D1                          
-                CMP.W       #3,D1
+                LSR.W       #6,D1 
+                MOVE.W      D1,D6                         
+                CMP.W       #3,D6
                 BEQ         INV_INSTR
+                
+                JSR         PRINT_ADDR
                 
                 LEA         MSG_NOT,A5
                 JSR         PRINTNULL                       ; print "NOT"
-                
+                               
+                MOVE.W      D6,D1
+
                 JSR         OR_SIZE                         ; print ".B",".W",".L"
                 
                 ; get bits 0-5 
@@ -1362,6 +1391,8 @@ DELETEME        MOVEA.L  -(A1),A3
                 OR.W        D3,D5
                 NOT.W       D2
                 
+                MULS.W    #$0010,D2
+                
 DELETEMEAGAIN                 
           
     SIMHALT             ; halt simulator
@@ -1422,7 +1453,7 @@ STARTING                        DC.B    'Please enter a starting location in the
 ENDING                          DC.B    'Please enter an ending location in the above format',CR,LF,0
 BAD_INPUT                       DC.B    'Invalid input. Please try again',CR,LF,0
 ERROR_MSG                       DC.B    'Error while disassembling',CR,LF,0
-INVALID_INSTR                   DC.B    '1000',TAB,'DATA',TAB,'$WXYZ',CR,LF,0
+INVALID_INSTR                   DC.B    '1000',TAB,'DATA',TAB,'$',CR,LF,0
 NEW_LINE                        DC.B    CR,LF,0
 THREE_TAB                       DC.B    TAB,TAB,TAB,0
 
