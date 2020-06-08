@@ -12,6 +12,14 @@ START:                  ; first instruction of program
                 LEA     WELCOME,A1          ; output welcome startup message
                 MOVE.B  #14,D0
                 TRAP    #15
+                
+                LEA     FORMAT1,A1
+                MOVE.L  #14,D0
+                TRAP    #15
+                
+                LEA     FORMAT2,A1
+                MOVE.L  #14,D0
+                TRAP    #15
             
 INPUT1          MOVE.L  #$0000000, A1       ;clear A1
                 LEA     STARTING,A1         ; output starting address message
@@ -1013,7 +1021,7 @@ CASE_RTS        CMP.W   #$4E75,D0           ; compares to RTS opcode in hex
 
                 
 
-CASE_DATA           ; JSR INV_INSTR  
+CASE_DATA           JSR INV_INSTR  
                     RTS               
 
 CASE_EPICFAIL       RTS
@@ -1586,8 +1594,9 @@ LSd_REG                         EQU     1
 ROd_REG                         EQU     3
 
 * Messages
-WELCOME                         DC.B    'Welcome to Team Big Blue Disassembler',CR,LF
-                                DC.B    'Format: 8 digit address in hexadecimal format. Numbers and letters only.',CR,LF, 'Letters must be capital case.',CR,LF,0
+WELCOME                         DC.B    'Welcome to Team Big Blue Disassembler',CR,LF,0
+FORMAT1                         DC.B    'Format: 8 digit address in hexadecimal format. Numbers and letters only.',CR,LF,0
+FORMAT2                         DC.B    'Letters must be capital case.',CR,LF,0
 STARTING                        DC.B    'Please enter a starting location in the above format',CR,LF,0
 ENDING                          DC.B    'Please enter an ending location in the above format',CR,LF,0
 BAD_INPUT                       DC.B    'Invalid input. Please try again',CR,LF,0
