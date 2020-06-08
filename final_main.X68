@@ -236,13 +236,19 @@ CASE_MOVE       MOVE.W  D0,D1                   ; stores d0 in d1
                 
                 JSR     PRINT_ADDR               ; print address
                 LEA     MSG_MOVE,A5              ; loads string pointer for MOVE into A5
+                JSR     PRINTNULL                ; prints out MOVE
+                JSR     PRINTMOVESIZE            ; prints out the size 
+                LEA     MSG_4SPACES,A5           ; loads spaces
+                JSR     PRINTNULL                ; prints out spaces
                 BRA     PRINTMOVE                ; Branches to print move
                 
 INSERTA         LEA     MSG_MOVEA,A5             ; loads string pointer for MOVEA into A5
+                JSR     PRINTNULL                ; prints out MOVEA
+                JSR     PRINTMOVESIZE            ; prints out the size 
+                LEA     MSG_3SPACES,A5           ; loads spaces
+                JSR     PRINTNULL                ; prints out spaces
  
-PRINTMOVE       JSR     PRINTNULL                ; prints out MOVE/MOVEA
-                JSR     PRINTMOVESIZE            ; prints out the size  
-                MOVE.W  D4,D2                    ; Moves D4 (source effective address) to D2
+PRINTMOVE       MOVE.W  D4,D2                    ; Moves D4 (source effective address) to D2
                 MOVE.W  D5,D3                    ; Moves D5 (source Xn) to D3 
                 JSR     EA_TO_STRING             ; outputs it into a string
                 
@@ -285,14 +291,15 @@ MOVEM_REG2MEM   ; loads EA and XN
                 AND.W   #$0040,D1                       ; gets the size bit
                 BNE     REG2MEMLONG                     ; if it isn't 0 go to REG2MEMLONG
 
-REG2MEMWORD     LEA     MSG_W,A5                        ; loads MOVEM
-                JSR     PRINTNULL                       ; prints MOVEM
+REG2MEMWORD     LEA     MSG_W,A5                        ; loads .W
                 BRA     PRINTREG2MEM                    ; prints the registers           
                 
-REG2MEMLONG     LEA     MSG_L,A5                        ; loads MOVEM
-                JSR     PRINTNULL                       ; prints MOVEM 
+REG2MEMLONG     LEA     MSG_L,A5                        ; loads .L
            
-PRINTREG2MEM    MOVE.W  #1,D4                           ; loads 1 into D4 to represent type
+PRINTREG2MEM    JSR     PRINTNULL                       ; prints size
+                LEA     MSG_3SPACES,A5                  ; loads spaces
+                JSR     PRINTNULL                       ; prints out spaces
+                MOVE.W  #1,D4                           ; loads 1 into D4 to represent type
                 JSR     PRINTREGISTERS                  ; prints registers
                 LEA     MSG_COMMA,A5                    ; loads comma
                 JSR     PRINTNULL                       ; prints comma
@@ -315,14 +322,17 @@ MOVEM_MEM2REG  ; loads EA and XN
                 AND.W   #$0040,D1                       ; gets the size bit
                 BNE     MEM2REGLONG                     ; if it isn't 0 go to MEM2REGLONG
 
-MEM2REGWORD     LEA     MSG_W,A5                        ; loads MOVEM
+MEM2REGWORD     LEA     MSG_W,A5                        ; loads .W
                 JSR     PRINTNULL                       ; prints MOVEM
-                BRA     PRINTREG2MEM                    ; prints the registers           
+                BRA     PRINTMEM2REG                    ; prints the registers           
                 
-MEM2REGLONG     LEA     MSG_L,A5                        ; loads MOVEM
+MEM2REGLONG     LEA     MSG_L,A5                        ; loads .L
                 JSR     PRINTNULL                       ; prints MOVEM 
            
-PRINTMEM2REG    JSR     EA_TO_STRING                    ; prints EA
+PRINTMEM2REG    JSR     PRINTNULL                       ; prints out size
+                LEA     MSG_3SPACES,A5                  ; loads spaces
+                JSR     PRINTNULL                       ; prints out spaces
+                JSR     EA_TO_STRING                    ; prints EA
                 LEA     MSG_COMMA,A5                    ; loads comma
                 JSR     PRINTNULL                       ; prints comma
                 MOVE.W  #-1,D4                          ; loads -1 into D4 to represent type
@@ -351,6 +361,9 @@ PRINT_MOVEQ     JSR     PRINT_ADDR                      ; print address
 
                 LEA     MSG_MOVEQ,A5                    ;PRINT MOVEQ
                 JSR     PRINTNULL  
+                
+                LEA     MSG_3SPACES,A5                  ; loads spaces
+                JSR     PRINTNULL                       ; prints out spaces
                 
                 LEA     MSG_L,A5                        ;PRINT SIZE L
                 JSR     PRINTNULL
@@ -407,6 +420,8 @@ PRINTADD        LEA         MSG_ADD,A5              ; loads string pointer for M
                 JSR         PRINTNULL               ; print ADD
                 MOVE.W      D0,D1                   ; bits 7-8 contain size
                 JSR         ADD_SUB_SIZE
+                LEA         MSG_5SPACES,A5          ; loads spaces
+                JSR         PRINTNULL               ; prints out spaces
                 BRA         FINISH_ADD
                   
 ADD_SUB_SIZE    MOVE.W      D0,D1
@@ -420,7 +435,7 @@ ADD_SUB_SIZE    MOVE.W      D0,D1
                 BEQ         ADD_SUB_WORD
                 CMP.W       #2,D1                   ; if 2, it is a long
                 BEQ         ADD_SUB_LONG
-                BRA         CASE_SUBA                    ; error
+                BRA         CASE_SUBA               ; error
                   
 ADD_SUB_BYTE    LEA         MSG_B,A5
                 JSR         PRINTNULL
@@ -490,10 +505,14 @@ CASE_ADDA       ; gets bit 8 (size bit)
                   
                 LEA         MSG_W,A5
                 JSR         PRINTNULL
+                LEA         MSG_4SPACES,A5          ; loads spaces
+                JSR         PRINTNULL               ; prints out spaces
                 BRA         FINISH_ADDA   
                   
 ADDA_LONG       LEA         MSG_L,A5
                 JSR         PRINTNULL
+                LEA         MSG_4SPACES,A5          ; loads spaces
+                JSR         PRINTNULL               ; prints out spaces
                 BRA         FINISH_ADDA
                   
 FINISH_ADDA     MOVE.W      D4,D2                    ; Moves D4 (source effective address) to D2
@@ -544,14 +563,20 @@ CASE_ADDQ       MOVE.W      D0,D1
                   
 ADDQ_BYTE       LEA         MSG_B,A5
                 JSR         PRINTNULL
+                LEA         MSG_4SPACES,A5          ; loads spaces
+                JSR         PRINTNULL               ; prints out spaces
                 BRA         FINISH_ADDQ  
  
 ADDQ_WORD       LEA         MSG_W,A5
                 JSR         PRINTNULL
+                LEA         MSG_4SPACES,A5          ; loads spaces
+                JSR         PRINTNULL               ; prints out spaces
                 BRA         FINISH_ADDQ                 
   
 ADDQ_LONG       LEA         MSG_L,A5
                 JSR         PRINTNULL
+                LEA         MSG_4SPACES,A5          ; loads spaces
+                JSR         PRINTNULL               ; prints out spaces
                 BRA         FINISH_ADDQ                  
                   
 FINISH_ADDQ     JSR         PRINT_ADDQ_DATA
@@ -591,14 +616,16 @@ CASE_SUB        MOVE.W      D0,D1                                ; Copies instru
                 BNE         CASE_LEA
                
                 JSR         ADD_SUB_HELP
-                JSR         PRINT_ADDR                          ; print address               
+                JSR         PRINT_ADDR                          ; print address                              
                 
-                BRA         PRINTSUB                            ; Branches to print move
+                BRA         PRINTSUB                            ; Branches to print sub
 
-PRINTSUB        LEA         MSG_SUB,A5                          ; loads string pointer for MOVE into A5
+PRINTSUB        LEA         MSG_SUB,A5                          ; loads string pointer for SUB into A5
                 JSR         PRINTNULL
                 MOVE.W      D0,D1                               ; bits 6-7 contain size
                 JSR         ADD_SUB_SIZE
+                LEA         MSG_5SPACES,A5                      ; loads spaces
+                JSR         PRINTNULL                           ; prints out spaces
                 MOVE.W      D0,D1
                 LSL.W       #8,D1
                 LSR.W       #8,D1
@@ -607,7 +634,7 @@ PRINTSUB        LEA         MSG_SUB,A5                          ; loads string p
                 BNE         FINISH_SUB
                 BRA         FINISH_SUBA                         ; same as ADDA
                 
-FINISH_SUB      JSR     ADD_SUB_OPERAND
+FINISH_SUB      JSR         ADD_SUB_OPERAND
                 RTS
                   
 FINISH_SUBA     MOVE.W      D4,D2                    ; Moves D4 (source effective address) to D2
@@ -617,7 +644,7 @@ FINISH_SUBA     MOVE.W      D4,D2                    ; Moves D4 (source effectiv
                 ; prints a comma to seperate
                 LEA         MSG_COMMA,A5             ; loads string pointer into A5
                 JSR         PRINTNULL                ; prints out MOVE
-        
+                
                 LEA         MSG_AR,A5                ; print address register
                 JSR         PRINTNULL
                 MOVE.W      D0,D1
@@ -666,6 +693,8 @@ CASE_LEA        MOVE.W  D0,D1                                ; Copies instructio
 
                 LEA     MSG_LEA,A5                           ; loads string pointer for LEA into A5
                 JSR     PRINTNULL                            ; prints LEA
+                LEA     MSG_7SPACES,A5                       ; loads spaces
+                JSR     PRINTNULL                            ; prints out spaces
                 
                 ; print source
                 MOVE.W  D4,D2
@@ -713,14 +742,20 @@ CASE_AND        MOVE.W      D0,D1                           ; bitmask for 4 MSB
                 
 AND_BYTE        LEA         MSG_B,A5
                 JSR         PRINTNULL
+                LEA         MSG_7SPACES,A5                  ; loads spaces
+                JSR         PRINTNULL                       ; prints out spaces
                 BRA         FINISH_AND
                                   
 AND_WORD        LEA         MSG_W,A5
                 JSR         PRINTNULL
+                LEA         MSG_7SPACES,A5                  ; loads spaces
+                JSR         PRINTNULL                       ; prints out spaces
                 BRA         FINISH_AND
   
 AND_LONG        LEA         MSG_L,A5
                 JSR         PRINTNULL
+                LEA         MSG_7SPACES,A5                  ; loads spaces
+                JSR         PRINTNULL                       ; prints out spaces
                 BRA         FINISH_AND
       
 FINISH_AND      JSR         ADD_SUB_HELP                    ; AND has the same structure as ADD and SUB
@@ -728,6 +763,10 @@ FINISH_AND      JSR         ADD_SUB_HELP                    ; AND has the same s
                 RTS
                 
 INV_INSTR       LEA         INVALID_INSTR,A5
+                JSR         PRINTNULL
+                LEA         MSG_6SPACES,A5
+                JSR         PRINTNULL
+                LEA         MSG_HEX,A5
                 JSR         PRINTNULL
                 MOVE.L      D0,D1
                 MOVE.W      #0,D4
@@ -757,6 +796,8 @@ CASE_OR         MOVE.W      D0,D1                           ; bitmask for 4 MSB
                 
                 MOVE.W      D6,D1
                 JSR         OR_SIZE                         ; print ".B",".W",".L"
+                LEA         MSG_6SPACES,A5                  ; loads spaces
+                JSR         PRINTNULL                       ; prints out spaces
 
                 JSR         ADD_SUB_HELP                    ; OR has the same structure as ADD and SUB
                 JSR         ADD_SUB_OPERAND                 ; print 
@@ -793,6 +834,8 @@ CASE_NOT        MOVE.W      D0,D1                           ; bitmask for 4 MSB
                 MOVE.W      D6,D1
 
                 JSR         OR_SIZE                         ; print ".B",".W",".L"
+                LEA         MSG_5SPACES,A5                  ; loads spaces
+                JSR         PRINTNULL                       ; prints out spaces
                 
                 ; get bits 0-5 
                 LEA         VALIDEA_ALL,A5           ; Loads valid EA types in A5
@@ -844,6 +887,8 @@ CASE_RIGHTMEM   LEA         MSG_RIGHT,A5                     ; loads R into A5
 PRINT_MEMDIR    JSR         PRINTNULL                        ; Prints L or R
                 LEA         MSG_W,A5                         ; loads .W into A5
                 JSR         PRINTNULL                        ; Prints .W
+                LEA         MSG_7SPACES,A5                   ; loads spaces
+                JSR         PRINTNULL                        ; prints out spaces
                 BRA         GETMEMSOURCE                     ; checks the source 
                 
 ; get source addressing mode       
@@ -925,6 +970,8 @@ REG_WORD        LEA         MSG_W,A5                         ; loads .W into A5
 REG_LONG        LEA         MSG_L,A5                         ; loads .L into A5
 
 PRINTREGEA      JSR         PRINTNULL                        ; Prints size
+                LEA         MSG_5SPACES,A5                   ; loads spaces
+                JSR         PRINTNULL                        ; prints out spaces
                 MOVE.W      D0,D2                            ; copies D0 to D1
                 JSR         GETROTATIONLOCATION              ; finds out if its immediate or register 
                 CMP.W       #$1,D1                           ; Compares D1 to 0, if it is 0, it is a data register
@@ -968,6 +1015,8 @@ CASE_BRA        MOVE.W  D0,D1                                ; Copies instructio
                 JSR     PRINT_ADDR
                 LEA     MSG_BRA,A5                           ; loads string pointer for BRA into A5
                 JSR     PRINTNULL                            ; prints BRA
+                LEA     MSG_7SPACES,A5                       ; loads spaces
+                JSR     PRINTNULL                            ; prints out spaces
 
                 MOVE.W  D0,D2                                ; Copies instruction word to D1
                 JSR     GETDISPLACEMENT                      ; finds the displacement
@@ -1004,6 +1053,8 @@ CASE_BGT        LEA     MSG_BGT,A5                           ; loads string poin
 
 PRINTBCC        JSR     PRINT_ADDR                           ; prints address
                 JSR     PRINTNULL                            ; prints BEQ/BLE/BGT
+                LEA     MSG_7SPACES,A5                       ; loads spaces
+                JSR     PRINTNULL                            ; prints out spaces
                 MOVE.W  D0,D2                                ; Copies instruction word to D1
                 JSR     GETDISPLACEMENT                      ; finds the displacement
                 RTS              
@@ -1600,7 +1651,7 @@ STARTING                        DC.B    'Please enter a starting location in the
 ENDING                          DC.B    'Please enter an ending location in the above format',CR,LF,0
 BAD_INPUT                       DC.B    'Invalid input. Please try again',CR,LF,0
 ERROR_MSG                       DC.B    'Error while disassembling',CR,LF,0
-INVALID_INSTR                   DC.B    '1000    ',TAB,'DATA',TAB,TAB,TAB,'$',0
+INVALID_INSTR                   DC.B    '1000    ',TAB,'DATA',0
 DONE                            DC.B    'Finished Disassembling. Press ENTER to restart.',CR,LF,0
 NEW_LINE                        DC.B    CR,LF,0
 THREE_TAB                       DC.B    TAB,TAB,TAB,0
@@ -1617,30 +1668,30 @@ MSG_ADDQ                        DC.B    TAB,'ADDQ',0
 MSG_SUB                         DC.B    TAB,'SUB',0
 MSG_MULS                        DC.B    TAB,'MULS',0
 MSG_DIVU                        DC.B    TAB,'DIVU',0
-MSG_LEA                         DC.B    TAB,'LEA',TAB,TAB,TAB,0
+MSG_LEA                         DC.B    TAB,'LEA',0
 MSG_AND                         DC.B    TAB,'AND',0
 MSG_OR                          DC.B    TAB,'OR',0
 MSG_NOT                         DC.B    TAB,'NOT',0
 MSG_LSd                         DC.B    TAB,'LS',0
 MSG_ASd                         DC.B    TAB,'AS',0
 MSG_ROd                         DC.B    TAB,'RO',0
-MSG_BCC                         DC.B    TAB,'BCC',TAB,TAB,TAB,0
-MSG_BCS                         DC.B    TAB,'BCS',TAB,TAB,TAB,0
-MSG_BEQ                         DC.B    TAB,'BEQ',TAB,TAB,TAB,0
-MSG_BNE                         DC.B    TAB,'BNE',TAB,TAB,TAB,0
-MSG_BGE                         DC.B    TAB,'BGE',TAB,TAB,TAB,0
-MSG_BGT                         DC.B    TAB,'BGT',TAB,TAB,TAB,0
-MSG_BHI                         DC.B    TAB,'BHI',TAB,TAB,TAB,0
-MSG_BLE                         DC.B    TAB,'BLE',TAB,TAB,TAB,0
-MSG_BLS                         DC.B    TAB,'BLS',TAB,TAB,TAB,0
-MSG_BLT                         DC.B    TAB,'BLT',TAB,TAB,TAB,0
-MSG_BMI                         DC.B    TAB,'BMI',TAB,TAB,TAB,0
-MSG_BPL                         DC.B    TAB,'BPL',TAB,TAB,TAB,0
-MSG_BVC                         DC.B    TAB,'BVC',TAB,TAB,TAB,0
-MSG_BVS                         DC.B    TAB,'BVS',TAB,TAB,TAB,0
-MSG_JSR                         DC.B    TAB,'JSR',TAB,TAB,TAB,0
+MSG_BCC                         DC.B    TAB,'BCC',0
+MSG_BCS                         DC.B    TAB,'BCS',0
+MSG_BEQ                         DC.B    TAB,'BEQ',0
+MSG_BNE                         DC.B    TAB,'BNE',0
+MSG_BGE                         DC.B    TAB,'BGE',0
+MSG_BGT                         DC.B    TAB,'BGT',0
+MSG_BHI                         DC.B    TAB,'BHI',0
+MSG_BLE                         DC.B    TAB,'BLE',0
+MSG_BLS                         DC.B    TAB,'BLS',0
+MSG_BLT                         DC.B    TAB,'BLT',0
+MSG_BMI                         DC.B    TAB,'BMI',0
+MSG_BPL                         DC.B    TAB,'BPL',0
+MSG_BVC                         DC.B    TAB,'BVC',0
+MSG_BVS                         DC.B    TAB,'BVS',0
+MSG_JSR                         DC.B    TAB,'JSR',0
 MSG_RTS                         DC.B    TAB,'RTS',0
-MSG_BRA                         DC.B    TAB,'BRA',TAB,TAB,TAB,0
+MSG_BRA                         DC.B    TAB,'BRA',0
 
 * Direction for LSd and ASd
 MSG_RIGHT                       DC.B    'R',0
@@ -1659,11 +1710,16 @@ MSG_COMMA                       DC.B    ', ',0
 MSG_SLASH                       DC.B    '/',0  
 MSG_SPACE                       DC.B    ' ',0
 MSG_TAB                         DC.B    TAB,0
+MSG_3SPACES                     DC.B    '   ',0
+MSG_4SPACES                     DC.B    '    ',0
+MSG_5SPACES                     DC.B    '     ',0
+MSG_6SPACES                     DC.B    '      ',0
+MSG_7SPACES                     DC.B    '       ',0
 
 * Size Messages
-MSG_B                           DC.B    '.B',TAB,TAB,TAB,0
-MSG_W                           DC.B    '.W',TAB,TAB,TAB,0
-MSG_L                           DC.B    '.L',TAB,TAB,TAB,0
+MSG_B                           DC.B    '.B',0
+MSG_W                           DC.B    '.W',0
+MSG_L                           DC.B    '.L',0
 
 * Variables
 STARTING_ADDRESS                EQU     $100
@@ -1675,16 +1731,6 @@ EA_MODE                         EQU     $350 * Hold bits 5-3
 EA_REG                          EQU     $400 * Hold bits 2-0
 
             END     START        ; last line of source
-
-
-
-
-*~Font name~Courier New~
-*~Font size~10~
-*~Tab type~1~
-*~Tab size~4~
-
-
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
