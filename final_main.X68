@@ -1,4 +1,4 @@
-*-----------------------------------------------------------
+case*-----------------------------------------------------------
 * Title      : Final Project
 * Written by : Nick Young, Audrey Nguyen, Khiam Rehman
 * Date       : 6/5/20
@@ -1006,7 +1006,7 @@ CASE_RTS        CMP.W   #$4E75,D0           ; compares to RTS opcode in hex
 
                 
 
-CASE_DATA             
+CASE_DATA           JSR INV_INSTR  
                     RTS               
 
 CASE_EPICFAIL       RTS
@@ -1580,7 +1580,7 @@ ROd_REG                         EQU     3
 
 * Messages
 WELCOME                         DC.B    'Welcome to Team Big Blue Disassembler',CR,LF
-                                DC.B    'Format: 8 digit address in hexadecimal format. Letters must be capital case.',CR,LF,0
+                                DC.B    'Format: 8 digit address in hexadecimal format. Numbers and letters only. Letters must be capital case.',CR,LF,0
 STARTING                        DC.B    'Please enter a starting location in the above format',CR,LF,0
 ENDING                          DC.B    'Please enter an ending location in the above format',CR,LF,0
 BAD_INPUT                       DC.B    'Invalid input. Please try again',CR,LF,0
@@ -1668,6 +1668,7 @@ EA_REG                          EQU     $400 * Hold bits 2-0
 *~Font size~10~
 *~Tab type~1~
 *~Tab size~4~
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
