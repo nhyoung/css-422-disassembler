@@ -63,8 +63,41 @@ DISASSEMBLE     ;MOVE.L  A2,A6               ; loads current address in D1
                 CMP.L   A3, A2              ; checks if A2 has reached A3
                 BLE     DISASSEMBLE         ; if not, loop
 
-STOP            MOVE.B  #9,D0
+FINISHED        LEA     DONE,A5
+                JSR     PRINTNULL
+                MOVE.B  #5,D0
                 TRAP    #15
+                
+                CMP.B   #$D,D1              ; Compare the key press with ENTER
+                BEQ     RESTART             ; it's Enter, restart
+                
+                MOVE.B  #9,D0
+                TRAP    #15
+                
+RESTART         MOVE.B  #11, D0             Task 11 - Clear screen
+                MOVE.W  #$FF00, D1          Clear Screen
+                TRAP    #15                 Call Trap
+                
+                MOVE.B  #12,D0              Keyboard echo
+                MOVE.B  #1,D1               Visible
+                TRAP    #15
+                
+                MOVE.L  #$0000000, A0       Reset A1
+                MOVE.L  #$0000000, A1       Reset A1
+                MOVE.L  #$0000000, A2       Reset A2
+                MOVE.L  #$0000000, A3       Reset the Good Buffer
+                MOVE.L  #$0000000, A4       Reset A4
+                MOVE.L  #$0000000, A5       Reset the Starting address
+                MOVE.L  #$0000000, A6       Reset the Ending Address
+                MOVEA.L #$01000000,A7       Reset stack pointer
+                CLR.L   D1                  Reset D1
+                CLR.L   D1                  Reset D1
+                CLR.L   D2                  Reset D2
+                CLR.L   D3                  Reset D3
+                CLR.L   D4                  Reset D4
+                CLR.L   D5                  Reset D5
+                CLR.L   D6                  Reset D6
+                BRA     START               Restart the program
 
 *--------------------SUBROUTINES------------------    
 
@@ -1446,7 +1479,7 @@ ASd_REG                         EQU     0
 LSd_REG                         EQU     1 
 ROd_REG                         EQU     3
 
-* Starting messages
+* Messages
 WELCOME                         DC.B    'Welcome to Team Big Blue Disassembler',CR,LF
                                 DC.B    'Format: 8 digit address in hexadecimal format. Letters must be capital case.',CR,LF,0
 STARTING                        DC.B    'Please enter a starting location in the above format',CR,LF,0
@@ -1454,6 +1487,7 @@ ENDING                          DC.B    'Please enter an ending location in the 
 BAD_INPUT                       DC.B    'Invalid input. Please try again',CR,LF,0
 ERROR_MSG                       DC.B    'Error while disassembling',CR,LF,0
 INVALID_INSTR                   DC.B    '1000',TAB,'DATA',TAB,'$',CR,LF,0
+DONE                            DC.B    'Finished Disassembling. Press ENTER to restart.',CR,LF,0
 NEW_LINE                        DC.B    CR,LF,0
 THREE_TAB                       DC.B    TAB,TAB,TAB,0
 
