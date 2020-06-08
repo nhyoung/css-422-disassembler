@@ -398,8 +398,6 @@ ADD_SUB_HELP    LEA         VALIDEA_ALL,A5           ; Loads valid EA types in A
                 LEA         VALIDXN_SHORTLONG,A6     ; Loads valid Xn types in A6
                 MOVE.W      #1,D7                    ; Marks D7 as "Destination" for CHECKGETEAXN
                 JSR         CHECKGET_EAXN            ; getting if its valid (D1), EA (D2), and Xn (D3)
-                CMP.W       #1,D1                    ; checks if invalid
-                BEQ         CASE_DATA                ; branches to CASE_DATA if invalid
                 MOVE.W      D2,D6                    ; Moves D2 (destination effective address) to D6
                 MOVE.W      D3,D7                    ; Moves D3 (destination Xn if applicable) to D7
   
