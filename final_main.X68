@@ -756,7 +756,8 @@ CASE_OR         MOVE.W      D0,D1                           ; bitmask for 4 MSB
                 JSR         PRINTNULL                       ; print "OR"
                 
                 MOVE.W      D6,D1
-                JSR         OR_SIZE                         ; print ".B",".W",".L"
+                JSR         OR_SIZE                         ; print ".B",".W",".L"
+
                 JSR         ADD_SUB_HELP                    ; OR has the same structure as ADD and SUB
                 JSR         ADD_SUB_OPERAND                 ; print 
                 RTS
@@ -1599,7 +1600,7 @@ STARTING                        DC.B    'Please enter a starting location in the
 ENDING                          DC.B    'Please enter an ending location in the above format',CR,LF,0
 BAD_INPUT                       DC.B    'Invalid input. Please try again',CR,LF,0
 ERROR_MSG                       DC.B    'Error while disassembling',CR,LF,0
-INVALID_INSTR                   DC.B    '1000',TAB,TAB,'DATA',TAB,TAB,TAB,'$',0
+INVALID_INSTR                   DC.B    '1000    ',TAB,'DATA',TAB,TAB,TAB,'$',0
 DONE                            DC.B    'Finished Disassembling. Press ENTER to restart.',CR,LF,0
 NEW_LINE                        DC.B    CR,LF,0
 THREE_TAB                       DC.B    TAB,TAB,TAB,0
@@ -1682,6 +1683,7 @@ EA_REG                          EQU     $400 * Hold bits 2-0
 *~Font size~10~
 *~Tab type~1~
 *~Tab size~4~
+
 
 *~Font name~Courier New~
 *~Font size~10~
