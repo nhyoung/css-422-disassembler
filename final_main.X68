@@ -135,13 +135,16 @@ CHECK_ODD       BTST       #0,D5            ; check if input is odd
 * Outputs: Prints out dissasembled content to console and A2 will increment appropriatley
 
 OPCODE_DECODE   MOVE.W  (A2)+,D0                ; load instruction word from memory, store in D0
-                
+
+
+*---------------NOP opcode----------------------                
 CASE_NOP        CMP.W   #$4E71,D0               ; compares to NOP opcode in hex
                 BNE     CASE_MOVE               ; checks the next case if not equal
                 LEA     MSG_NOP,A5              ; loads string pointer into A5
                 JSR     PRINTNULL               ; prints NOP                
                 RTS                             ; returns from the subroutine
-                
+
+*---------------MOVE opcode----------------------              
                 * if first two bits are 00, next two are not 00
 CASE_MOVE       MOVE.W  D0,D1                   ; stores d0 in d1
                 AND.W   #$C000, D1              ; applies a bitmask to get 4 bits, want 00XX
@@ -196,7 +199,7 @@ PRINTMOVE       JSR     PRINTNULL                ; prints out MOVE/MOVEA
                 JSR     EA_TO_STRING             ; outputs it into a string
                 RTS                              ; exits subroutine                 
               
-                
+*---------------MOVEM opcode----------------------                
 CASE_MOVEM      MOVE.W  D0,D1                           ; copies instruction word to D1
                 AND.W   #$FB80,D1                       ; check bitmask for MOVEM (1111 1011 1000 0000)
                 CMP.W   #$4880,D1                       ; sees if it matches MOVEM (0100 1000 1000 0000)
@@ -235,7 +238,7 @@ REG2MEMXNCHECK  LEA     VALIDEA_MOVEM_REGTOMEM,A5       ; loads valid addresses
 MOVEM_MEM2REG    
                         
 
-
+*---------------MOVEQ opcode----------------------
 CASE_MOVEQ      MOVE.W  D0,D1
                 AND.W   #$F100,D1
                 CMP.W   #$7000,D1
@@ -250,9 +253,8 @@ CASE_MOVEQ      MOVE.W  D0,D1
                 MOVE.W  D0,D1
                 AND.W   #$00FF,D1                       ;bit mask to get DATA
                 MOVE.W  D1,D3                          ;copy data into D3
-                                                        ;must convert bits to hex
-                
-                
+                                                      ;must convert bits to hex
+                                
 PRINT_MOVEQ     LEA     MSG_MOVEQ,A5                    ;PRINT MOVEQ
                 JSR     PRINTNULL  
                 
@@ -266,6 +268,7 @@ PRINT_MOVEQ     LEA     MSG_MOVEQ,A5                    ;PRINT MOVEQ
                 JSR     PRINTNULL
                 RTS
                 
+*---------------ADD opcode----------------------                
 * get bits 0-5, 9-11, and 12-15 first (similarities between ADD and ADDA)
 CASE_ADD        MOVE.W  D0,D1
                 AND.W   #$F000,D1
@@ -376,8 +379,9 @@ Dn_PLUS_EA      ; below is Dn+EA->EA
                 JSR         PRINTNULL
                 MOVE.W      D7,D1
                 JSR         PRINTNUM             
-                RTS                                  ; exits subroutine                                
-
+                RTS                                  ; exits subroutine          
+                      
+*---------------ADDA opcode----------------------
 CASE_ADDA       MOVE.W      D0,D1
                 LSL.W       #7,D1
                 LSR.W       #7,D1
@@ -410,7 +414,8 @@ FINISH_ADDA     MOVE.W      D4,D2                    ; Moves D4 (source effectiv
                 MOVE.W      D7,D1
                 JSR         PRINTNUM             
                 RTS                              ; exits subroutine
-                  
+                
+*---------------ADDQ opcode----------------------                  
 CASE_ADDQ       MOVE.W      D0,D1
                 AND.W       #$F000,D1       
                 CMP.W       #$5000,D1
@@ -481,8 +486,9 @@ PRINT_ADDQ_DATA LEA         MSG_POUND,A5
 
 PRINT_8         MOVE.B      #8,D1
                 JSR         PRINTNUM
-                RTS           
- 
+                RTS   
+       
+*---------------SUB opcode---------------------- 
 CASE_SUB        MOVE.W      D0,D1                                ; Copies instruction word to D1
                 AND.W       #$F000,D1                            ; Applies a bitmask to get first 4 bits                
                 CMP.W       #$9000,D1                            ; Checks if it fits the first four bits of LEA opcode
@@ -626,10 +632,65 @@ INV_INSTR       LEA         INVALID_INSTR,A5
                 JSR         PRINTNULL
                 RTS               
                 
-            
-CASE_OR
+*---------------OR opcode----------------------            
+CASE_OR         MOVE.W      D0,D1                           ; bitmask for 4 MSB
+                AND.W       #$F000,D1       
+                CMP.W       #$8000,D1
+                BNE         CASE_NOT
+                              
+                JSR         ADD_SUB_HELP                    ; OR has the same structure as ADD and SUB
+                
+                MOVE.W      D0,D1
+                LSL.W       #8,D1
+                LSR.W       #8,D1
+                LSR.W       #6,D1                           ; get bits 6-7 (size)
+                CMP.W       #3,D1
+                BEQ         INV_INSTR
+                
+                LEA         MSG_OR,A5
+                JSR         PRINTNULL                       ; print "OR"
+                
+                JSR         OR_SIZE                         ; print ".B",".W",".L"
+                JSR         ADD_SUB_OPERAND                 ; print 
+                RTS
 
-CASE_NOT
+OR_SIZE         CMP.W       #0,D1
+                BEQ         ADD_SUB_BYTE
+                CMP.W       #1,D1                   ; if 1, it is a word
+                BEQ         ADD_SUB_WORD
+                CMP.W       #2,D1                   ; if 2, it is a long
+                BEQ         ADD_SUB_LONG
+                ; no need for rts, since ADD_SUB_ already has                
+
+*---------------NOT opcode----------------------
+CASE_NOT        MOVE.W      D0,D1                           ; bitmask for 4 MSB
+                AND.W       #$FF00,D1       
+                CMP.W       #$4600,D1
+                BNE         CASE_LSDASD
+               
+                ; get bits 6-7 (size)
+                MOVE.W      D0,D1
+                LSL.W       #8,D1
+                LSR.W       #8,D1
+                LSR.W       #6,D1                          
+                CMP.W       #3,D1
+                BEQ         INV_INSTR
+                
+                LEA         MSG_NOT,A5
+                JSR         PRINTNULL                       ; print "NOT"
+                
+                JSR         OR_SIZE                         ; print ".B",".W",".L"
+                
+                ; get bits 0-5 
+                LEA         VALIDEA_ALL,A5           ; Loads valid EA types in A5
+                LEA         VALIDXN_ALL,A6           ; Loads valid Xn types in A6
+                MOVE.W      #0,D7                    ; Marks D7 as "Source" for CHECKGETEAXN
+                JSR         CHECKGET_EAXN            ; getting if its valid (D1), EA (D2), and Xn (D3)
+                CMP.W       #1,D1                    ; checks if invalid
+                BEQ         CASE_DATA                ; branches to CASE_DATA if invalid
+                JSR         EA_TO_STRING             ; outputs it into a string
+  
+                RTS
 
 CASE_LSDASD     MOVE.W      D0,D1                            ; copies D0 to D1
                 AND.W       #$F000, D1                       ; gets first 4 bits
@@ -1298,6 +1359,8 @@ DELETEME        MOVEA.L  -(A1),A3
                 ADDQ.W      #8,A5
                 ADDA.W      D2,A3
                 SUB.L       A3,A5        
+                OR.W        D3,D5
+                NOT.W       D2
                 
 DELETEMEAGAIN                 
           
