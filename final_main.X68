@@ -65,20 +65,32 @@ CHECK_ORDER     MOVE.L  A2,D3
                                
 DISASSEMBLE     ;MOVE.L  A2,A6               ; loads current address in D1
                 ; MOVE.L  #1,D4               ; tells subroutine we want to make the address print as a long
-                ; JSR     PRINTSHORTLONGNUM   ; prints out address                    
+                ; JSR     PRINTSHORTLONGNUM   ; prints out address
+                
+                MOVE.B  LINE_COUNT,D2       ; move to D2 for editing
+                ADD.B   #1,D2               ; add 1 to counter
+                MOVE.B  D2,LINE_COUNT       ; store back in the variable
+                    
                 JSR     OPCODE_DECODE       ; decode the opcode
+                
+                JSR     CHECK_LINE          ; check if max number of lines on screen has been reached
+                
                 JSR     PRINTENTER          ; prints a new line
                 CMP.L   A3, A2              ; checks if A2 has reached A3
                 BLE     DISASSEMBLE         ; if not, loop
+                
 
 FINISHED        LEA     DONE,A5
                 JSR     PRINTNULL
                 MOVE.B  #5,D0
                 TRAP    #15
                 
-                CMP.B   #$D,D1              ; Compare the key press with ENTER
-                BEQ     RESTART             ; it's Enter, restart
+                CMP.B   #82,D1              ; Compare the key press with R
+                BEQ     RESTART             ; it's R, restart
                 
+                CMP.B   #114,D1              ; Compare the key press with r
+                BEQ     RESTART             ; it's r, restart
+
                 MOVE.B  #9,D0
                 TRAP    #15
                 
@@ -107,7 +119,34 @@ RESTART         MOVE.B  #11, D0             Task 11 - Clear screen
                 CLR.L   D6                  ; Reset D6
                 BRA     START               ; branch to start of program
 
-*--------------------SUBROUTINES------------------    
+*--------------------SUBROUTINES------------------
+CHECK_LINE      MOVE.B  LINE_COUNT,D2
+                MOVE.B  LINE_MAX,D3                
+                CMP.B   D2,D3 ; compare number of lines on screen with maximum
+                BLE     NEXT_SCREEN         ; if max line count has been reached go to next screen
+                RTS
+
+NEXT_SCREEN     LEA     CONTINUE,A5
+                JSR     PRINTNULL
+                BRA     READ_KEY
+                
+READ_KEY        MOVE.B  #5,D0
+                TRAP    #15
+                
+                CMP.B   #$D,D1              ; Compare the key press with ENTER
+                BEQ     CLEAR_SCREEN             ; it's Enter, restart
+                BRA     READ_KEY
+                
+CLEAR_SCREEN    MOVE.B  #11, D0             Task 11 - Clear screen
+                MOVE.W  #$FF00, D1          Clear Screen
+                TRAP    #15                 Call Trap
+                
+                ; reset line counter
+                MOVE.B  LINE_COUNT,D2
+                MOVE.B  #$0,D2
+                MOVE.B  D2,LINE_COUNT
+                RTS       
+    
 
 RESET_INPUT     MOVE.B  #1,D2
                 BRA     INVALID            
@@ -1652,7 +1691,8 @@ ENDING                          DC.B    'Please enter an ending location in the 
 BAD_INPUT                       DC.B    'Invalid input. Please try again',CR,LF,0
 ERROR_MSG                       DC.B    'Error while disassembling',CR,LF,0
 INVALID_INSTR                   DC.B    '1000    ',TAB,'DATA',0
-DONE                            DC.B    'Finished Disassembling. Press ENTER to restart.',CR,LF,0
+DONE                            DC.B    'Finished Disassembling. Press R to restart. Any other key to end.',CR,LF,0
+CONTINUE                        DC.B    CR,LF,'Press ENTER to continue disassembling.',CR,LF,0
 NEW_LINE                        DC.B    CR,LF,0
 THREE_TAB                       DC.B    TAB,TAB,TAB,0
 
@@ -1729,8 +1769,10 @@ REG_VAR                         EQU     $250 * Hold bits 11-9
 OPMODE_VAR                      EQU     $300 * Hold bits 8-6
 EA_MODE                         EQU     $350 * Hold bits 5-3
 EA_REG                          EQU     $400 * Hold bits 2-0
-
+LINE_COUNT                      DC.B     0
+LINE_MAX                        DC.B     15
             END     START        ; last line of source
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
