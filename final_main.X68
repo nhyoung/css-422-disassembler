@@ -1113,15 +1113,22 @@ CASE_JSR        MOVE.W  D0,D1                                ; check if JSR mand
                 BNE     CASE_RTS
                 
                 MOVE.B  #0,D7
-                JSR CHECKGET_EAXN
+                LEA     VALIDEA_JSR,A5                       ; loads string of valid addresses
+                LEA     VALIDXN_SHORTLONG,A6                 ; loads string of valid addresses
+                JSR     CHECKGET_EAXN                        ; checks if has valid effective address
+                CMP     #1,D1
+                BEQ     CASE_DATA                            ; goes to case data if EA is invalid
                 
 PRINT_JSR       ;print JSR
                 LEA     MSG_JSR,A5
                 JSR     PRINTNULL
+                
+                ;print spaces
+                LEA     MSG_7SPACES,A5
+                JSR     PRINTNULL
                                 
                 ;print address
                 JSR     EA_TO_STRING
-                
                 RTS     
 
 CASE_RTS        CMP.W   #$4E75,D0           ; compares to RTS opcode in hex
@@ -1130,12 +1137,10 @@ CASE_RTS        CMP.W   #$4E75,D0           ; compares to RTS opcode in hex
                 JSR     PRINTNULL           ; prints RTS                
                 RTS                         ; returns from the subroutine
 
-                
+CASE_DATA       JSR INV_INSTR  
+                RTS               
 
-CASE_DATA           JSR INV_INSTR  
-                    RTS               
-
-CASE_EPICFAIL       RTS
+CASE_EPICFAIL   RTS
 
 
 * Finds the EA type
@@ -1418,7 +1423,7 @@ CASE_ARIPRE        LEA      MSG_MINUS,A5            ; Loads - into A5
                    BRA      EA_TO_STRING_EXIT       ; exits
 
 * other (long, short, immediate) with Xn yes
-CASE_OTHER         MOVE     (A2)+, D0               ; Moves next instruction word into D1 since A2 is auxilliary instruction word 
+CASE_OTHER         MOVE.W   (A2)+, D0               ; Moves next instruction word into D1 since A2 is auxilliary instruction word 
                    CMP.W    #ABSShort,D3            ; checks if it is a word
                    BEQ      CASE_WORD               ; branches to CASE_WORD if is a short
                    
@@ -1448,12 +1453,14 @@ CASE_LONG
                    LEA      MSG_HEX,A5              ; Loads $ into A5
                    JSR      PRINTNULL               ; Prints $
                    MOVE.W   D0, D1                  ; moves instruction word into d1
-                   MOVE.W   #1, D4                  ; moves length size (long) into d4
+                   MOVE.W   #0, D4                  ; moves word size (long) into d4
+                   JSR      PRINTSHORTLONGNUM       ; reformats the number to the proper length and prints out the number
+                   MOVE.W   (A2)+, D0               ; Moves next instruction word into D1 since A2 is auxilliary instruction word
+                   MOVE.W   D0, D1                  ; moves instruction word into d1
+                   MOVE.W   #0, D4                  ; moves word size (long) into d4
                    JSR      PRINTSHORTLONGNUM       ; reformats the number to the proper length and prints out the number
                    MOVE     (A2)+, D1               ; Moves next instruction word into D1 since A2 is auxilliary instruction word
-                   JSR      PRINTNUM                ; reformats the number to the proper length and prints out the number
-
-
+                   
 * exits subroutine
 EA_TO_STRING_EXIT   MOVEM.L  (SP)+,D0-D1/A5          ; restoers D1, D0, and A5
                     RTS                              ; returns from subroutine
@@ -1756,11 +1763,6 @@ EA_REG                          EQU     $400 * Hold bits 2-0
 LINE_COUNT                      DC.B     0
 LINE_MAX                        DC.B     20
             END     START        ; last line of source
-
-*~Font name~Courier New~
-*~Font size~10~
-*~Tab type~1~
-*~Tab size~4~
 
 *~Font name~Courier New~
 *~Font size~10~
