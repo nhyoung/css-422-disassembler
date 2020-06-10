@@ -391,31 +391,44 @@ CASE_MOVEQ      MOVE.W  D0,D1
                 ;loads Register
                 MOVE.W  #1,D1                           ; copies instruction word to D1
                 JSR     GET_XN                          ; gets XN and puts in D1
-                MOVE.W  D1,D2                           ; copies Xn to D2 so it won't be overwritten
+                MOVE.W  D1,D3                           ; copies Xn to D3 so it won't be overwritten
                 
                 ;loads DATA
                 MOVE.W  D0,D1
                 AND.W   #$00FF,D1                       ;bit mask to get DATA
-                MOVE.W  D1,D3                          ;copy data into D3
-                                                      ;must convert bits to hex
+                MOVE.W  D1,D4                           ;copy data into D4
+                                                        ;must convert bits to hex
                                 
-PRINT_MOVEQ     LEA     MSG_MOVEQ,A5                    ;PRINT MOVEQ
+PRINT_MOVEQ     JSR     PRINT_ADDR                      ; print address
+
+                LEA     MSG_MOVEQ,A5                    ;PRINT MOVEQ
                 JSR     PRINTNULL  
-                
-                LEA     MSG_3SPACES,A5                  ; loads spaces
-                JSR     PRINTNULL                       ; prints out spaces
-                
+                                
                 LEA     MSG_L,A5                        ;PRINT SIZE L
                 JSR     PRINTNULL
     
                 LEA     THREE_TAB,A5                    ;PRINT THREE TABS
                 JSR     PRINTNULL
                 
-                LEA     MSG_POUND, A5                     ;PRINT HASHTAG
+                LEA     MSG_POUND, A5                   ;PRINT HASHTAG
                 JSR     PRINTNULL
-                RTS                                
-                                
-
+                
+                MOVE.W  D4,D1                           ;PRINT DATA
+                MOVE.B  #16,D2                          
+                MOVE.B  #15,D0                          
+                TRAP    #15                             
+                
+                LEA     MSG_COMMA, A5                   ;PRINT COMMA
+                JSR     PRINTNULL
+                
+                LEA     MSG_DR,A5                        ;PRINT D
+                JSR     PRINTNULL
+          
+                MOVE.W  D3,D1
+                MOVE.B  #15,D0                          ;PRINT REGISTER NUM
+                TRAP    #15
+                
+                RTS
                 
 *---------------ADD opcode----------------------                
 * get bits 0-5, 9-11, and 12-15 first (similarities between ADD and ADDA)
@@ -1097,7 +1110,20 @@ PRINTBCC        JSR     PRINTNULL                            ; prints BEQ/BLE/BG
                 RTS              
                 
 
-CASE_JSR       
+CASE_JSR        MOVE.W  D0,D1                                ; check if JSR mandatory bits exist
+                AND.W   #$FFC0,D1
+                CMP.W   #$4E80,D1
+                BNE     CASE_RTS
+                
+                ;loads Register
+                MOVE.W  #0,D1                               ; copies instruction word to D1
+                JSR     GET_XN                              ; gets XN and puts in D1
+                MOVE.W  D1,D3                               ; copies Xn to D3 so it won't be overwritten
+                
+                ;loads EA       
+                MOVE.W #0,D1
+                JSR     GET_EA
+                MOVE.W  D1,D4       
 
 CASE_RTS        CMP.W   #$4E75,D0           ; compares to RTS opcode in hex
                 BNE     CASE_DATA           ; checks the next case if not equal
@@ -1736,6 +1762,7 @@ EA_REG                          EQU     $400 * Hold bits 2-0
 LINE_COUNT                      DC.B     0
 LINE_MAX                        DC.B     20
             END     START        ; last line of source
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
