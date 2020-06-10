@@ -62,6 +62,8 @@ CHECK_ORDER     MOVE.L  A2,D3
                 MOVE.L  A3,D4
                 CMP.L   D3,D4               ; make sure first input is less than second input
                 BLT     RESET_INPUT
+                LEA     NEW_LINE,A5
+                JSR     PRINTNULL
                                
 DISASSEMBLE     ;MOVE.L  A2,A6               ; loads current address in D1
                 ; MOVE.L  #1,D4               ; tells subroutine we want to make the address print as a long
@@ -70,7 +72,7 @@ DISASSEMBLE     ;MOVE.L  A2,A6               ; loads current address in D1
                 MOVE.B  LINE_COUNT,D2       ; move to D2 for editing
                 ADD.B   #1,D2               ; add 1 to counter
                 MOVE.B  D2,LINE_COUNT       ; store back in the variable
-                    
+                
                 JSR     OPCODE_DECODE       ; decode the opcode
                 
                 JSR     CHECK_LINE          ; check if max number of lines on screen has been reached
@@ -228,13 +230,13 @@ PRINT_ADDR      ;MOVEM.L D1/D4,-(SP)             ; saves D1 and D4
 
 OPCODE_DECODE   MOVE.W  A2,A6
                 MOVE.W  (A2)+,D0                ; load instruction word from memory, store in D0
+                JSR     PRINT_ADDR
                 
 
 *---------------NOP opcode----------------------                
 CASE_NOP        CMP.W   #$4E71,D0               ; compares to NOP opcode in hex
                 BNE     CASE_MOVE               ; checks the next case if not equal
                 
-                JSR     PRINT_ADDR
                 LEA     MSG_NOP,A5              ; loads string pointer into A5
                 JSR     PRINTNULL               ; prints NOP                
                 RTS                             ; returns from the subroutine
@@ -273,7 +275,6 @@ CASE_MOVE       MOVE.W  D0,D1                   ; stores d0 in d1
                 CMP.W   #$0040, D1               ; confirms if it is a MOVEA
                 BEQ     INSERTA                  ; branches to MOVEA, otherwise it is a normal MOVE
                 
-                JSR     PRINT_ADDR               ; print address
                 LEA     MSG_MOVE,A5              ; loads string pointer for MOVE into A5
                 JSR     PRINTNULL                ; prints out MOVE
                 JSR     PRINTMOVESIZE            ; prints out the size 
@@ -321,7 +322,6 @@ MOVEM_REG2MEM   ; loads EA and XN
                 JSR     CHECKGET_EAXN
                 CMP.W   #1,D1                           ; checks if D1 invalid
                 BEQ     CASE_DATA                       ; if invalid go to CASE_DATA
-                JSR     PRINT_ADDR                      ; prints the address
                 LEA     MSG_MOVEM,A5                    ; loads MOVEM
                 JSR     PRINTNULL                       ; prints MOVEM
                 
@@ -352,7 +352,6 @@ MOVEM_MEM2REG  ; loads EA and XN
                 JSR     CHECKGET_EAXN
                 CMP.W   #1,D1                           ; checks if D1 invalid
                 BEQ     CASE_DATA                       ; if invalid go to CASE_DATA
-                JSR     PRINT_ADDR                      ; prints the address
                 LEA     MSG_MOVEM,A5                    ; loads MOVEM
                 JSR     PRINTNULL                       ; prints MOVEM
                 
@@ -396,9 +395,7 @@ CASE_MOVEQ      MOVE.W  D0,D1
                 MOVE.W  D1,D3                          ;copy data into D3
                                                       ;must convert bits to hex
                                 
-PRINT_MOVEQ     JSR     PRINT_ADDR                      ; print address
-
-                LEA     MSG_MOVEQ,A5                    ;PRINT MOVEQ
+PRINT_MOVEQ     LEA     MSG_MOVEQ,A5                    ;PRINT MOVEQ
                 JSR     PRINTNULL  
                 
                 LEA     MSG_3SPACES,A5                  ; loads spaces
@@ -420,9 +417,7 @@ CASE_ADD        MOVE.W  D0,D1
                 AND.W   #$F000,D1
                 CMP.W   #$D000,D1
                 BNE     CASE_ADDQ
- 
-                JSR     PRINT_ADDR              ; print address
-                
+                 
                 JSR     ADD_SUB_HELP
                 
                 ; bits 7-8 determine if it is ADDA or ADD
@@ -574,7 +569,6 @@ CASE_ADDQ       MOVE.W      D0,D1
                 CMP.W       #$5000,D1
                 BNE         CASE_SUB
                                                  
-                JSR         PRINT_ADDR              ; print address  
                 LEA         MSG_ADDQ,A5             ; print ADDQ
                 JSR         PRINTNULL
                 
@@ -655,7 +649,6 @@ CASE_SUB        MOVE.W      D0,D1                                ; Copies instru
                 BNE         CASE_LEA
                
                 JSR         ADD_SUB_HELP
-                JSR         PRINT_ADDR                          ; print address                              
                 
                 BRA         PRINTSUB                            ; Branches to print sub
 
@@ -767,7 +760,6 @@ CASE_AND        MOVE.W      D0,D1                           ; bitmask for 4 MSB
                 CMP.W       #3,D6
                 BEQ         INV_INSTR
                 
-                JSR         PRINT_ADDR                      ; print address
                 LEA         MSG_AND,A5                      ; print AND
                 JSR         PRINTNULL
                 
@@ -828,7 +820,6 @@ CASE_OR         MOVE.W      D0,D1                           ; bitmask for 4 MSB
                 MOVE.W      D1,D6
                 BEQ         INV_INSTR
                 
-                JSR         PRINT_ADDR                      ; print address
                 
                 LEA         MSG_OR,A5
                 JSR         PRINTNULL                       ; print "OR"
@@ -864,9 +855,7 @@ CASE_NOT        MOVE.W      D0,D1                           ; bitmask for 4 MSB
                 MOVE.W      D1,D6                         
                 CMP.W       #3,D6
                 BEQ         INV_INSTR
-                
-                JSR         PRINT_ADDR
-                
+                                
                 LEA         MSG_NOT,A5
                 JSR         PRINTNULL                       ; print "NOT"
                                
@@ -911,8 +900,7 @@ CASE_ASdMEM     LEA         MSG_ASd,A5                       ; loads AS into A5
 
 CASE_ROdMEM     LEA         MSG_ROd,A5                       ; loads AS into A5          
                 
-PRINTSHIFTMEM   JSR         PRINT_ADDR                       ; prints address
-                JSR         PRINTNULL                        ; Prints LS or AS or RO 
+PRINTSHIFTMEM   JSR         PRINTNULL                        ; Prints LS or AS or RO 
                 MOVE.W      D0,D2                            ; copies D0 to D2
                 JSR         GETDIRECTION                     ; gets direction
                 CMP.W       #0,D2                            ; checking if its right
@@ -978,8 +966,7 @@ CASE_ASdREG     LEA         MSG_ASd,A5                       ; loads AS into A5
 
 CASE_ROdREG     LEA         MSG_ROd,A5                       ; loads AS into A5          
                 
-PRINTSHIFTREG   JSR         PRINT_ADDR                       ; prints address
-                JSR         PRINTNULL                        ; Prints LS or AS or RO 
+PRINTSHIFTREG   JSR         PRINTNULL                        ; Prints LS or AS or RO 
                 MOVE.W      D0,D2                            ; copies D0 to D2
                 JSR         GETDIRECTION                     ; gets direction
                 CMP.W       #0,D2                            ; checking if its right
@@ -1051,7 +1038,6 @@ CASE_BRA        MOVE.W  D0,D1                                ; Copies instructio
                 CMP.W   #$6000,D1                            ; Checks if it fits the BRA opcode
                 BNE.W   CASE_BCC                             ; If its not, check BCC
                 
-                JSR     PRINT_ADDR
                 LEA     MSG_BRA,A5                           ; loads string pointer for BRA into A5
                 JSR     PRINTNULL                            ; prints BRA
                 LEA     MSG_7SPACES,A5                       ; loads spaces
@@ -1090,8 +1076,7 @@ CASE_BLE        LEA     MSG_BLE,A5                           ; loads string poin
 CASE_BGT        LEA     MSG_BGT,A5                           ; loads string pointer for BGT into A5
                 BRA     PRINTBCC
 
-PRINTBCC        JSR     PRINT_ADDR                           ; prints address
-                JSR     PRINTNULL                            ; prints BEQ/BLE/BGT
+PRINTBCC        JSR     PRINTNULL                            ; prints BEQ/BLE/BGT
                 LEA     MSG_7SPACES,A5                       ; loads spaces
                 JSR     PRINTNULL                            ; prints out spaces
                 MOVE.W  D0,D2                                ; Copies instruction word to D1
@@ -1103,7 +1088,6 @@ CASE_JSR
 
 CASE_RTS        CMP.W   #$4E75,D0           ; compares to RTS opcode in hex
                 BNE     CASE_DATA           ; checks the next case if not equal
-                JSR     PRINT_ADDR          ; prints address
                 LEA     MSG_RTS,A5          ; loads string pointer into A5
                 JSR     PRINTNULL           ; prints RTS                
                 RTS                         ; returns from the subroutine
@@ -1690,7 +1674,7 @@ STARTING                        DC.B    'Please enter a starting location in the
 ENDING                          DC.B    'Please enter an ending location in the above format',CR,LF,0
 BAD_INPUT                       DC.B    'Invalid input. Please try again',CR,LF,0
 ERROR_MSG                       DC.B    'Error while disassembling',CR,LF,0
-INVALID_INSTR                   DC.B    '1000    ',TAB,'DATA',0
+INVALID_INSTR                   DC.B    TAB,'DATA',0
 DONE                            DC.B    'Finished Disassembling. Press R to restart. Any other key to end.',CR,LF,0
 CONTINUE                        DC.B    CR,LF,'Press ENTER to continue disassembling.',CR,LF,0
 NEW_LINE                        DC.B    CR,LF,0
@@ -1770,8 +1754,9 @@ OPMODE_VAR                      EQU     $300 * Hold bits 8-6
 EA_MODE                         EQU     $350 * Hold bits 5-3
 EA_REG                          EQU     $400 * Hold bits 2-0
 LINE_COUNT                      DC.B     0
-LINE_MAX                        DC.B     15
+LINE_MAX                        DC.B     20
             END     START        ; last line of source
+
 
 *~Font name~Courier New~
 *~Font size~10~
