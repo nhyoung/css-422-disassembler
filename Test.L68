@@ -1,12 +1,12 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 6/2/2020 4:16:21 AM
+Created On: 6/10/2020 2:39:37 AM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      :  Test Code
 00000000                             3  * Written by :  Audrey Nguyen
-00000000                             4  * Date       :  05/16/2020
-00000000                             5  * Description:  Version 3
+00000000                             4  * Date       :  06/10/2020
+00000000                             5  * Description:  Version 4
 00000000                             6  *-----------------------------------------------------------
 00001000                             7      ORG    $1000
 00001000                             8  START:                  
@@ -745,45 +745,98 @@ Created On: 6/2/2020 4:16:21 AM
 00001620  E300                     741                  ASL.B       #1,D0
 00001622  E542                     742                  ASL.W       #2,D2
 00001624  E783                     743                  ASL.L       #3,D3
-00001626                           744                 
-00001626                           745      
-00001626                           746  * ASR test
-00001626                           747  ASRTEST
-00001626  E200                     748                  ASR.B       #1,D0
-00001628  E442                     749                  ASR.W       #2,D2
-0000162A  E683                     750                  ASR.L       #3,D3
-0000162C                           751      
-0000162C                           752  * JSR & RTS test
-0000162C                           753  JSRTEST             
-0000162C  4EB9 00001672            754                  JSR     SUBROUTINE
-00001632                           755  * Bcc & BRA test 
-00001632                           756  BCCTEST
-00001632  6400 0036                757                  BCC         BRANCH
-00001636  6500 0032                758                  BCS         BRANCH
-0000163A  6700 002E                759                  BEQ         BRANCH
-0000163E  6600 002A                760                  BNE         BRANCH
-00001642  6C00 0026                761                  BGE         BRANCH
-00001646  6E00 0022                762                  BGT         BRANCH
-0000164A  6200 001E                763                  BHI         BRANCH
-0000164E  6F00 001A                764                  BLE         BRANCH
-00001652  6300 0016                765                  BLS         BRANCH
-00001656  6D00 0012                766                  BLT         BRANCH
-0000165A  6B00 000E                767                  BMI         BRANCH
-0000165E  6A00 000A                768                  BPL         BRANCH
-00001662  6800 0006                769                  BVC         BRANCH
-00001666  6900 0002                770                  BVS         BRANCH
-0000166A                           771  
-0000166A                           772  BRANCH 
-0000166A                           773  BRATEST
-0000166A  6000 0002                774                  BRA         TESTBRANCH
-0000166E                           775                  
-0000166E                           776  TESTBRANCH                
-0000166E                           777  
-0000166E  FFFF FFFF                778      SIMHALT             ; halt simulator
-00001672                           779  
-00001672  4E75                     780  SUBROUTINE      RTS
-00001674                           781  
-00001674                           782      END    START        ; last line of source
+00001626                           744                  
+00001626  E121                     745                  ASL.B       D0,D1
+00001628  E567                     746                  ASL.W       D2,D7
+0000162A  E7A4                     747                  ASL.L       D3,D4
+0000162C                           748                  
+0000162C  E1F9 0000A000            749                  ASL.W       $0000A000
+00001632  E1EC 0021                750                  ASL.W       $21(A4)
+00001636  E1D6                     751                  ASL.W       (A6)
+00001638  E1D9                     752                  ASL.W       (A1)+
+0000163A  E1E2                     753                  ASL.W       -(A2)
+0000163C                           754                 
+0000163C                           755      
+0000163C                           756  * ASR test
+0000163C                           757  ASRTEST
+0000163C  E200                     758                  ASR.B       #1,D0
+0000163E  E442                     759                  ASR.W       #2,D2
+00001640  E683                     760                  ASR.L       #3,D3
+00001642                           761                  
+00001642  E021                     762                  ASR.B       D0,D1
+00001644  E467                     763                  ASR.W       D2,D7
+00001646  E6A4                     764                  ASR.L       D3,D4
+00001648                           765                  
+00001648  E0F9 0000A000            766                  ASR.W       $0000A000
+0000164E  E0F9 0000BBBB            767                  ASR.W       $BBBB
+00001654  E0D6                     768                  ASR.W       (A6)
+00001656  E0D9                     769                  ASR.W       (A1)+
+00001658  E0E2                     770                  ASR.W       -(A2)
+0000165A                           771  * ROL test
+0000165A                           772  ROLTEST 
+0000165A  E318                     773                  ROL.B       #1,D0
+0000165C  E55A                     774                  ROL.W       #2,D2
+0000165E  E79B                     775                  ROL.L       #3,D3
+00001660                           776                  
+00001660  E139                     777                  ROL.B       D0,D1
+00001662  E57F                     778                  ROL.W       D2,D7
+00001664  E7BC                     779                  ROL.L       D3,D4
+00001666                           780                  
+00001666  E7F9 0000A000            781                  ROL.W       $0000A000
+0000166C  E7EC 0021                782                  ROL.W       $21(A4)
+00001670  E7D6                     783                  ROL.W       (A6)
+00001672  E7D9                     784                  ROL.W       (A1)+
+00001674  E7E2                     785                  ROL.W       -(A2)
+00001676                           786                 
+00001676                           787      
+00001676                           788  * ROR test
+00001676                           789  RORTEST
+00001676  E218                     790                  ROR.B       #1,D0
+00001678  E45A                     791                  ROR.W       #2,D2
+0000167A  E69B                     792                  ROR.L       #3,D3
+0000167C                           793                  
+0000167C  E039                     794                  ROR.B       D0,D1
+0000167E  E47F                     795                  ROR.W       D2,D7
+00001680  E6BC                     796                  ROR.L       D3,D4
+00001682                           797                  
+00001682  E6F9 0000A000            798                  ROR.W       $0000A000
+00001688  E6F9 0000BBBB            799                  ROR.W       $BBBB
+0000168E  E6D6                     800                  ROR.W       (A6)
+00001690  E6D9                     801                  ROR.W       (A1)+
+00001692  E6E2                     802                  ROR.W       -(A2)
+00001694                           803  
+00001694                           804      
+00001694                           805  * JSR & RTS test
+00001694                           806  JSRTEST             
+00001694  4EB9 000016DA            807                  JSR     SUBROUTINE
+0000169A                           808  * Bcc & BRA test 
+0000169A                           809  BCCTEST
+0000169A  6400 0036                810                  BCC         BRANCH
+0000169E  6500 0032                811                  BCS         BRANCH
+000016A2  6700 002E                812                  BEQ         BRANCH
+000016A6  6600 002A                813                  BNE         BRANCH
+000016AA  6C00 0026                814                  BGE         BRANCH
+000016AE  6E00 0022                815                  BGT         BRANCH
+000016B2  6200 001E                816                  BHI         BRANCH
+000016B6  6F00 001A                817                  BLE         BRANCH
+000016BA  6300 0016                818                  BLS         BRANCH
+000016BE  6D00 0012                819                  BLT         BRANCH
+000016C2  6B00 000E                820                  BMI         BRANCH
+000016C6  6A00 000A                821                  BPL         BRANCH
+000016CA  6800 0006                822                  BVC         BRANCH
+000016CE  6900 0002                823                  BVS         BRANCH
+000016D2                           824  
+000016D2                           825  BRANCH 
+000016D2                           826  BRATEST
+000016D2  6000 0002                827                  BRA         TESTBRANCH
+000016D6                           828                  
+000016D6                           829  TESTBRANCH                
+000016D6                           830  
+000016D6  FFFF FFFF                831      SIMHALT             ; halt simulator
+000016DA                           832  
+000016DA  4E75                     833  SUBROUTINE      RTS
+000016DC                           834  
+000016DC                           835      END    START        ; last line of source
 
 No errors detected
 No warnings generated
@@ -797,12 +850,12 @@ ADDQTEST            1344
 ADDTEST             122E
 ANDTEST             1464
 ASLTEST             1620
-ASRTEST             1626
-BCCTEST             1632
-BRANCH              166A
-BRATEST             166A
+ASRTEST             163C
+BCCTEST             169A
+BRANCH              16D2
+BRATEST             16D2
 DIVUTEST            1440
-JSRTEST             162C
+JSRTEST             1694
 LEATEST             1458
 LSLTEST             15E6
 LSRTEST             1602
@@ -812,7 +865,9 @@ MOVEQTEST           1222
 MOVETEST            1002
 MULSTEST            1428
 NOTTEST             15B0
+ROLTEST             165A
+RORTEST             1676
 START               1000
-SUBROUTINE          1672
+SUBROUTINE          16DA
 SUBTEST             1348
-TESTBRANCH          166E
+TESTBRANCH          16D6

@@ -1,8 +1,8 @@
 *-----------------------------------------------------------
 * Title      :  Test Code
 * Written by :  Audrey Nguyen
-* Date       :  05/16/2020
-* Description:  Version 3
+* Date       :  06/10/2020
+* Description:  Version 4
 *-----------------------------------------------------------
     ORG    $1000
 START:                  
@@ -741,6 +741,16 @@ ASLTEST
                 ASL.B       #1,D0
                 ASL.W       #2,D2
                 ASL.L       #3,D3
+                
+                ASL.B       D0,D1
+                ASL.W       D2,D7
+                ASL.L       D3,D4
+                
+                ASL.W       $0000A000
+                ASL.W       $21(A4)
+                ASL.W       (A6)
+                ASL.W       (A1)+
+                ASL.W       -(A2)
                
     
 * ASR test
@@ -748,6 +758,49 @@ ASRTEST
                 ASR.B       #1,D0
                 ASR.W       #2,D2
                 ASR.L       #3,D3
+                
+                ASR.B       D0,D1
+                ASR.W       D2,D7
+                ASR.L       D3,D4
+                
+                ASR.W       $0000A000
+                ASR.W       $BBBB
+                ASR.W       (A6)
+                ASR.W       (A1)+
+                ASR.W       -(A2)
+* ROL test
+ROLTEST 
+                ROL.B       #1,D0
+                ROL.W       #2,D2
+                ROL.L       #3,D3
+                
+                ROL.B       D0,D1
+                ROL.W       D2,D7
+                ROL.L       D3,D4
+                
+                ROL.W       $0000A000
+                ROL.W       $21(A4)
+                ROL.W       (A6)
+                ROL.W       (A1)+
+                ROL.W       -(A2)
+               
+    
+* ROR test
+RORTEST
+                ROR.B       #1,D0
+                ROR.W       #2,D2
+                ROR.L       #3,D3
+                
+                ROR.B       D0,D1
+                ROR.W       D2,D7
+                ROR.L       D3,D4
+                
+                ROR.W       $0000A000
+                ROR.W       $BBBB
+                ROR.W       (A6)
+                ROR.W       (A1)+
+                ROR.W       -(A2)
+
     
 * JSR & RTS test
 JSRTEST             
@@ -780,10 +833,6 @@ TESTBRANCH
 SUBROUTINE      RTS
 
     END    START        ; last line of source
-
-
-
-
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
