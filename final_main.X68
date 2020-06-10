@@ -1112,15 +1112,17 @@ CASE_JSR        MOVE.W  D0,D1                                ; check if JSR mand
                 CMP.W   #$4E80,D1
                 BNE     CASE_RTS
                 
-                ;loads Register
-                MOVE.W  #0,D1                               ; copies instruction word to D1
-                JSR     GET_XN                              ; gets XN and puts in D1
-                MOVE.W  D1,D3                               ; copies Xn to D3 so it won't be overwritten
+                MOVE.B  #0,D7
+                JSR CHECKGET_EAXN
                 
-                ;loads EA       
-                MOVE.W #0,D1
-                JSR     GET_EA
-                MOVE.W  D1,D4       
+PRINT_JSR       ;print JSR
+                LEA     MSG_JSR,A5
+                JSR     PRINTNULL
+                                
+                ;print address
+                JSR     EA_TO_STRING
+                
+                RTS     
 
 CASE_RTS        CMP.W   #$4E75,D0           ; compares to RTS opcode in hex
                 BNE     CASE_DATA           ; checks the next case if not equal
@@ -1759,6 +1761,7 @@ LINE_MAX                        DC.B     20
 *~Font size~10~
 *~Tab type~1~
 *~Tab size~4~
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
