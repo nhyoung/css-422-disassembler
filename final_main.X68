@@ -918,7 +918,7 @@ CASE_RIGHTMEM   LEA         MSG_RIGHT,A5                     ; loads R into A5
 PRINT_MEMDIR    JSR         PRINTNULL                        ; Prints L or R
                 LEA         MSG_W,A5                         ; loads .W into A5
                 JSR         PRINTNULL                        ; Prints .W
-                LEA         MSG_7SPACES,A5                   ; loads spaces
+                LEA         MSG_5SPACES,A5                   ; loads spaces
                 JSR         PRINTNULL                        ; prints out spaces
                 BRA         GETMEMSOURCE                     ; checks the source 
                 
@@ -1002,16 +1002,16 @@ REG_LONG        LEA         MSG_L,A5                         ; loads .L into A5
 PRINTREGEA      JSR         PRINTNULL                        ; Prints size
                 LEA         MSG_5SPACES,A5                   ; loads spaces
                 JSR         PRINTNULL                        ; prints out spaces
-                MOVE.W      D0,D2                            ; copies D0 to D1
+                MOVE.W      D0,D2                            ; copies D0 to D2
                 JSR         GETROTATIONLOCATION              ; finds out if its immediate or register 
-                CMP.W       #$1,D1                           ; Compares D1 to 0, if it is 0, it is a data register
-                BEQ         REG_REGISTER                     ; goes to ASd case if so
+                CMP.W       #$1,D2                           ; Compares D1 to 1, if it is 1, it is a data register
+                BEQ         REG_REGISTER                     ; goes to register case if so
                                 
 REG_IMMEDIATE   MOVE.W      D0,D2                            ; copies D0 to D2
-                JSR         GETROTATIONSIZE                  ; gets the rotation size
-                MOVE.W      D2, D1                           ; moves rotation size to D1
+                JSR         GETROTATION                      ; gets the rotation size
                 LEA         MSG_POUND, A5                    ; loads # into A5
                 JSR         PRINTNULL                        ; prints #
+                MOVE.W      D2, D1                           ; moves rotation size to D1
                 JSR         PRINTNUM                         ; prints shift count
                 LEA         MSG_COMMA, A5                    ; loads , into A5
                 JSR         PRINTNULL                        ; prints the comma out to divide the source and destination  
@@ -1224,7 +1224,7 @@ GETROTATIONSIZE     AND.W      #$00C0,D2            ; gets the rotation bits
 * Input: D2 = instruction word copy (of D0)                                    
 * Output: rotation location value in D2             
 GETROTATIONLOCATION AND.W      #$0020,D2            ; gets the rotation location bits
-                    LSR.W      #5,D2                ; shifts 6 bits to the right to only have the rotation bits
+                    LSR.W      #5,D2                ; shifts 5 bits to the right to only have the rotation bits
                     RTS                             ; return from subroutine
 
 * Prints out registers for MOVEM
@@ -1587,12 +1587,7 @@ ERROR           LEA     ERROR_MSG,A1
                 TRAP    #15 
        
 * DELETE THIS: Test                
-DELETEME        MOVEA.L  -(A1),A3
-                BEQ      DELETEMEAGAIN  
-                BLE      DELETEMEAGAIN
-                BGT      DELETEMEAGAIN
-
-                LSR.B      #2,D2
+DELETEME        LSR.B      #2,D2
                 LSR.W      -(A2)
                 LSR.W      (A2)+
                 LSR.L      D2,D2 
@@ -1607,17 +1602,7 @@ DELETEME        MOVEA.L  -(A1),A3
                 ROR.B      #2,D2
                 ROR.W      -(A2)
                 ROR.W      (A2)+
-                ROR.L      D2,D2
-                
-                ADDQ.W      #8,A5
-                ADDA.W      D2,A3
-                SUB.L       A3,A5        
-                OR.W        D3,D5
-                NOT.W       D2
-                
-                MULS.W    #$0010,D2
-                
-DELETEMEAGAIN                 
+                ROR.L      D2,D2              
           
     SIMHALT             ; halt simulator
 
@@ -1760,9 +1745,6 @@ EA_REG                          EQU     $400 * Hold bits 2-0
 LINE_COUNT                      DC.B     0
 LINE_MAX                        DC.B     20
             END     START        ; last line of source
-
-
-
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
