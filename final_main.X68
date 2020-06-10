@@ -413,7 +413,9 @@ PRINT_MOVEQ     LEA     MSG_MOVEQ,A5                    ;PRINT MOVEQ
                 
                 LEA     MSG_POUND, A5                     ;PRINT HASHTAG
                 JSR     PRINTNULL
-                RTS
+                RTS                                
+                                
+
                 
 *---------------ADD opcode----------------------                
 * get bits 0-5, 9-11, and 12-15 first (similarities between ADD and ADDA)
@@ -1009,10 +1011,17 @@ PRINTREGEA      JSR         PRINTNULL                        ; Prints size
                                 
 REG_IMMEDIATE   MOVE.W      D0,D2                            ; copies D0 to D2
                 JSR         GETROTATION                      ; gets the rotation size
-                LEA         MSG_POUND, A5                    ; loads # into A5
+                CMP.W       #0,D2                            ; checks if D2 is 0 (shift count of 8)
+                BNE         COMPLETE_REGIM                   ; if not shigt count of 8, then branch to start printing
+                
+MAKESHIFT8      MOVE.W      #8,D2                            ; sets shift cound to 8 (shift count of 8 is 000 in the opcode)
+                
+COMPLETE_REGIM  LEA         MSG_POUND, A5                    ; loads # into A5
                 JSR         PRINTNULL                        ; prints #
+                LEA         MSG_HEX, A5                      ; loads $ into A5
+                JSR         PRINTNULL                        ; prints $
                 MOVE.W      D2, D1                           ; moves rotation size to D1
-                JSR         PRINTNUM                         ; prints shift count
+                JSR         PRINTHEXNUM                      ; prints shift count
                 LEA         MSG_COMMA, A5                    ; loads , into A5
                 JSR         PRINTNULL                        ; prints the comma out to divide the source and destination  
                 LEA         MSG_DR, A5                       ; loads D into A5
@@ -1584,25 +1593,7 @@ FINISHMOVE      JSR     PRINTNULL           ; prints out the size
 
 ERROR           LEA     ERROR_MSG,A1
                 MOVE.B  #14,D0
-                TRAP    #15 
-       
-* DELETE THIS: Test                
-DELETEME        LSR.B      #2,D2
-                LSR.W      -(A2)
-                LSR.W      (A2)+
-                LSR.L      D2,D2 
-                LSL.B      #2,D2
-                LSL.W      -(A2)
-                LSL.W      (A2)+
-                LSL.L      D2,D2
-                ROL.B      #2,D2
-                ROL.W      -(A2)
-                ROL.W      (A2)+
-                ROL.L      D2,D2
-                ROR.B      #2,D2
-                ROR.W      -(A2)
-                ROR.W      (A2)+
-                ROR.L      D2,D2              
+                TRAP    #15   
           
     SIMHALT             ; halt simulator
 
