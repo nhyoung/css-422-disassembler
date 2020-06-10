@@ -399,34 +399,32 @@ CASE_MOVEQ      MOVE.W  D0,D1
                 MOVE.W  D1,D4                           ;copy data into D4
                                                         ;must convert bits to hex
                                 
-PRINT_MOVEQ     JSR     PRINT_ADDR                      ; print address
-
-                LEA     MSG_MOVEQ,A5                    ;PRINT MOVEQ
+PRINT_MOVEQ     LEA     MSG_MOVEQ,A5                    ;PRINT MOVEQ
                 JSR     PRINTNULL  
                                 
                 LEA     MSG_L,A5                        ;PRINT SIZE L
                 JSR     PRINTNULL
     
-                LEA     THREE_TAB,A5                    ;PRINT THREE TABS
+                LEA     MSG_3SPACES,A5                  ;PRINT THREE TABS
                 JSR     PRINTNULL
                 
                 LEA     MSG_POUND, A5                   ;PRINT HASHTAG
                 JSR     PRINTNULL
                 
+                LEA     MSG_HEX, A5                     ;PRINT DOLLAR SIGN
+                JSR     PRINTNULL
+                
                 MOVE.W  D4,D1                           ;PRINT DATA
-                MOVE.B  #16,D2                          
-                MOVE.B  #15,D0                          
-                TRAP    #15                             
+                JSR     PRINTHEXNUM                           
                 
                 LEA     MSG_COMMA, A5                   ;PRINT COMMA
                 JSR     PRINTNULL
                 
-                LEA     MSG_DR,A5                        ;PRINT D
+                LEA     MSG_DR,A5                       ;PRINT D
                 JSR     PRINTNULL
           
-                MOVE.W  D3,D1
-                MOVE.B  #15,D0                          ;PRINT REGISTER NUM
-                TRAP    #15
+                MOVE.W  D3,D1                           ;PRINT REGISTER NUMBER
+                JSR     PRINTNUM                         
                 
                 RTS
                 
@@ -1074,7 +1072,6 @@ CASE_BRA        MOVE.W  D0,D1                                ; Copies instructio
                 RTS
                 
 ; DO NOT MOVE THIS FORM UNDER CASE_BRA. IS DEPENDENT ON RESULTS OF BRA
-; DELETE THIS NOTE: NEED TO FIX LSL/LSR SHIFT TO ENSURE THE BCC CODES GET PRINTED 
 CASE_BCC        MOVE.W  D0,D1                                ; copies instruction word from D0 to D1
                 AND.W   #$F000,D1                            ; get top 4 bits
                 CMP.W   #$6000,D1                            ; make sure top 4 bits are 6
@@ -1225,13 +1222,13 @@ GETDISPLACEMENT     MOVEM.L    D1/A5, -(SP)         ; saves D1
                     
 PRINTADDRESS        ADD.W     A5,D2                 ; Adds address to D2 to get displacement
                     MOVE.W    D2,D1                 ; moves address to D1 for printing
-                    MOVE.B    #0,D4                 ; marks address as word  length
+                    MOVE.B    #0,D4                 ; marks address as word length
                     LEA       MSG_HEX,A5            ; loads hex sign to A5
                     JSR       PRINTNULL             ; prints null
                     JSR       PRINTSHORTLONGNUM     ; prints address
                     
                     MOVEM.L    (SP)+,D1/A5              ; restores D1
-                    ; DELETE LATER. NOTE: WE DONT HAVE HEX YET, PRINT HEX SIGN BEFORE NUM, BUT WILL NEED TO ADD THIS LATER
+                    
 
 * Gets the rotation value for ASd and LSd
 * Input: D2 = instruction word copy (of D0)                                    
@@ -1426,7 +1423,6 @@ CASE_OTHER         MOVE     (A2)+, D0               ; Moves next instruction wor
                    CMP.W    #ABSLong,D3             ; checks if it is (An)
                    BEQ      CASE_LONG               ; branches to CASE_LONG if is a long
 
-* NOTE DELETE LATER: update to print num as HEX and add NEGATIVE NUMBER CHECK
 * immediate
 CASE_IMMEDIATE     LEA      MSG_POUND,A5            ; Loads # into A5
                    JSR      PRINTNULL               ; Prints #  
@@ -1436,8 +1432,6 @@ CASE_IMMEDIATE     LEA      MSG_POUND,A5            ; Loads # into A5
                    JSR      PRINTHEXNUM 
                    BRA      EA_TO_STRING_EXIT       ; exits subroutine                  
                    
-; DELETE LATER: convert to hex andwrite code to make them print out a total of 4 and 8 characters, add 0's                      
-
 * word address
 CASE_WORD          
                    LEA      MSG_HEX,A5              ; Loads $ into A5
@@ -1461,8 +1455,6 @@ CASE_LONG
 * exits subroutine
 EA_TO_STRING_EXIT   MOVEM.L  (SP)+,D0-D1/A5          ; restoers D1, D0, and A5
                     RTS                              ; returns from subroutine
-
-* DELETE LATER: sorry the formatting is weird here we can fix it later or whenever you want  im just lazy for now
 
 * Prints out the content of D1 as a decimal number
 * Input: number in D1 to be printed
@@ -1619,7 +1611,7 @@ FINISHMOVE      JSR     PRINTNULL           ; prints out the size
 
 ERROR           LEA     ERROR_MSG,A1
                 MOVE.B  #14,D0
-                TRAP    #15   
+                TRAP    #15 
           
     SIMHALT             ; halt simulator
 
@@ -1763,6 +1755,10 @@ LINE_COUNT                      DC.B     0
 LINE_MAX                        DC.B     20
             END     START        ; last line of source
 
+*~Font name~Courier New~
+*~Font size~10~
+*~Tab type~1~
+*~Tab size~4~
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
