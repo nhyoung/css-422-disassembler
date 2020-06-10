@@ -104,6 +104,10 @@ RESTART         MOVE.B  #11, D0             Task 11 - Clear screen
                 MOVE.B  #1,D1               Visible
                 TRAP    #15
                 
+                MOVE.B  LINE_COUNT,D2       ; move to D2 for editing
+                MOVE.B  #0,D2               ; set variable to 0
+                MOVE.B  D2,LINE_COUNT       ; store back in the variable
+ 
                 MOVE.L  #$0000000, A0       ; Reset A1
                 MOVE.L  #$0000000, A1       ; Reset A1
                 MOVE.L  #$0000000, A2       ; Reset A2
@@ -1756,6 +1760,7 @@ EA_REG                          EQU     $400 * Hold bits 2-0
 LINE_COUNT                      DC.B     0
 LINE_MAX                        DC.B     20
             END     START        ; last line of source
+
 
 
 *~Font name~Courier New~
