@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 6/9/2020 6:47:49 PM
+Created On: 6/9/2020 6:49:35 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : Final Project
@@ -1758,7 +1758,7 @@ Created On: 6/9/2020 6:47:49 PM
 0000256B  =00000350               1754  EA_MODE                         EQU     $350 * Hold bits 5-3
 0000256B  =00000400               1755  EA_REG                          EQU     $400 * Hold bits 2-0
 0000256B= 00                      1756  LINE_COUNT                      DC.B     0
-0000256C= 19                      1757  LINE_MAX                        DC.B     25
+0000256C= 14                      1757  LINE_MAX                        DC.B     20
 0000256D                          1758              END     START        ; last line of source
 
 No errors detected
