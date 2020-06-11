@@ -1,6 +1,6 @@
 00001000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 6/10/2020 7:28:53 PM
+Created On: 6/10/2020 7:45:41 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      : Final Project
@@ -26,7 +26,7 @@ Created On: 6/10/2020 7:28:53 PM
 0000101E  4E4F                      22                  TRAP    #15
 00001020                            23              
 00001020  227C 00000000             24  INPUT1          MOVE.L  #$0000000, A1       ;clear A1
-00001026  43F9 000023F6             25                  LEA     STARTING,A1         ; output starting address message
+00001026  43F9 0000240B             25                  LEA     STARTING,A1         ; output starting address message
 0000102C  103C 000E                 26                  MOVE.B  #14,D0
 00001030  4E4F                      27                  TRAP    #15
 00001032                            28              
@@ -45,7 +45,7 @@ Created On: 6/10/2020 7:28:53 PM
 00001066                            41    
 00001066  143C 0002                 42  INPUT2          MOVE.B  #2,D2
 0000106A  227C 00000000             43                  MOVE.L  #$0000000, A1       ;clear A1
-00001070  43F9 0000242D             44                  LEA     ENDING,A1           ; output ending address message
+00001070  43F9 00002442             44                  LEA     ENDING,A1           ; output ending address message
 00001076  103C 000E                 45                  MOVE.B  #14,D0
 0000107A  4E4F                      46                  TRAP    #15         
 0000107C                            47  
@@ -66,16 +66,16 @@ Created On: 6/10/2020 7:28:53 PM
 000010B0  280B                      62                  MOVE.L  A3,D4
 000010B2  B883                      63                  CMP.L   D3,D4               ; make sure first input is less than second input
 000010B4  6D00 0120                 64                  BLT     RESET_INPUT
-000010B8  4BF9 00002516             65                  LEA     NEW_LINE,A5
+000010B8  4BF9 0000252B             65                  LEA     NEW_LINE,A5
 000010BE  4EB9 000022B2             66                  JSR     PRINTNULL
 000010C4                            67                  
-000010C4  1439 00002617             68                  MOVE.B  LINE_COUNT,D2       ; move to D2 for editing
+000010C4  1439 0000262C             68                  MOVE.B  LINE_COUNT,D2       ; move to D2 for editing
 000010CA  143C 0007                 69                  MOVE.B  #7,D2               ; set variable to 0
-000010CE  13C2 00002617             70                  MOVE.B  D2,LINE_COUNT       ; store back in the variabl
+000010CE  13C2 0000262C             70                  MOVE.B  D2,LINE_COUNT       ; store back in the variabl
 000010D4                            71                                 
-000010D4  1439 00002617             72  DISASSEMBLE     MOVE.B  LINE_COUNT,D2       ; move to D2 for editing
+000010D4  1439 0000262C             72  DISASSEMBLE     MOVE.B  LINE_COUNT,D2       ; move to D2 for editing
 000010DA  5202                      73                  ADD.B   #1,D2               ; add 1 to counter
-000010DC  13C2 00002617             74                  MOVE.B  D2,LINE_COUNT       ; store back in the variable
+000010DC  13C2 0000262C             74                  MOVE.B  D2,LINE_COUNT       ; store back in the variable
 000010E2                            75                  
 000010E2  4EB9 0000128E             76                  JSR     OPCODE_DECODE       ; decode the opcode
 000010E8                            77                  
@@ -86,7 +86,7 @@ Created On: 6/10/2020 7:28:53 PM
 000010F6  6FDC                      82                  BLE     DISASSEMBLE         ; if not, loop
 000010F8                            83                  
 000010F8                            84  
-000010F8  4BF9 000024A7             85  FINISHED        LEA     DONE,A5
+000010F8  4BF9 000024BC             85  FINISHED        LEA     DONE,A5
 000010FE  4EB9 000022B2             86                  JSR     PRINTNULL
 00001104  103C 0005                 87                  MOVE.B  #5,D0
 00001108  4E4F                      88                  TRAP    #15
@@ -108,9 +108,9 @@ Created On: 6/10/2020 7:28:53 PM
 0000112E  123C 0001                104                  MOVE.B  #1,D1               Visible
 00001132  4E4F                     105                  TRAP    #15
 00001134                           106                  
-00001134  1439 00002617            107                  MOVE.B  LINE_COUNT,D2       ; move to D2 for editing
+00001134  1439 0000262C            107                  MOVE.B  LINE_COUNT,D2       ; move to D2 for editing
 0000113A  143C 0000                108                  MOVE.B  #0,D2               ; set variable to 0
-0000113E  13C2 00002617            109                  MOVE.B  D2,LINE_COUNT       ; store back in the variable
+0000113E  13C2 0000262C            109                  MOVE.B  D2,LINE_COUNT       ; store back in the variable
 00001144                           110   
 00001144  207C 00000000            111                  MOVE.L  #$0000000, A0       ; Reset A1
 0000114A  227C 00000000            112                  MOVE.L  #$0000000, A1       ; Reset A1
@@ -130,13 +130,13 @@ Created On: 6/10/2020 7:28:53 PM
 00001182  6000 FE7C                126                  BRA     START               ; branch to start of program
 00001186                           127  
 00001186                           128  *--------------------SUBROUTINES------------------
-00001186  1439 00002617            129  CHECK_LINE      MOVE.B  LINE_COUNT,D2
-0000118C  1639 00002618            130                  MOVE.B  LINE_MAX,D3                
+00001186  1439 0000262C            129  CHECK_LINE      MOVE.B  LINE_COUNT,D2
+0000118C  1639 0000262D            130                  MOVE.B  LINE_MAX,D3                
 00001192  B602                     131                  CMP.B   D2,D3 ; compare number of lines on screen with maximum
 00001194  6F00 0004                132                  BLE     NEXT_SCREEN         ; if max line count has been reached go to next screen
 00001198  4E75                     133                  RTS
 0000119A                           134  
-0000119A  4BF9 000024EB            135  NEXT_SCREEN     LEA     CONTINUE,A5
+0000119A  4BF9 00002500            135  NEXT_SCREEN     LEA     CONTINUE,A5
 000011A0  4EB9 000022B2            136                  JSR     PRINTNULL
 000011A6  6000 0002                137                  BRA     READ_KEY
 000011AA                           138                  
@@ -152,9 +152,9 @@ Created On: 6/10/2020 7:28:53 PM
 000011C2  4E4F                     148                  TRAP    #15                 Call Trap
 000011C4                           149                  
 000011C4                           150                  ; reset line counter
-000011C4  1439 00002617            151                  MOVE.B  LINE_COUNT,D2
+000011C4  1439 0000262C            151                  MOVE.B  LINE_COUNT,D2
 000011CA  143C 0000                152                  MOVE.B  #$0,D2
-000011CE  13C2 00002617            153                  MOVE.B  D2,LINE_COUNT
+000011CE  13C2 0000262C            153                  MOVE.B  D2,LINE_COUNT
 000011D4  4E75                     154                  RTS       
 000011D6                           155      
 000011D6                           156  
@@ -202,7 +202,7 @@ Created On: 6/10/2020 7:28:53 PM
 00001244  4283                     198                  CLR.L   D3
 00001246  4284                     199                  CLR.L   D4
 00001248  4285                     200                  CLR.L   D5
-0000124A  43F9 00002463            201                  LEA     BAD_INPUT,A1        ; output invalid message
+0000124A  43F9 00002478            201                  LEA     BAD_INPUT,A1        ; output invalid message
 00001250  103C 000E                202                  MOVE.B  #14,D0
 00001254  4E4F                     203                  TRAP    #15
 00001256  B47C 0001                204                  CMP     #1,D2
@@ -242,7 +242,7 @@ Created On: 6/10/2020 7:28:53 PM
 00001296  B07C 4E71                238  CASE_NOP        CMP.W   #$4E71,D0               ; compares to NOP opcode in hex
 0000129A  6600 0010                239                  BNE     CASE_MOVE               ; checks the next case if not equal
 0000129E                           240                  
-0000129E  4BF9 0000251D            241                  LEA     MSG_NOP,A5              ; loads string pointer into A5
+0000129E  4BF9 00002532            241                  LEA     MSG_NOP,A5              ; loads string pointer into A5
 000012A4  4EB9 000022B2            242                  JSR     PRINTNULL               ; prints NOP                
 000012AA  4E75                     243                  RTS                             ; returns from the subroutine
 000012AC                           244  
@@ -280,17 +280,17 @@ Created On: 6/10/2020 7:28:53 PM
 00001308  B27C 0040                276                  CMP.W   #$0040, D1               ; confirms if it is a MOVEA
 0000130C  6700 0024                277                  BEQ     INSERTA                  ; branches to MOVEA, otherwise it is a normal MOVE
 00001310                           278                  
-00001310  4BF9 00002522            279                  LEA     MSG_MOVE,A5              ; loads string pointer for MOVE into A5
+00001310  4BF9 00002537            279                  LEA     MSG_MOVE,A5              ; loads string pointer for MOVE into A5
 00001316  4EB9 000022B2            280                  JSR     PRINTNULL                ; prints out MOVE
 0000131C  4EB9 000022D4            281                  JSR     PRINTMOVESIZE            ; prints out the size 
-00001322  4BF9 000025F4            282                  LEA     MSG_4SPACES,A5           ; loads spaces
+00001322  4BF9 00002609            282                  LEA     MSG_4SPACES,A5           ; loads spaces
 00001328  4EB9 000022B2            283                  JSR     PRINTNULL                ; prints out spaces
 0000132E  6000 0020                284                  BRA     PRINTMOVE                ; Branches to print move
 00001332                           285                  
-00001332  4BF9 00002528            286  INSERTA         LEA     MSG_MOVEA,A5             ; loads string pointer for MOVEA into A5
+00001332  4BF9 0000253D            286  INSERTA         LEA     MSG_MOVEA,A5             ; loads string pointer for MOVEA into A5
 00001338  4EB9 000022B2            287                  JSR     PRINTNULL                ; prints out MOVEA
 0000133E  4EB9 000022D4            288                  JSR     PRINTMOVESIZE            ; prints out the size 
-00001344  4BF9 000025F0            289                  LEA     MSG_3SPACES,A5           ; loads spaces
+00001344  4BF9 00002605            289                  LEA     MSG_3SPACES,A5           ; loads spaces
 0000134A  4EB9 000022B2            290                  JSR     PRINTNULL                ; prints out spaces
 00001350                           291   
 00001350  3404                     292  PRINTMOVE       MOVE.W  D4,D2                    ; Moves D4 (source effective address) to D2
@@ -298,7 +298,7 @@ Created On: 6/10/2020 7:28:53 PM
 00001354  4EB9 00001FC0            294                  JSR     EA_TO_STRING             ; outputs it into a string
 0000135A                           295                  
 0000135A                           296                  ; prints a comma to seperate
-0000135A  4BF9 000025E7            297                  LEA     MSG_COMMA,A5             ; loads string pointer into A5
+0000135A  4BF9 000025FC            297                  LEA     MSG_COMMA,A5             ; loads string pointer into A5
 00001360  4EB9 000022B2            298                  JSR     PRINTNULL                ; prints out MOVE
 00001366                           299                  
 00001366                           300                  ; print destination
@@ -327,7 +327,7 @@ Created On: 6/10/2020 7:28:53 PM
 000013A0  4EB9 00001E52            323                  JSR     CHECKGET_EAXN
 000013A6  B27C 0001                324                  CMP.W   #1,D1                           ; checks if D1 invalid
 000013AA  6700 0A46                325                  BEQ     CASE_DATA                       ; if invalid go to CASE_DATA
-000013AE  4BF9 00002536            326                  LEA     MSG_MOVEM,A5                    ; loads MOVEM
+000013AE  4BF9 0000254B            326                  LEA     MSG_MOVEM,A5                    ; loads MOVEM
 000013B4  4EB9 000022B2            327                  JSR     PRINTNULL                       ; prints MOVEM
 000013BA                           328                  
 000013BA                           329                  ; finds and prints size
@@ -335,17 +335,17 @@ Created On: 6/10/2020 7:28:53 PM
 000013BC  C27C 0040                331                  AND.W   #$0040,D1                       ; gets the size bit
 000013C0  6600 000C                332                  BNE     REG2MEMLONG                     ; if it isn't 0 go to REG2MEMLONG
 000013C4                           333  
-000013C4  4BF9 00002611            334  REG2MEMWORD     LEA     MSG_W,A5                        ; loads .W
+000013C4  4BF9 00002626            334  REG2MEMWORD     LEA     MSG_W,A5                        ; loads .W
 000013CA  6000 0008                335                  BRA     PRINTREG2MEM                    ; prints the registers           
 000013CE                           336                  
-000013CE  4BF9 00002614            337  REG2MEMLONG     LEA     MSG_L,A5                        ; loads .L
+000013CE  4BF9 00002629            337  REG2MEMLONG     LEA     MSG_L,A5                        ; loads .L
 000013D4                           338             
 000013D4  4EB9 000022B2            339  PRINTREG2MEM    JSR     PRINTNULL                       ; prints size
-000013DA  4BF9 000025F0            340                  LEA     MSG_3SPACES,A5                  ; loads spaces
+000013DA  4BF9 00002605            340                  LEA     MSG_3SPACES,A5                  ; loads spaces
 000013E0  4EB9 000022B2            341                  JSR     PRINTNULL                       ; prints out spaces
 000013E6  383C 0001                342                  MOVE.W  #1,D4                           ; loads 1 into D4 to represent type
 000013EA  4EB9 00001EEA            343                  JSR     PRINTREGISTERS                  ; prints registers
-000013F0  4BF9 000025E7            344                  LEA     MSG_COMMA,A5                    ; loads comma
+000013F0  4BF9 000025FC            344                  LEA     MSG_COMMA,A5                    ; loads comma
 000013F6  4EB9 000022B2            345                  JSR     PRINTNULL                       ; prints comma
 000013FC  4EB9 00001FC0            346                  JSR     EA_TO_STRING                    ; prints EA
 00001402  4E75                     347                  RTS
@@ -357,7 +357,7 @@ Created On: 6/10/2020 7:28:53 PM
 00001414  4EB9 00001E52            353                  JSR     CHECKGET_EAXN
 0000141A  B27C 0001                354                  CMP.W   #1,D1                           ; checks if D1 invalid
 0000141E  6700 09D2                355                  BEQ     CASE_DATA                       ; if invalid go to CASE_DATA
-00001422  4BF9 00002536            356                  LEA     MSG_MOVEM,A5                    ; loads MOVEM
+00001422  4BF9 0000254B            356                  LEA     MSG_MOVEM,A5                    ; loads MOVEM
 00001428  4EB9 000022B2            357                  JSR     PRINTNULL                       ; prints MOVEM
 0000142E                           358                  
 0000142E                           359                  ; finds and prints size
@@ -365,16 +365,16 @@ Created On: 6/10/2020 7:28:53 PM
 00001430  C27C 0040                361                  AND.W   #$0040,D1                       ; gets the size bit
 00001434  6600 000C                362                  BNE     MEM2REGLONG                     ; if it isn't 0 go to MEM2REGLONG
 00001438                           363  
-00001438  4BF9 00002611            364  MEM2REGWORD     LEA     MSG_W,A5                        ; loads .W
+00001438  4BF9 00002626            364  MEM2REGWORD     LEA     MSG_W,A5                        ; loads .W
 0000143E  6000 0008                365                  BRA     PRINTMEM2REG                    ; prints the registers           
 00001442                           366                  
-00001442  4BF9 00002614            367  MEM2REGLONG     LEA     MSG_L,A5                        ; loads .L
+00001442  4BF9 00002629            367  MEM2REGLONG     LEA     MSG_L,A5                        ; loads .L
 00001448                           368             
 00001448  4EB9 000022B2            369  PRINTMEM2REG    JSR     PRINTNULL                       ; prints out size
-0000144E  4BF9 000025F0            370                  LEA     MSG_3SPACES,A5                  ; loads spaces
+0000144E  4BF9 00002605            370                  LEA     MSG_3SPACES,A5                  ; loads spaces
 00001454  4EB9 000022B2            371                  JSR     PRINTNULL                       ; prints out spaces
 0000145A  4EB9 00001FC0            372                  JSR     EA_TO_STRING                    ; prints EA
-00001460  4BF9 000025E7            373                  LEA     MSG_COMMA,A5                    ; loads comma
+00001460  4BF9 000025FC            373                  LEA     MSG_COMMA,A5                    ; loads comma
 00001466  4EB9 000022B2            374                  JSR     PRINTNULL                       ; prints comma
 0000146C  383C FFFF                375                  MOVE.W  #-1,D4                          ; loads -1 into D4 to represent type
 00001470  4EB9 00001EEA            376                  JSR     PRINTREGISTERS                  ; prints registers
@@ -398,28 +398,28 @@ Created On: 6/10/2020 7:28:53 PM
 00001498  3801                     394                  MOVE.W  D1,D4                           ;copy data into D4
 0000149A                           395                                                          ;must convert bits to hex
 0000149A                           396                                  
-0000149A  4BF9 0000252F            397  PRINT_MOVEQ     LEA     MSG_MOVEQ,A5                    ;PRINT MOVEQ
+0000149A  4BF9 00002544            397  PRINT_MOVEQ     LEA     MSG_MOVEQ,A5                    ;PRINT MOVEQ
 000014A0  4EB9 000022B2            398                  JSR     PRINTNULL  
 000014A6                           399                                  
-000014A6  4BF9 00002614            400                  LEA     MSG_L,A5                        ;PRINT SIZE L
+000014A6  4BF9 00002629            400                  LEA     MSG_L,A5                        ;PRINT SIZE L
 000014AC  4EB9 000022B2            401                  JSR     PRINTNULL
 000014B2                           402      
-000014B2  4BF9 000025F0            403                  LEA     MSG_3SPACES,A5                  ;PRINT THREE TABS
+000014B2  4BF9 00002605            403                  LEA     MSG_3SPACES,A5                  ;PRINT THREE TABS
 000014B8  4EB9 000022B2            404                  JSR     PRINTNULL
 000014BE                           405                  
-000014BE  4BF9 000025E3            406                  LEA     MSG_POUND, A5                   ;PRINT HASHTAG
+000014BE  4BF9 000025F8            406                  LEA     MSG_POUND, A5                   ;PRINT HASHTAG
 000014C4  4EB9 000022B2            407                  JSR     PRINTNULL
 000014CA                           408                  
-000014CA  4BF9 000025E5            409                  LEA     MSG_HEX, A5                     ;PRINT DOLLAR SIGN
+000014CA  4BF9 000025FA            409                  LEA     MSG_HEX, A5                     ;PRINT DOLLAR SIGN
 000014D0  4EB9 000022B2            410                  JSR     PRINTNULL
 000014D6                           411                  
 000014D6  3204                     412                  MOVE.W  D4,D1                           ;PRINT DATA
 000014D8  4EB9 00002178            413                  JSR     PRINTHEXNUM                           
 000014DE                           414                  
-000014DE  4BF9 000025E7            415                  LEA     MSG_COMMA, A5                   ;PRINT COMMA
+000014DE  4BF9 000025FC            415                  LEA     MSG_COMMA, A5                   ;PRINT COMMA
 000014E4  4EB9 000022B2            416                  JSR     PRINTNULL
 000014EA                           417                  
-000014EA  4BF9 000025D7            418                  LEA     MSG_DR,A5                       ;PRINT D
+000014EA  4BF9 000025EC            418                  LEA     MSG_DR,A5                       ;PRINT D
 000014F0  4EB9 000022B2            419                  JSR     PRINTNULL
 000014F6                           420            
 000014F6  3203                     421                  MOVE.W  D3,D1                           ;PRINT REGISTER NUMBER
@@ -466,11 +466,11 @@ Created On: 6/10/2020 7:28:53 PM
 00001564                           462    
 00001564  4E75                     463                  RTS                
 00001566                           464                    
-00001566  4BF9 0000253D            465  PRINTADD        LEA         MSG_ADD,A5              ; loads string pointer for MOVE into A5
+00001566  4BF9 00002552            465  PRINTADD        LEA         MSG_ADD,A5              ; loads string pointer for MOVE into A5
 0000156C  4EB9 000022B2            466                  JSR         PRINTNULL               ; print ADD
 00001572  3200                     467                  MOVE.W      D0,D1                   ; bits 7-8 contain size
 00001574  4EB9 0000158A            468                  JSR         ADD_SUB_SIZE            ; D1 = size
-0000157A  4BF9 000025F9            469                  LEA         MSG_5SPACES,A5          ; loads spaces
+0000157A  4BF9 0000260E            469                  LEA         MSG_5SPACES,A5          ; loads spaces
 00001580  4EB9 000022B2            470                  JSR         PRINTNULL               ; prints out spaces
 00001586  6000 0050                471                  BRA         FINISH_ADD
 0000158A                           472                    
@@ -487,15 +487,15 @@ Created On: 6/10/2020 7:28:53 PM
 000015A6  6700 0022                483                  BEQ         ADD_SUB_LONG
 000015AA  6000 02AE                484                  BRA         CASE_SUBA               ; error
 000015AE                           485                    
-000015AE  4BF9 0000260E            486  ADD_SUB_BYTE    LEA         MSG_B,A5
+000015AE  4BF9 00002623            486  ADD_SUB_BYTE    LEA         MSG_B,A5
 000015B4  4EB9 000022B2            487                  JSR         PRINTNULL
 000015BA  4E75                     488                  RTS
 000015BC                           489                    
-000015BC  4BF9 00002611            490  ADD_SUB_WORD    LEA         MSG_W,A5
+000015BC  4BF9 00002626            490  ADD_SUB_WORD    LEA         MSG_W,A5
 000015C2  4EB9 000022B2            491                  JSR         PRINTNULL
 000015C8  4E75                     492                  RTS
 000015CA                           493    
-000015CA  4BF9 00002614            494  ADD_SUB_LONG    LEA         MSG_L,A5
+000015CA  4BF9 00002629            494  ADD_SUB_LONG    LEA         MSG_L,A5
 000015D0  4EB9 000022B2            495                  JSR         PRINTNULL
 000015D6  4E75                     496                  RTS
 000015D8                           497        
@@ -510,13 +510,13 @@ Created On: 6/10/2020 7:28:53 PM
 000015EC  6600 0036                506                  BNE         Dn_PLUS_EA          
 000015F0                           507                    
 000015F0                           508                  ; print Data Register
-000015F0  4BF9 000025D7            509                  LEA         MSG_DR,A5
+000015F0  4BF9 000025EC            509                  LEA         MSG_DR,A5
 000015F6  4EB9 000022B2            510                  JSR         PRINTNULL
 000015FC  3207                     511                  MOVE.W      D7,D1
 000015FE  4EB9 00002168            512                  JSR         PRINTNUM                
 00001604                           513                  
 00001604                           514                  ; prints a comma to seperate
-00001604  4BF9 000025E7            515                  LEA         MSG_COMMA,A5             ; loads string pointer into A5
+00001604  4BF9 000025FC            515                  LEA         MSG_COMMA,A5             ; loads string pointer into A5
 0000160A  4EB9 000022B2            516                  JSR         PRINTNULL                ; prints out MOVE
 00001610                           517                 
 00001610                           518                  ; below is EA+Dn->Dn  
@@ -539,11 +539,11 @@ Created On: 6/10/2020 7:28:53 PM
 00001630  4EB9 00001FC0            535                  JSR         EA_TO_STRING             ; outputs it into a string   
 00001636                           536                  
 00001636                           537                  ; prints a comma to seperate
-00001636  4BF9 000025E7            538                  LEA         MSG_COMMA,A5             ; loads string pointer into A5
+00001636  4BF9 000025FC            538                  LEA         MSG_COMMA,A5             ; loads string pointer into A5
 0000163C  4EB9 000022B2            539                  JSR         PRINTNULL                ; prints out MOVE
 00001642                           540                  
 00001642                           541                  ; below is Dn+EA->EA
-00001642  4BF9 000025D7            542                  LEA         MSG_DR,A5                ; print data register
+00001642  4BF9 000025EC            542                  LEA         MSG_DR,A5                ; print data register
 00001648  4EB9 000022B2            543                  JSR         PRINTNULL
 0000164E  3207                     544                  MOVE.W      D7,D1
 00001650  4EB9 00002168            545                  JSR         PRINTNUM             
@@ -556,22 +556,22 @@ Created On: 6/10/2020 7:28:53 PM
 0000165C  EE49                     552                  LSR.W       #7,D1
 0000165E  E049                     553                  LSR         #8,D1                   
 00001660                           554                  
-00001660  4BF9 00002542            555                  LEA         MSG_ADDA,A5             ; print ADDA
+00001660  4BF9 00002557            555                  LEA         MSG_ADDA,A5             ; print ADDA
 00001666  4EB9 000022B2            556                  JSR         PRINTNULL
 0000166C                           557                   
 0000166C  B27C 0001                558                  CMP.W       #1,D1
 00001670  6700 001E                559                  BEQ         ADDA_LONG
 00001674                           560                    
-00001674  4BF9 00002611            561                  LEA         MSG_W,A5
+00001674  4BF9 00002626            561                  LEA         MSG_W,A5
 0000167A  4EB9 000022B2            562                  JSR         PRINTNULL
-00001680  4BF9 000025F4            563                  LEA         MSG_4SPACES,A5          ; loads spaces
+00001680  4BF9 00002609            563                  LEA         MSG_4SPACES,A5          ; loads spaces
 00001686  4EB9 000022B2            564                  JSR         PRINTNULL               ; prints out spaces
 0000168C  6000 0022                565                  BRA         FINISH_ADDA   
 00001690                           566                    
 00001690  323C 0002                567  ADDA_LONG       MOVE.W      #2,D1                   ;sets D1 to be word sized for EA to string
-00001694  4BF9 00002614            568                  LEA         MSG_L,A5
+00001694  4BF9 00002629            568                  LEA         MSG_L,A5
 0000169A  4EB9 000022B2            569                  JSR         PRINTNULL
-000016A0  4BF9 000025F4            570                  LEA         MSG_4SPACES,A5          ; loads spaces
+000016A0  4BF9 00002609            570                  LEA         MSG_4SPACES,A5          ; loads spaces
 000016A6  4EB9 000022B2            571                  JSR         PRINTNULL               ; prints out spaces
 000016AC  6000 0002                572                  BRA         FINISH_ADDA
 000016B0                           573                    
@@ -580,10 +580,10 @@ Created On: 6/10/2020 7:28:53 PM
 000016B4  4EB9 00001FC0            576                  JSR         EA_TO_STRING             ; outputs it into a string
 000016BA                           577                    
 000016BA                           578                  ; prints a comma to seperate
-000016BA  4BF9 000025E7            579                  LEA         MSG_COMMA,A5             ; loads string pointer into A5
+000016BA  4BF9 000025FC            579                  LEA         MSG_COMMA,A5             ; loads string pointer into A5
 000016C0  4EB9 000022B2            580                  JSR         PRINTNULL                ; prints out MOVE
 000016C6                           581            
-000016C6  4BF9 000025D9            582                  LEA         MSG_AR,A5                ; print address register
+000016C6  4BF9 000025EE            582                  LEA         MSG_AR,A5                ; print address register
 000016CC  4EB9 000022B2            583                  JSR         PRINTNULL
 000016D2  3207                     584                  MOVE.W      D7,D1
 000016D4  4EB9 00002168            585                  JSR         PRINTNUM             
@@ -603,7 +603,7 @@ Created On: 6/10/2020 7:28:53 PM
 00001700  B27C 0001                599                  CMP.W       #1,D1                    ; checks if invalid
 00001704  6700 06EC                600                  BEQ         CASE_DATA                ; branches to CASE_DATA if invalid
 00001708                           601                  
-00001708  4BF9 00002548            602                  LEA         MSG_ADDQ,A5             ; print ADDQ
+00001708  4BF9 0000255D            602                  LEA         MSG_ADDQ,A5             ; print ADDQ
 0000170E  4EB9 000022B2            603                  JSR         PRINTNULL
 00001714                           604                  
 00001714  3802                     605                  MOVE.W      D2,D4                    ; Moves D2 (source effective address) to D4
@@ -620,28 +620,28 @@ Created On: 6/10/2020 7:28:53 PM
 0000172A  B27C 0002                616                  CMP.W       #2,D1
 0000172E  6700 003A                617                  BEQ         ADDQ_LONG
 00001732                           618                    
-00001732  4BF9 0000260E            619  ADDQ_BYTE       LEA         MSG_B,A5
+00001732  4BF9 00002623            619  ADDQ_BYTE       LEA         MSG_B,A5
 00001738  4EB9 000022B2            620                  JSR         PRINTNULL
-0000173E  4BF9 000025F4            621                  LEA         MSG_4SPACES,A5          ; loads spaces
+0000173E  4BF9 00002609            621                  LEA         MSG_4SPACES,A5          ; loads spaces
 00001744  4EB9 000022B2            622                  JSR         PRINTNULL               ; prints out spaces
 0000174A  6000 003A                623                  BRA         FINISH_ADDQ  
 0000174E                           624   
-0000174E  4BF9 00002611            625  ADDQ_WORD       LEA         MSG_W,A5
+0000174E  4BF9 00002626            625  ADDQ_WORD       LEA         MSG_W,A5
 00001754  4EB9 000022B2            626                  JSR         PRINTNULL
-0000175A  4BF9 000025F4            627                  LEA         MSG_4SPACES,A5          ; loads spaces
+0000175A  4BF9 00002609            627                  LEA         MSG_4SPACES,A5          ; loads spaces
 00001760  4EB9 000022B2            628                  JSR         PRINTNULL               ; prints out spaces
 00001766  6000 001E                629                  BRA         FINISH_ADDQ                 
 0000176A                           630    
-0000176A  4BF9 00002614            631  ADDQ_LONG       LEA         MSG_L,A5
+0000176A  4BF9 00002629            631  ADDQ_LONG       LEA         MSG_L,A5
 00001770  4EB9 000022B2            632                  JSR         PRINTNULL
-00001776  4BF9 000025F4            633                  LEA         MSG_4SPACES,A5          ; loads spaces
+00001776  4BF9 00002609            633                  LEA         MSG_4SPACES,A5          ; loads spaces
 0000177C  4EB9 000022B2            634                  JSR         PRINTNULL               ; prints out spaces
 00001782  6000 0002                635                  BRA         FINISH_ADDQ                  
 00001786                           636                    
 00001786  4EB9 000017A6            637  FINISH_ADDQ     JSR         PRINT_ADDQ_DATA
 0000178C                           638   
 0000178C                           639                  ; prints a comma to seperate
-0000178C  4BF9 000025E7            640                  LEA         MSG_COMMA,A5             ; loads string pointer into A5
+0000178C  4BF9 000025FC            640                  LEA         MSG_COMMA,A5             ; loads string pointer into A5
 00001792  4EB9 000022B2            641                  JSR         PRINTNULL                ; prints out MOVE
 00001798                           642                    
 00001798                           643                  ; prints destination
@@ -652,7 +652,7 @@ Created On: 6/10/2020 7:28:53 PM
 000017A4                           648                 
 000017A4  4E75                     649                  RTS
 000017A6                           650   
-000017A6  4BF9 000025E3            651  PRINT_ADDQ_DATA LEA         MSG_POUND,A5
+000017A6  4BF9 000025F8            651  PRINT_ADDQ_DATA LEA         MSG_POUND,A5
 000017AC  4EB9 000022B2            652                  JSR         PRINTNULL
 000017B2                           653                  ; gets bits 9-11 (data bits)
 000017B2  3200                     654                  MOVE.W      D0,D1                               ; gets D0
@@ -680,11 +680,11 @@ Created On: 6/10/2020 7:28:53 PM
 000017EA                           676                  
 000017EA  6000 0002                677                  BRA         PRINTSUB                            ; Branches to print sub
 000017EE                           678  
-000017EE  4BF9 0000254E            679  PRINTSUB        LEA         MSG_SUB,A5                          ; loads string pointer for SUB into A5
+000017EE  4BF9 00002563            679  PRINTSUB        LEA         MSG_SUB,A5                          ; loads string pointer for SUB into A5
 000017F4  4EB9 000022B2            680                  JSR         PRINTNULL
 000017FA  3200                     681                  MOVE.W      D0,D1                               ; bits 6-7 contain size
 000017FC  4EB8 158A                682                  JSR         ADD_SUB_SIZE
-00001800  4BF9 000025F9            683                  LEA         MSG_5SPACES,A5                      ; loads spaces
+00001800  4BF9 0000260E            683                  LEA         MSG_5SPACES,A5                      ; loads spaces
 00001806  4EB9 000022B2            684                  JSR         PRINTNULL                           ; prints out spaces
 0000180C  3200                     685                  MOVE.W      D0,D1
 0000180E  E149                     686                  LSL.W       #8,D1
@@ -702,10 +702,10 @@ Created On: 6/10/2020 7:28:53 PM
 0000182A  4EB9 00001FC0            698                  JSR         EA_TO_STRING             ; outputs it into a string
 00001830                           699                
 00001830                           700                  ; prints a comma to seperate
-00001830  4BF9 000025E7            701                  LEA         MSG_COMMA,A5             ; loads string pointer into A5
+00001830  4BF9 000025FC            701                  LEA         MSG_COMMA,A5             ; loads string pointer into A5
 00001836  4EB9 000022B2            702                  JSR         PRINTNULL                ; prints out MOVE
 0000183C                           703                  
-0000183C  4BF9 000025D9            704                  LEA         MSG_AR,A5                ; print address register
+0000183C  4BF9 000025EE            704                  LEA         MSG_AR,A5                ; print address register
 00001842  4EB9 000022B2            705                  JSR         PRINTNULL
 00001848  3200                     706                  MOVE.W      D0,D1
 0000184A  E949                     707                  LSL.W       #4,D1
@@ -751,9 +751,9 @@ Created On: 6/10/2020 7:28:53 PM
 000018BC  3C02                     747                  MOVE.W  D2,D6                                ; Saves D2 in D4
 000018BE  3E03                     748                  MOVE.W  D3,D7                                ; Saves D2 in D4
 000018C0                           749  
-000018C0  4BF9 0000255F            750                  LEA     MSG_LEA,A5                           ; loads string pointer for LEA into A5
+000018C0  4BF9 00002574            750                  LEA     MSG_LEA,A5                           ; loads string pointer for LEA into A5
 000018C6  4EB9 000022B2            751                  JSR     PRINTNULL                            ; prints LEA
-000018CC  4BF9 00002606            752                  LEA     MSG_7SPACES,A5                       ; loads spaces
+000018CC  4BF9 0000261B            752                  LEA     MSG_7SPACES,A5                       ; loads spaces
 000018D2  4EB9 000022B2            753                  JSR     PRINTNULL                            ; prints out spaces
 000018D8                           754                  
 000018D8                           755                  ; print source
@@ -762,11 +762,11 @@ Created On: 6/10/2020 7:28:53 PM
 000018DC  4EB9 00001FC0            758                  JSR     EA_TO_STRING                         ; Prints out the EA
 000018E2                           759                  
 000018E2                           760                  ; comma
-000018E2  4BF9 000025E7            761                  LEA     MSG_COMMA,A5                         ; prints out a comma for formatting
+000018E2  4BF9 000025FC            761                  LEA     MSG_COMMA,A5                         ; prints out a comma for formatting
 000018E8  4EB9 000022B2            762                  JSR     PRINTNULL                       
 000018EE                           763                   
 000018EE                           764                  ; register
-000018EE  4BF9 000025D9            765                  LEA     MSG_AR,A5                            ; loads A into A5 (we already checked for it)
+000018EE  4BF9 000025EE            765                  LEA     MSG_AR,A5                            ; loads A into A5 (we already checked for it)
 000018F4  4EB9 000022B2            766                  JSR     PRINTNULL 
 000018FA  3401                     767                  MOVE.W  D1,D2                                ; saves Xn to D3 so it doesn't get overwritten
 000018FC  323C 0001                768                  MOVE.W  #1,D1                                ; specifies that we are looking for destination Xn
@@ -788,7 +788,7 @@ Created On: 6/10/2020 7:28:53 PM
 00001926  BC7C 0003                784                  CMP.W       #3,D6
 0000192A  6700 0086                785                  BEQ         INV_INSTR
 0000192E                           786                  
-0000192E  4BF9 00002564            787                  LEA         MSG_AND,A5                      ; print AND
+0000192E  4BF9 00002579            787                  LEA         MSG_AND,A5                      ; print AND
 00001934  4EB9 000022B2            788                  JSR         PRINTNULL
 0000193A                           789                  
 0000193A  3206                     790                  MOVE.W      D6,D1
@@ -799,21 +799,21 @@ Created On: 6/10/2020 7:28:53 PM
 0000194C  B27C 0002                795                  CMP.W       #2,D1                   ; if 2, it is a long
 00001950  6700 003A                796                  BEQ         AND_LONG
 00001954                           797                  
-00001954  4BF9 0000260E            798  AND_BYTE        LEA         MSG_B,A5
+00001954  4BF9 00002623            798  AND_BYTE        LEA         MSG_B,A5
 0000195A  4EB9 000022B2            799                  JSR         PRINTNULL
-00001960  4BF9 000025F9            800                  LEA         MSG_5SPACES,A5                  ; loads spaces
+00001960  4BF9 0000260E            800                  LEA         MSG_5SPACES,A5                  ; loads spaces
 00001966  4EB9 000022B2            801                  JSR         PRINTNULL                       ; prints out spaces
 0000196C  6000 003A                802                  BRA         FINISH_AND
 00001970                           803                                    
-00001970  4BF9 00002611            804  AND_WORD        LEA         MSG_W,A5
+00001970  4BF9 00002626            804  AND_WORD        LEA         MSG_W,A5
 00001976  4EB9 000022B2            805                  JSR         PRINTNULL
-0000197C  4BF9 000025F9            806                  LEA         MSG_5SPACES,A5                  ; loads spaces
+0000197C  4BF9 0000260E            806                  LEA         MSG_5SPACES,A5                  ; loads spaces
 00001982  4EB9 000022B2            807                  JSR         PRINTNULL                       ; prints out spaces
 00001988  6000 001E                808                  BRA         FINISH_AND
 0000198C                           809    
-0000198C  4BF9 00002614            810  AND_LONG        LEA         MSG_L,A5
+0000198C  4BF9 00002629            810  AND_LONG        LEA         MSG_L,A5
 00001992  4EB9 000022B2            811                  JSR         PRINTNULL
-00001998  4BF9 000025F9            812                  LEA         MSG_5SPACES,A5                  ; loads spaces
+00001998  4BF9 0000260E            812                  LEA         MSG_5SPACES,A5                  ; loads spaces
 0000199E  4EB9 000022B2            813                  JSR         PRINTNULL                       ; prints out spaces
 000019A4  6000 0002                814                  BRA         FINISH_AND
 000019A8                           815        
@@ -821,11 +821,11 @@ Created On: 6/10/2020 7:28:53 PM
 000019AC  4EB8 15E0                817                  JSR         ADD_SUB_OPERAND
 000019B0  4E75                     818                  RTS
 000019B2                           819                  
-000019B2  4BF9 000024A1            820  INV_INSTR       LEA         INVALID_INSTR,A5
+000019B2  4BF9 000024B6            820  INV_INSTR       LEA         INVALID_INSTR,A5
 000019B8  4EB9 000022B2            821                  JSR         PRINTNULL
-000019BE  4BF9 000025FF            822                  LEA         MSG_6SPACES,A5
+000019BE  4BF9 00002614            822                  LEA         MSG_6SPACES,A5
 000019C4  4EB9 000022B2            823                  JSR         PRINTNULL
-000019CA  4BF9 000025E5            824                  LEA         MSG_HEX,A5
+000019CA  4BF9 000025FA            824                  LEA         MSG_HEX,A5
 000019D0  4EB9 000022B2            825                  JSR         PRINTNULL
 000019D6  2200                     826                  MOVE.L      D0,D1
 000019D8  383C 0000                827                  MOVE.W      #0,D4
@@ -847,12 +847,12 @@ Created On: 6/10/2020 7:28:53 PM
 00001A00  3C01                     843                  MOVE.W      D1,D6
 00001A02                           844  
 00001A02                           845                  
-00001A02  4BF9 00002569            846                  LEA         MSG_OR,A5
+00001A02  4BF9 0000257E            846                  LEA         MSG_OR,A5
 00001A08  4EB9 000022B2            847                  JSR         PRINTNULL                       ; print "OR"
 00001A0E                           848                  
 00001A0E  3206                     849                  MOVE.W      D6,D1
 00001A10  4EB9 00001A2C            850                  JSR         OR_SIZE                         ; print ".B",".W",".L"
-00001A16  4BF9 000025FF            851                  LEA         MSG_6SPACES,A5                  ; loads spaces
+00001A16  4BF9 00002614            851                  LEA         MSG_6SPACES,A5                  ; loads spaces
 00001A1C  4EB9 000022B2            852                  JSR         PRINTNULL                       ; prints out spaces
 00001A22                           853  
 00001A22  4EB8 1528                854                  JSR         ADD_SUB_HELP                    ; OR has the same structure as ADD and SUB
@@ -882,13 +882,13 @@ Created On: 6/10/2020 7:28:53 PM
 00001A5C  BC7C 0003                878                  CMP.W       #3,D6
 00001A60  6700 FF50                879                  BEQ         INV_INSTR
 00001A64                           880                                  
-00001A64  4BF9 0000256D            881                  LEA         MSG_NOT,A5
+00001A64  4BF9 00002582            881                  LEA         MSG_NOT,A5
 00001A6A  4EB9 000022B2            882                  JSR         PRINTNULL                       ; print "NOT"
 00001A70                           883                                 
 00001A70  3206                     884                  MOVE.W      D6,D1
 00001A72                           885  
 00001A72  4EB8 1A2C                886                  JSR         OR_SIZE                         ; print ".B",".W",".L"
-00001A76  4BF9 000025F9            887                  LEA         MSG_5SPACES,A5                  ; loads spaces
+00001A76  4BF9 0000260E            887                  LEA         MSG_5SPACES,A5                  ; loads spaces
 00001A7C  4EB9 000022B2            888                  JSR         PRINTNULL                       ; prints out spaces
 00001A82                           889                  
 00001A82                           890                  ; get bits 0-5 
@@ -918,13 +918,13 @@ Created On: 6/10/2020 7:28:53 PM
 00001AD6  B47C 0003                914                  CMP.W       #ROd_MEM,D2                      ; checks if rotation value is ASdMem
 00001ADA  6700 0016                915                  BEQ         CASE_ROdMEM                      ; branches to ASd_MEM if value matches
 00001ADE                           916                  
-00001ADE  4BF9 00002572            917  CASE_LSdMEM     LEA         MSG_LSd,A5                       ; loads LS into A5
+00001ADE  4BF9 00002587            917  CASE_LSdMEM     LEA         MSG_LSd,A5                       ; loads LS into A5
 00001AE4  6000 0012                918                  BRA         PRINTSHIFTMEM                    ; branches to PRINTSHIFTMEM
 00001AE8                           919  
-00001AE8  4BF9 00002576            920  CASE_ASdMEM     LEA         MSG_ASd,A5                       ; loads AS into A5  
+00001AE8  4BF9 0000258B            920  CASE_ASdMEM     LEA         MSG_ASd,A5                       ; loads AS into A5  
 00001AEE  6000 0008                921                  BRA         PRINTSHIFTMEM                    ; branches to PRINTSHIFTMEM
 00001AF2                           922  
-00001AF2  4BF9 0000257A            923  CASE_ROdMEM     LEA         MSG_ROd,A5                       ; loads AS into A5          
+00001AF2  4BF9 0000258F            923  CASE_ROdMEM     LEA         MSG_ROd,A5                       ; loads AS into A5          
 00001AF8                           924                  
 00001AF8  4EB9 000022B2            925  PRINTSHIFTMEM   JSR         PRINTNULL                        ; Prints LS or AS or RO 
 00001AFE  3400                     926                  MOVE.W      D0,D2                            ; copies D0 to D2
@@ -932,15 +932,15 @@ Created On: 6/10/2020 7:28:53 PM
 00001B06  B47C 0000                928                  CMP.W       #0,D2                            ; checking if its right
 00001B0A  6700 000C                929                  BEQ         CASE_RIGHTMEM                    ; shifts to the right 
 00001B0E                           930  
-00001B0E  4BF9 000025D5            931  CASE_LEFTMEM    LEA         MSG_LEFT,A5                      ; loads L into A5 
+00001B0E  4BF9 000025EA            931  CASE_LEFTMEM    LEA         MSG_LEFT,A5                      ; loads L into A5 
 00001B14  6000 0008                932                  BRA         PRINT_MEMDIR                     ; branches for printing
 00001B18                           933          
-00001B18  4BF9 000025D3            934  CASE_RIGHTMEM   LEA         MSG_RIGHT,A5                     ; loads R into A5  
+00001B18  4BF9 000025E8            934  CASE_RIGHTMEM   LEA         MSG_RIGHT,A5                     ; loads R into A5  
 00001B1E                           935  
 00001B1E  4EB9 000022B2            936  PRINT_MEMDIR    JSR         PRINTNULL                        ; Prints L or R
-00001B24  4BF9 00002611            937                  LEA         MSG_W,A5                         ; loads .W into A5
+00001B24  4BF9 00002626            937                  LEA         MSG_W,A5                         ; loads .W into A5
 00001B2A  4EB9 000022B2            938                  JSR         PRINTNULL                        ; Prints .W
-00001B30  4BF9 000025F9            939                  LEA         MSG_5SPACES,A5                   ; loads spaces
+00001B30  4BF9 0000260E            939                  LEA         MSG_5SPACES,A5                   ; loads spaces
 00001B36  4EB9 000022B2            940                  JSR         PRINTNULL                        ; prints out spaces
 00001B3C  6000 0002                941                  BRA         GETMEMSOURCE                     ; checks the source 
 00001B40                           942                  
@@ -984,13 +984,13 @@ Created On: 6/10/2020 7:28:53 PM
 00001BAA  B27C 0003                980                  CMP.W       #ROd_REG,D1                      ; Compares D1 to 0, if it is 0, it is ASd
 00001BAE  6700 0016                981                  BEQ         CASE_ROdReg                      ; goes to ASd case if so                 
 00001BB2                           982                  
-00001BB2  4BF9 00002572            983  CASE_LSdREG     LEA         MSG_LSd,A5                       ; loads LS into A5
+00001BB2  4BF9 00002587            983  CASE_LSdREG     LEA         MSG_LSd,A5                       ; loads LS into A5
 00001BB8  6000 0012                984                  BRA         PRINTSHIFTREG                    ; branches to PRINTSHIFTREG
 00001BBC                           985  
-00001BBC  4BF9 00002576            986  CASE_ASdREG     LEA         MSG_ASd,A5                       ; loads AS into A5
+00001BBC  4BF9 0000258B            986  CASE_ASdREG     LEA         MSG_ASd,A5                       ; loads AS into A5
 00001BC2  6000 0008                987                  BRA         PRINTSHIFTREG                    ; branches to PRINTSHIFTREG
 00001BC6                           988  
-00001BC6  4BF9 0000257A            989  CASE_ROdREG     LEA         MSG_ROd,A5                       ; loads AS into A5          
+00001BC6  4BF9 0000258F            989  CASE_ROdREG     LEA         MSG_ROd,A5                       ; loads AS into A5          
 00001BCC                           990                  
 00001BCC  4EB9 000022B2            991  PRINTSHIFTREG   JSR         PRINTNULL                        ; Prints LS or AS or RO 
 00001BD2  3400                     992                  MOVE.W      D0,D2                            ; copies D0 to D2
@@ -998,10 +998,10 @@ Created On: 6/10/2020 7:28:53 PM
 00001BDA  B47C 0000                994                  CMP.W       #0,D2                            ; checking if its right
 00001BDE  6700 000C                995                  BEQ         CASE_RIGHTREG                    ; shifts to the right 
 00001BE2                           996  
-00001BE2  4BF9 000025D5            997  CASE_LEFTREG    LEA         MSG_LEFT,A5                      ; loads L into A5 
+00001BE2  4BF9 000025EA            997  CASE_LEFTREG    LEA         MSG_LEFT,A5                      ; loads L into A5 
 00001BE8  6000 000C                998                  BRA         PRINT_REGDIR                     ; branches for printing
 00001BEC                           999          
-00001BEC  4BF9 000025D3           1000  CASE_RIGHTREG   LEA         MSG_RIGHT,A5                     ; loads R into A5 
+00001BEC  4BF9 000025E8           1000  CASE_RIGHTREG   LEA         MSG_RIGHT,A5                     ; loads R into A5 
 00001BF2  6000 0002               1001                  BRA         PRINT_REGDIR                     ; branches for printing
 00001BF6                          1002                  
 00001BF6  4EB9 000022B2           1003  PRINT_REGDIR    JSR         PRINTNULL                        ; Prints L or R
@@ -1013,16 +1013,16 @@ Created On: 6/10/2020 7:28:53 PM
 00001C0C  B47C 0002               1009                  CMP.W       #2,D2                            ; Checks if it is long size
 00001C10  6700 0016               1010                  BEQ         REG_LONG                         ; Prints .L
 00001C14                          1011  
-00001C14  4BF9 0000260E           1012  REG_BYTE        LEA         MSG_B,A5                         ; loads .B into A5
+00001C14  4BF9 00002623           1012  REG_BYTE        LEA         MSG_B,A5                         ; loads .B into A5
 00001C1A  6000 0012               1013                  BRA         PRINTREGEA      
 00001C1E                          1014  
-00001C1E  4BF9 00002611           1015  REG_WORD        LEA         MSG_W,A5                         ; loads .W into A5
+00001C1E  4BF9 00002626           1015  REG_WORD        LEA         MSG_W,A5                         ; loads .W into A5
 00001C24  6000 0008               1016                  BRA         PRINTREGEA      
 00001C28                          1017                             
-00001C28  4BF9 00002614           1018  REG_LONG        LEA         MSG_L,A5                         ; loads .L into A5
+00001C28  4BF9 00002629           1018  REG_LONG        LEA         MSG_L,A5                         ; loads .L into A5
 00001C2E                          1019  
 00001C2E  4EB9 000022B2           1020  PRINTREGEA      JSR         PRINTNULL                        ; Prints size
-00001C34  4BF9 000025F9           1021                  LEA         MSG_5SPACES,A5                   ; loads spaces
+00001C34  4BF9 0000260E           1021                  LEA         MSG_5SPACES,A5                   ; loads spaces
 00001C3A  4EB9 000022B2           1022                  JSR         PRINTNULL                        ; prints out spaces
 00001C40  3400                    1023                  MOVE.W      D0,D2                            ; copies D0 to D2
 00001C42  4EB9 00001EE2           1024                  JSR         GETROTATIONLOCATION              ; finds out if its immediate or register 
@@ -1036,15 +1036,15 @@ Created On: 6/10/2020 7:28:53 PM
 00001C60                          1032                  
 00001C60  343C 0008               1033  MAKESHIFT8      MOVE.W      #8,D2                            ; sets shift cound to 8 (shift count of 8 is 000 in the opcode)
 00001C64                          1034                  
-00001C64  4BF9 000025E3           1035  COMPLETE_REGIM  LEA         MSG_POUND, A5                    ; loads # into A5
+00001C64  4BF9 000025F8           1035  COMPLETE_REGIM  LEA         MSG_POUND, A5                    ; loads # into A5
 00001C6A  4EB9 000022B2           1036                  JSR         PRINTNULL                        ; prints #
-00001C70  4BF9 000025E5           1037                  LEA         MSG_HEX, A5                      ; loads $ into A5
+00001C70  4BF9 000025FA           1037                  LEA         MSG_HEX, A5                      ; loads $ into A5
 00001C76  4EB9 000022B2           1038                  JSR         PRINTNULL                        ; prints $
 00001C7C  3202                    1039                  MOVE.W      D2, D1                           ; moves rotation size to D1
 00001C7E  4EB9 00002178           1040                  JSR         PRINTHEXNUM                      ; prints shift count
-00001C84  4BF9 000025E7           1041                  LEA         MSG_COMMA, A5                    ; loads , into A5
+00001C84  4BF9 000025FC           1041                  LEA         MSG_COMMA, A5                    ; loads , into A5
 00001C8A  4EB9 000022B2           1042                  JSR         PRINTNULL                        ; prints the comma out to divide the source and destination  
-00001C90  4BF9 000025D7           1043                  LEA         MSG_DR, A5                       ; loads D into A5
+00001C90  4BF9 000025EC           1043                  LEA         MSG_DR, A5                       ; loads D into A5
 00001C96  4EB9 000022B2           1044                  JSR         PRINTNULL                        ; prints out D 
 00001C9C  323C 0000               1045                  MOVE.W      #0,D1                            ; marks that we are looking for Xn (data register number) in the source location  
 00001CA0  4EB9 00001E28           1046                  JSR         GET_XN                           ; gets the data register number, stores in D1
@@ -1054,12 +1054,12 @@ Created On: 6/10/2020 7:28:53 PM
 00001CAE  3400                    1050  REG_REGISTER    MOVE.W      D0,D2                            ; copies D0 to D2
 00001CB0  4EB9 00001EDA           1051                  JSR         GETROTATIONSIZE                  ; gets the rotation size
 00001CB6  3202                    1052                  MOVE.W      D2, D1                           ; moves rotation size to D1
-00001CB8  4BF9 000025D7           1053                  LEA         MSG_DR, A5                       ; loads D into A5
+00001CB8  4BF9 000025EC           1053                  LEA         MSG_DR, A5                       ; loads D into A5
 00001CBE  4EB9 000022B2           1054                  JSR         PRINTNULL                        ; prints D
 00001CC4  4EB9 00002168           1055                  JSR         PRINTNUM                         ; prints register number
-00001CCA  4BF9 000025E7           1056                  LEA         MSG_COMMA, A5                    ; loads , into A5
+00001CCA  4BF9 000025FC           1056                  LEA         MSG_COMMA, A5                    ; loads , into A5
 00001CD0  4EB9 000022B2           1057                  JSR         PRINTNULL                        ; prints the comma out to divide the source and destination  
-00001CD6  4BF9 000025D7           1058                  LEA         MSG_DR, A5                       ; loads D into A5
+00001CD6  4BF9 000025EC           1058                  LEA         MSG_DR, A5                       ; loads D into A5
 00001CDC  4EB9 000022B2           1059                  JSR         PRINTNULL                        ; prints out D 
 00001CE2  323C 0000               1060                  MOVE.W      #0,D1                            ; marks that we are looking for Xn (data register number) in the source location  
 00001CE6  4EB9 00001E28           1061                  JSR         GET_XN                           ; gets the data register number, stores in D1
@@ -1071,9 +1071,9 @@ Created On: 6/10/2020 7:28:53 PM
 00001CFA  B27C 6000               1067                  CMP.W   #$6000,D1                            ; Checks if it fits the BRA opcode
 00001CFE  6600 0024               1068                  BNE.W   CASE_BCC                             ; If its not, check BCC
 00001D02                          1069                  
-00001D02  4BF9 000025CE           1070                  LEA     MSG_BRA,A5                           ; loads string pointer for BRA into A5
+00001D02  4BF9 000025E3           1070                  LEA     MSG_BRA,A5                           ; loads string pointer for BRA into A5
 00001D08  4EB9 000022B2           1071                  JSR     PRINTNULL                            ; prints BRA
-00001D0E  4BF9 00002606           1072                  LEA     MSG_7SPACES,A5                       ; loads spaces
+00001D0E  4BF9 0000261B           1072                  LEA     MSG_7SPACES,A5                       ; loads spaces
 00001D14  4EB9 000022B2           1073                  JSR     PRINTNULL                            ; prints out spaces
 00001D1A                          1074  
 00001D1A  3400                    1075                  MOVE.W  D0,D2                                ; Copies instruction word to D1
@@ -1099,17 +1099,17 @@ Created On: 6/10/2020 7:28:53 PM
 00001D4E  6700 0006               1095                  BEQ     CASE_BEQ                             ; branches to BEQ if it is
 00001D52  6000 009E               1096                  BRA     CASE_DATA                            ; BCC condition code not in the system
 00001D56                          1097     
-00001D56  4BF9 00002588           1098  CASE_BEQ        LEA     MSG_BEQ,A5                           ; loads string pointer for BEQ into A5
+00001D56  4BF9 0000259D           1098  CASE_BEQ        LEA     MSG_BEQ,A5                           ; loads string pointer for BEQ into A5
 00001D5C  6000 0016               1099                  BRA     PRINTBCC
 00001D60                          1100  
-00001D60  4BF9 000025A1           1101  CASE_BLE        LEA     MSG_BLE,A5                           ; loads string pointer for BLE into A5
+00001D60  4BF9 000025B6           1101  CASE_BLE        LEA     MSG_BLE,A5                           ; loads string pointer for BLE into A5
 00001D66  6000 000C               1102                  BRA     PRINTBCC
 00001D6A                          1103                  
-00001D6A  4BF9 00002597           1104  CASE_BGT        LEA     MSG_BGT,A5                           ; loads string pointer for BGT into A5
+00001D6A  4BF9 000025AC           1104  CASE_BGT        LEA     MSG_BGT,A5                           ; loads string pointer for BGT into A5
 00001D70  6000 0002               1105                  BRA     PRINTBCC
 00001D74                          1106  
 00001D74  4EB9 000022B2           1107  PRINTBCC        JSR     PRINTNULL                            ; prints BEQ/BLE/BGT
-00001D7A  4BF9 00002606           1108                  LEA     MSG_7SPACES,A5                       ; loads spaces
+00001D7A  4BF9 0000261B           1108                  LEA     MSG_7SPACES,A5                       ; loads spaces
 00001D80  4EB9 000022B2           1109                  JSR     PRINTNULL                            ; prints out spaces
 00001D86  3400                    1110                  MOVE.W  D0,D2                                ; Copies instruction word to D1
 00001D88  4EB9 00001E9A           1111                  JSR     GETDISPLACEMENT                      ; finds the displacement
@@ -1129,11 +1129,11 @@ Created On: 6/10/2020 7:28:53 PM
 00001DB8  6700 0038               1125                  BEQ     CASE_DATA                            ; goes to case data if EA is invalid
 00001DBC                          1126                  
 00001DBC                          1127  PRINT_JSR       ;print JSR
-00001DBC  4BF9 000025C4           1128                  LEA     MSG_JSR,A5
+00001DBC  4BF9 000025D9           1128                  LEA     MSG_JSR,A5
 00001DC2  4EB9 000022B2           1129                  JSR     PRINTNULL
 00001DC8                          1130                  
 00001DC8                          1131                  ;print spaces
-00001DC8  4BF9 00002606           1132                  LEA     MSG_7SPACES,A5
+00001DC8  4BF9 0000261B           1132                  LEA     MSG_7SPACES,A5
 00001DCE  4EB9 000022B2           1133                  JSR     PRINTNULL
 00001DD4                          1134                                  
 00001DD4                          1135                  ;print address
@@ -1142,7 +1142,7 @@ Created On: 6/10/2020 7:28:53 PM
 00001DDC                          1138  
 00001DDC  B07C 4E75               1139  CASE_RTS        CMP.W   #$4E75,D0           ; compares to RTS opcode in hex
 00001DE0  6600 0010               1140                  BNE     CASE_DATA           ; checks the next case if not equal
-00001DE4  4BF9 000025C9           1141                  LEA     MSG_RTS,A5          ; loads string pointer into A5
+00001DE4  4BF9 000025DE           1141                  LEA     MSG_RTS,A5          ; loads string pointer into A5
 00001DEA  4EB9 000022B2           1142                  JSR     PRINTNULL           ; prints RTS                
 00001DF0  4E75                    1143                  RTS                         ; returns from the subroutine
 00001DF2                          1144  
@@ -1241,7 +1241,7 @@ Created On: 6/10/2020 7:28:53 PM
 00001EAA  D44D                    1237  PRINTADDRESS        ADD.W     A5,D2                 ; Adds address to D2 to get displacement
 00001EAC  3202                    1238                      MOVE.W    D2,D1                 ; moves address to D1 for printing
 00001EAE  183C 0000               1239                      MOVE.B    #0,D4                 ; marks address as word length
-00001EB2  4BF9 000025E5           1240                      LEA       MSG_HEX,A5            ; loads hex sign to A5
+00001EB2  4BF9 000025FA           1240                      LEA       MSG_HEX,A5            ; loads hex sign to A5
 00001EB8  4EB9 000022B2           1241                      JSR       PRINTNULL             ; prints null
 00001EBE  4EB9 0000218C           1242                      JSR       PRINTSHORTLONGNUM     ; prints address
 00001EC4                          1243                      
@@ -1288,11 +1288,11 @@ Created On: 6/10/2020 7:28:53 PM
 00001EF8  6600 0010               1284                      BNE        MEMTOREG1            ; branches to MEMTOREG1 if not REGTOMEM1
 00001EFC                          1285  
 00001EFC  3C3C 0000               1286  REGTOMEM1           MOVE.W     #0,D6                ; moves 0 to D1
-00001F00  4BF9 000025D7           1287                      LEA        MSG_DR,A5            ; loads D to A5
+00001F00  4BF9 000025EC           1287                      LEA        MSG_DR,A5            ; loads D to A5
 00001F06  6000 000C               1288                      BRA        PRINTREGISTERLOOP    ; branches to loop        
 00001F0A                          1289                      
 00001F0A  3C3C 0007               1290  MEMTOREG1           MOVE.W     #7,D6                ; moves 1 to D1
-00001F0E  4BF9 000025D9           1291                      LEA        MSG_AR,A5            ; loads A to A5
+00001F0E  4BF9 000025EE           1291                      LEA        MSG_AR,A5            ; loads A to A5
 00001F14                          1292                      
 00001F14  E34F                    1293  PRINTREGISTERLOOP   LSL.W      #1,D7                ; shifter out bitmask, see if it was a 1
 00001F16  6500 0018               1294                      BCS        PRINTREG             ; if pushes out a 1
@@ -1313,7 +1313,7 @@ Created On: 6/10/2020 7:28:53 PM
 00001F46  6000 0040               1309                      BRA        DONEPRINTINGREG      ; exit case
 00001F4A                          1310  
 00001F4A  2C4D                    1311  PRINTMORE           MOVEA.L    A5,A6                ; temporarily stores A5 in A6 so its not overwritten
-00001F4C  4BF9 000025EA           1312                      LEA        MSG_SLASH,A5         ; leads / into A5
+00001F4C  4BF9 000025FF           1312                      LEA        MSG_SLASH,A5         ; leads / into A5
 00001F52  4EB9 000022B2           1313                      JSR        PRINTNULL            ; prints the slash
 00001F58  2A4E                    1314                      MOVEA.L    A6,A5                ; reloads A6 into A5
 00001F5A  DC44                    1315                      ADD.W      D4,D6                ; decrements or increments
@@ -1325,11 +1325,11 @@ Created On: 6/10/2020 7:28:53 PM
 00001F6C  6000 0002               1321                      BRA        REGTOMEM2            ; loops
 00001F70                          1322  
 00001F70  3C3C 0000               1323  REGTOMEM2           MOVE.W     #0,D6                ; moves 1 to D1
-00001F74  4BF9 000025D9           1324                      LEA        MSG_AR,A5            ; loads A to A5
+00001F74  4BF9 000025EE           1324                      LEA        MSG_AR,A5            ; loads A to A5
 00001F7A  6098                    1325                      BRA        PRINTREGISTERLOOP    ; loops
 00001F7C                          1326  
 00001F7C  3C3C 0007               1327  MEMTOREG2           MOVE.W     #7,D6                ; moves 0 to D1
-00001F80  4BF9 000025D7           1328                      LEA        MSG_DR,A5            ; loads D to A5
+00001F80  4BF9 000025EC           1328                      LEA        MSG_DR,A5            ; loads D to A5
 00001F86  608C                    1329                      BRA        PRINTREGISTERLOOP    ; loops
 00001F88                          1330  
 00001F88  4CDF 60E2               1331  DONEPRINTINGREG     MOVEM.L    (SP)+,D1/D5-D7/A5-A6 ; saves D1/D5-D7/A5-A6
@@ -1381,7 +1381,7 @@ Created On: 6/10/2020 7:28:53 PM
 00001FEC                          1377                     ; otherwise assumes D2 = #Dn which means its a data register                   
 00001FEC                          1378  
 00001FEC                          1379  * data register, Dn
-00001FEC  4BF9 000025D7           1380  CASE_DR            LEA      MSG_DR,A5               ; Loads D into A5
+00001FEC  4BF9 000025EC           1380  CASE_DR            LEA      MSG_DR,A5               ; Loads D into A5
 00001FF2  4EB9 000022B2           1381                     JSR      PRINTNULL               ; Prints D
 00001FF8  3203                    1382                     MOVE.W   D3, D1                  ; Loads D3 (the Xn) into D1 for printing 
 00001FFA  4EB9 00002168           1383                     JSR      PRINTNUM                ; Prints the Xn
@@ -1389,47 +1389,47 @@ Created On: 6/10/2020 7:28:53 PM
 00002004                          1385  
 00002004                          1386  
 00002004                          1387  * address register
-00002004  4BF9 000025D9           1388  CASE_AR            LEA      MSG_AR,A5               ; Loads A into A5
+00002004  4BF9 000025EE           1388  CASE_AR            LEA      MSG_AR,A5               ; Loads A into A5
 0000200A  4EB9 000022B2           1389                     JSR      PRINTNULL               ; Prints A
 00002010  3203                    1390                     MOVE.W   D3, D1                  ; Loads D3 (the Xn) into D1 for printing 
 00002012  4EB9 00002168           1391                     JSR      PRINTNUM                ; Prints the Xn
 00002018  6000 0148               1392                     BRA      EA_TO_STRING_EXIT       ; exits
 0000201C                          1393  
 0000201C                          1394  * address register indirect
-0000201C  4BF9 000025DB           1395  CASE_ARI           LEA      MSG_LB,A5               ; Loads ( into A5
+0000201C  4BF9 000025F0           1395  CASE_ARI           LEA      MSG_LB,A5               ; Loads ( into A5
 00002022  4EB9 000022B2           1396                     JSR      PRINTNULL               ; Prints (
-00002028  4BF9 000025D9           1397                     LEA      MSG_AR,A5               ; Loads A into A5
+00002028  4BF9 000025EE           1397                     LEA      MSG_AR,A5               ; Loads A into A5
 0000202E  4EB9 000022B2           1398                     JSR      PRINTNULL               ; Prints A
 00002034  3203                    1399                     MOVE.W   D3, D1                  ; Loads D3 (the Xn) into D1 for printing 
 00002036  4EB9 00002168           1400                     JSR      PRINTNUM                ; Prints the Xn
-0000203C  4BF9 000025DD           1401                     LEA      MSG_RB,A5               ; Loads ) into A5
+0000203C  4BF9 000025F2           1401                     LEA      MSG_RB,A5               ; Loads ) into A5
 00002042  4EB9 000022B2           1402                     JSR      PRINTNULL               ; Prints )
 00002048  6000 0118               1403                     BRA      EA_TO_STRING_EXIT       ; exits
 0000204C                          1404  
 0000204C                          1405  * address register indirect post increment
-0000204C  4BF9 000025DB           1406  CASE_ARIPOST       LEA      MSG_LB,A5               ; Loads ( into A5
+0000204C  4BF9 000025F0           1406  CASE_ARIPOST       LEA      MSG_LB,A5               ; Loads ( into A5
 00002052  4EB9 000022B2           1407                     JSR      PRINTNULL               ; Prints (
-00002058  4BF9 000025D9           1408                     LEA      MSG_AR,A5               ; Loads A into A5
+00002058  4BF9 000025EE           1408                     LEA      MSG_AR,A5               ; Loads A into A5
 0000205E  4EB9 000022B2           1409                     JSR      PRINTNULL               ; Prints A
 00002064  3203                    1410                     MOVE.W   D3, D1                  ; Loads D3 (the Xn) into D1 for printing 
 00002066  4EB9 00002168           1411                     JSR      PRINTNUM                ; Prints the Xn
-0000206C  4BF9 000025DD           1412                     LEA      MSG_RB,A5               ; Loads ) into A5
+0000206C  4BF9 000025F2           1412                     LEA      MSG_RB,A5               ; Loads ) into A5
 00002072  4EB9 000022B2           1413                     JSR      PRINTNULL               ; Prints )
-00002078  4BF9 000025DF           1414                     LEA      MSG_PLUS,A5             ; Loads + into A5
+00002078  4BF9 000025F4           1414                     LEA      MSG_PLUS,A5             ; Loads + into A5
 0000207E  4EB9 000022B2           1415                     JSR      PRINTNULL               ; Prints +
 00002084  6000 00DC               1416                     BRA      EA_TO_STRING_EXIT       ; exits
 00002088                          1417  
 00002088                          1418  
 00002088                          1419  * address register indirect pre increment
-00002088  4BF9 000025E1           1420  CASE_ARIPRE        LEA      MSG_MINUS,A5            ; Loads - into A5
+00002088  4BF9 000025F6           1420  CASE_ARIPRE        LEA      MSG_MINUS,A5            ; Loads - into A5
 0000208E  4EB9 000022B2           1421                     JSR      PRINTNULL               ; Prints -
-00002094  4BF9 000025DB           1422                     LEA      MSG_LB,A5               ; Loads ( into A5
+00002094  4BF9 000025F0           1422                     LEA      MSG_LB,A5               ; Loads ( into A5
 0000209A  4EB9 000022B2           1423                     JSR      PRINTNULL               ; Prints (
-000020A0  4BF9 000025D9           1424                     LEA      MSG_AR,A5               ; Loads A into A5
+000020A0  4BF9 000025EE           1424                     LEA      MSG_AR,A5               ; Loads A into A5
 000020A6  4EB9 000022B2           1425                     JSR      PRINTNULL               ; Prints A
 000020AC  3203                    1426                     MOVE.W   D3, D1                  ; Loads D3 (the Xn) into D1 for printing 
 000020AE  4EB9 00002168           1427                     JSR      PRINTNUM                ; Prints the Xn
-000020B4  4BF9 000025DD           1428                     LEA      MSG_RB,A5               ; Loads ) into A5
+000020B4  4BF9 000025F2           1428                     LEA      MSG_RB,A5               ; Loads ) into A5
 000020BA  4EB9 000022B2           1429                     JSR      PRINTNULL               ; Prints )
 000020C0  6000 00A0               1430                     BRA      EA_TO_STRING_EXIT       ; exits
 000020C4                          1431  
@@ -1442,9 +1442,9 @@ Created On: 6/10/2020 7:28:53 PM
 000020D2  6700 0068               1438                     BEQ      CASE_LONG               ; branches to CASE_LONG if is a long
 000020D6                          1439  
 000020D6                          1440  * immediate
-000020D6  4BF9 000025E3           1441  CASE_IMMEDIATE     LEA      MSG_POUND,A5            ; Loads # into A5
+000020D6  4BF9 000025F8           1441  CASE_IMMEDIATE     LEA      MSG_POUND,A5            ; Loads # into A5
 000020DC  4EB9 000022B2           1442                     JSR      PRINTNULL               ; Prints #  
-000020E2  4BF9 000025E5           1443                     LEA      MSG_HEX,A5              ; Loads $ into A5
+000020E2  4BF9 000025FA           1443                     LEA      MSG_HEX,A5              ; Loads $ into A5
 000020E8  4EB9 000022B2           1444                     JSR      PRINTNULL               ; Prints $
 000020EE                          1445                     
 000020EE  B27C 0002               1446                     CMP.W    #2,D1                   ; checks if it is long size
@@ -1466,7 +1466,7 @@ Created On: 6/10/2020 7:28:53 PM
 00002120                          1462                     
 00002120                          1463  * word address
 00002120                          1464  CASE_WORD          
-00002120  4BF9 000025E5           1465                     LEA      MSG_HEX,A5              ; Loads $ into A5
+00002120  4BF9 000025FA           1465                     LEA      MSG_HEX,A5              ; Loads $ into A5
 00002126  4EB9 000022B2           1466                     JSR      PRINTNULL               ; Prints $
 0000212C  3200                    1467                     MOVE.W   D0, D1                  ; moves instruction word into d1
 0000212E  383C 0000               1468                     MOVE.W   #0, D4                  ; moves length size (word) into d4
@@ -1475,7 +1475,7 @@ Created On: 6/10/2020 7:28:53 PM
 0000213C                          1471  
 0000213C                          1472  * long address 
 0000213C                          1473  CASE_LONG          
-0000213C  4BF9 000025E5           1474                     LEA      MSG_HEX,A5              ; Loads $ into A5
+0000213C  4BF9 000025FA           1474                     LEA      MSG_HEX,A5              ; Loads $ into A5
 00002142  4EB9 000022B2           1475                     JSR      PRINTNULL               ; Prints $
 00002148  3200                    1476                     MOVE.W   D0, D1                  ; moves instruction word into d1
 0000214A  383C 0000               1477                     MOVE.W   #0, D4                  ; moves word size into d4
@@ -1615,7 +1615,7 @@ Created On: 6/10/2020 7:28:53 PM
 000022C2  4E75                    1611                  RTS                         ; returns from subroutine
 000022C4                          1612                  
 000022C4  2F0D                    1613  PRINTENTER      MOVE.L      A5, -(SP)       ; saves A5
-000022C6  4BF9 00002516           1614                  LEA         NEW_LINE,A5     ; Prints null
+000022C6  4BF9 0000252B           1614                  LEA         NEW_LINE,A5     ; Prints null
 000022CC  4EB8 22B2               1615                  JSR         PRINTNULL       ; prints the new line
 000022D0  2A5F                    1616                  MOVE.L      (SP)+,A5        ; returns A5
 000022D2  4E75                    1617                  RTS
@@ -1631,13 +1631,13 @@ Created On: 6/10/2020 7:28:53 PM
 000022E6  B27C 3000               1627                  CMP.W   #$3000,D1           ; checks if is word
 000022EA  6700 000C               1628                  BEQ     MOVE_WORD      
 000022EE                          1629                  
-000022EE  4BF9 0000260E           1630  MOVE_BYTE       LEA     MSG_B,A5            ; loads string pointer into a1
+000022EE  4BF9 00002623           1630  MOVE_BYTE       LEA     MSG_B,A5            ; loads string pointer into a1
 000022F4  6000 0012               1631                  BRA     FINISHMOVE          ; branches to FINISHMOVE
 000022F8                          1632  
-000022F8  4BF9 00002611           1633  MOVE_WORD       LEA     MSG_W,A5            ; loads string pointer into a1
+000022F8  4BF9 00002626           1633  MOVE_WORD       LEA     MSG_W,A5            ; loads string pointer into a1
 000022FE  6000 0008               1634                  BRA     FINISHMOVE          ; branches to FINISHMOVE
 00002302                          1635  
-00002302  4BF9 00002614           1636  MOVE_LONG       LEA     MSG_L,A5            ; loads string pointer into a1         
+00002302  4BF9 00002629           1636  MOVE_LONG       LEA     MSG_L,A5            ; loads string pointer into a1         
 00002308                          1637                  
 00002308  4EB8 22B2               1638  FINISHMOVE      JSR     PRINTNULL           ; prints out the size
 0000230C  E049                    1639                  LSR.W   #8,D1               ; shifts bytes 8 to the right
@@ -1645,7 +1645,7 @@ Created On: 6/10/2020 7:28:53 PM
 00002310  4CDF 2000               1641                  MOVEM.L (SP)+,A5            ; restores D0 and A5
 00002314  4E75                    1642                  RTS
 00002316                          1643  
-00002316  43F9 00002485           1644  ERROR           LEA     ERROR_MSG,A1
+00002316  43F9 0000249A           1644  ERROR           LEA     ERROR_MSG,A1
 0000231C  103C 000E               1645                  MOVE.B  #14,D0
 00002320  4E4F                    1646                  TRAP    #15 
 00002322                          1647            
@@ -1703,93 +1703,93 @@ Created On: 6/10/2020 7:28:53 PM
 00002363                          1699  * Messages
 00002363= 57 65 6C 63 6F 6D ...   1700  WELCOME                         DC.B    'Welcome to Team Big Blue Disassembler',CR,LF,0
 0000238B= 46 6F 72 6D 61 74 ...   1701  FORMAT1                         DC.B    'Format: 8 digit address in hexadecimal format. Numbers and letters only.',CR,LF,0
-000023D6= 4C 65 74 74 65 72 ...   1702  FORMAT2                         DC.B    'Letters must be capital case.',CR,LF,0
-000023F6= 50 6C 65 61 73 65 ...   1703  STARTING                        DC.B    'Please enter a starting location in the above format',CR,LF,0
-0000242D= 50 6C 65 61 73 65 ...   1704  ENDING                          DC.B    'Please enter an ending location in the above format',CR,LF,0
-00002463= 49 6E 76 61 6C 69 ...   1705  BAD_INPUT                       DC.B    'Invalid input. Please try again',CR,LF,0
-00002485= 45 72 72 6F 72 20 ...   1706  ERROR_MSG                       DC.B    'Error while disassembling',CR,LF,0
-000024A1= 09 44 41 54 41 00       1707  INVALID_INSTR                   DC.B    TAB,'DATA',0
-000024A7= 46 69 6E 69 73 68 ...   1708  DONE                            DC.B    'Finished Disassembling. Press R to restart. Any other key to end.',CR,LF,0
-000024EB= 0D 0A 50 72 65 73 ...   1709  CONTINUE                        DC.B    CR,LF,'Press ENTER to continue disassembling.',CR,LF,0
-00002516= 0D 0A 00                1710  NEW_LINE                        DC.B    CR,LF,0
-00002519= 09 09 09 00             1711  THREE_TAB                       DC.B    TAB,TAB,TAB,0
-0000251D                          1712  
-0000251D                          1713  * Opcode Messages
-0000251D= 09 4E 4F 50 00          1714  MSG_NOP                         DC.B    TAB,'NOP',0
-00002522= 09 4D 4F 56 45 00       1715  MSG_MOVE                        DC.B    TAB,'MOVE',0  
-00002528= 09 4D 4F 56 45 41 00    1716  MSG_MOVEA                       DC.B    TAB,'MOVEA',0
-0000252F= 09 4D 4F 56 45 51 00    1717  MSG_MOVEQ                       DC.B    TAB,'MOVEQ',0
-00002536= 09 4D 4F 56 45 4D 00    1718  MSG_MOVEM                       DC.B    TAB,'MOVEM',0
-0000253D= 09 41 44 44 00          1719  MSG_ADD                         DC.B    TAB,'ADD',0
-00002542= 09 41 44 44 41 00       1720  MSG_ADDA                        DC.B    TAB,'ADDA',0
-00002548= 09 41 44 44 51 00       1721  MSG_ADDQ                        DC.B    TAB,'ADDQ',0
-0000254E= 09 53 55 42 00          1722  MSG_SUB                         DC.B    TAB,'SUB',0
-00002553= 09 4D 55 4C 53 00       1723  MSG_MULS                        DC.B    TAB,'MULS',0
-00002559= 09 44 49 56 55 00       1724  MSG_DIVU                        DC.B    TAB,'DIVU',0
-0000255F= 09 4C 45 41 00          1725  MSG_LEA                         DC.B    TAB,'LEA',0
-00002564= 09 41 4E 44 00          1726  MSG_AND                         DC.B    TAB,'AND',0
-00002569= 09 4F 52 00             1727  MSG_OR                          DC.B    TAB,'OR',0
-0000256D= 09 4E 4F 54 00          1728  MSG_NOT                         DC.B    TAB,'NOT',0
-00002572= 09 4C 53 00             1729  MSG_LSd                         DC.B    TAB,'LS',0
-00002576= 09 41 53 00             1730  MSG_ASd                         DC.B    TAB,'AS',0
-0000257A= 09 52 4F 00             1731  MSG_ROd                         DC.B    TAB,'RO',0
-0000257E= 09 42 43 43 00          1732  MSG_BCC                         DC.B    TAB,'BCC',0
-00002583= 09 42 43 53 00          1733  MSG_BCS                         DC.B    TAB,'BCS',0
-00002588= 09 42 45 51 00          1734  MSG_BEQ                         DC.B    TAB,'BEQ',0
-0000258D= 09 42 4E 45 00          1735  MSG_BNE                         DC.B    TAB,'BNE',0
-00002592= 09 42 47 45 00          1736  MSG_BGE                         DC.B    TAB,'BGE',0
-00002597= 09 42 47 54 00          1737  MSG_BGT                         DC.B    TAB,'BGT',0
-0000259C= 09 42 48 49 00          1738  MSG_BHI                         DC.B    TAB,'BHI',0
-000025A1= 09 42 4C 45 00          1739  MSG_BLE                         DC.B    TAB,'BLE',0
-000025A6= 09 42 4C 53 00          1740  MSG_BLS                         DC.B    TAB,'BLS',0
-000025AB= 09 42 4C 54 00          1741  MSG_BLT                         DC.B    TAB,'BLT',0
-000025B0= 09 42 4D 49 00          1742  MSG_BMI                         DC.B    TAB,'BMI',0
-000025B5= 09 42 50 4C 00          1743  MSG_BPL                         DC.B    TAB,'BPL',0
-000025BA= 09 42 56 43 00          1744  MSG_BVC                         DC.B    TAB,'BVC',0
-000025BF= 09 42 56 53 00          1745  MSG_BVS                         DC.B    TAB,'BVS',0
-000025C4= 09 4A 53 52 00          1746  MSG_JSR                         DC.B    TAB,'JSR',0
-000025C9= 09 52 54 53 00          1747  MSG_RTS                         DC.B    TAB,'RTS',0
-000025CE= 09 42 52 41 00          1748  MSG_BRA                         DC.B    TAB,'BRA',0
-000025D3                          1749  
-000025D3                          1750  * Direction for LSd and ASd
-000025D3= 52 00                   1751  MSG_RIGHT                       DC.B    'R',0
-000025D5= 4C 00                   1752  MSG_LEFT                        DC.B    'L',0
-000025D7                          1753  
-000025D7                          1754  * Effective Addresses Messages
-000025D7= 44 00                   1755  MSG_DR                          DC.B    'D',0
-000025D9= 41 00                   1756  MSG_AR                          DC.B    'A',0
-000025DB= 28 00                   1757  MSG_LB                          DC.B    '(',0       ; left bracket, NEVER PRINTED WITHOUT RB
-000025DD= 29 00                   1758  MSG_RB                          DC.B    ')',0       ; right bracket, ALWAYS FOLLOWS AFTER LB
-000025DF= 2B 00                   1759  MSG_PLUS                        DC.B    '+',0
-000025E1= 2D 00                   1760  MSG_MINUS                       DC.B    '-',0
-000025E3= 23 00                   1761  MSG_POUND                       DC.B    '#',0 
-000025E5= 24 00                   1762  MSG_HEX                         DC.B    '$',0 
-000025E7= 2C 20 00                1763  MSG_COMMA                       DC.B    ', ',0
-000025EA= 2F 00                   1764  MSG_SLASH                       DC.B    '/',0  
-000025EC= 20 00                   1765  MSG_SPACE                       DC.B    ' ',0
-000025EE= 09 00                   1766  MSG_TAB                         DC.B    TAB,0
-000025F0= 20 20 20 00             1767  MSG_3SPACES                     DC.B    '   ',0
-000025F4= 20 20 20 20 00          1768  MSG_4SPACES                     DC.B    '    ',0
-000025F9= 20 20 20 20 20 00       1769  MSG_5SPACES                     DC.B    '     ',0
-000025FF= 20 20 20 20 20 20 00    1770  MSG_6SPACES                     DC.B    '      ',0
-00002606= 20 20 20 20 20 20 ...   1771  MSG_7SPACES                     DC.B    '       ',0
-0000260E                          1772  
-0000260E                          1773  * Size Messages
-0000260E= 2E 42 00                1774  MSG_B                           DC.B    '.B',0
-00002611= 2E 57 00                1775  MSG_W                           DC.B    '.W',0
-00002614= 2E 4C 00                1776  MSG_L                           DC.B    '.L',0
-00002617                          1777  
-00002617                          1778  * Variables
-00002617  =00000100               1779  STARTING_ADDRESS                EQU     $100
-00002617  =00000150               1780  ENDING_ADDRESS                  EQU     $150
-00002617  =00000200               1781  CURRENT_INSTR                   EQU     $200
-00002617  =00000250               1782  REG_VAR                         EQU     $250 * Hold bits 11-9
-00002617  =00000300               1783  OPMODE_VAR                      EQU     $300 * Hold bits 8-6
-00002617  =00000350               1784  EA_MODE                         EQU     $350 * Hold bits 5-3
-00002617  =00000400               1785  EA_REG                          EQU     $400 * Hold bits 2-0
-00002617= 00                      1786  LINE_COUNT                      DC.B     0
-00002618= 19                      1787  LINE_MAX                        DC.B     25
-00002619                          1788              END     START        ; last line of source
+000023D6= 4C 65 74 74 65 72 ...   1702  FORMAT2                         DC.B    'Letters must be capital case. Even addresses only.',CR,LF,0
+0000240B= 50 6C 65 61 73 65 ...   1703  STARTING                        DC.B    'Please enter a starting location in the above format',CR,LF,0
+00002442= 50 6C 65 61 73 65 ...   1704  ENDING                          DC.B    'Please enter an ending location in the above format',CR,LF,0
+00002478= 49 6E 76 61 6C 69 ...   1705  BAD_INPUT                       DC.B    'Invalid input. Please try again',CR,LF,0
+0000249A= 45 72 72 6F 72 20 ...   1706  ERROR_MSG                       DC.B    'Error while disassembling',CR,LF,0
+000024B6= 09 44 41 54 41 00       1707  INVALID_INSTR                   DC.B    TAB,'DATA',0
+000024BC= 46 69 6E 69 73 68 ...   1708  DONE                            DC.B    'Finished Disassembling. Press R to restart. Any other key to end.',CR,LF,0
+00002500= 0D 0A 50 72 65 73 ...   1709  CONTINUE                        DC.B    CR,LF,'Press ENTER to continue disassembling.',CR,LF,0
+0000252B= 0D 0A 00                1710  NEW_LINE                        DC.B    CR,LF,0
+0000252E= 09 09 09 00             1711  THREE_TAB                       DC.B    TAB,TAB,TAB,0
+00002532                          1712  
+00002532                          1713  * Opcode Messages
+00002532= 09 4E 4F 50 00          1714  MSG_NOP                         DC.B    TAB,'NOP',0
+00002537= 09 4D 4F 56 45 00       1715  MSG_MOVE                        DC.B    TAB,'MOVE',0  
+0000253D= 09 4D 4F 56 45 41 00    1716  MSG_MOVEA                       DC.B    TAB,'MOVEA',0
+00002544= 09 4D 4F 56 45 51 00    1717  MSG_MOVEQ                       DC.B    TAB,'MOVEQ',0
+0000254B= 09 4D 4F 56 45 4D 00    1718  MSG_MOVEM                       DC.B    TAB,'MOVEM',0
+00002552= 09 41 44 44 00          1719  MSG_ADD                         DC.B    TAB,'ADD',0
+00002557= 09 41 44 44 41 00       1720  MSG_ADDA                        DC.B    TAB,'ADDA',0
+0000255D= 09 41 44 44 51 00       1721  MSG_ADDQ                        DC.B    TAB,'ADDQ',0
+00002563= 09 53 55 42 00          1722  MSG_SUB                         DC.B    TAB,'SUB',0
+00002568= 09 4D 55 4C 53 00       1723  MSG_MULS                        DC.B    TAB,'MULS',0
+0000256E= 09 44 49 56 55 00       1724  MSG_DIVU                        DC.B    TAB,'DIVU',0
+00002574= 09 4C 45 41 00          1725  MSG_LEA                         DC.B    TAB,'LEA',0
+00002579= 09 41 4E 44 00          1726  MSG_AND                         DC.B    TAB,'AND',0
+0000257E= 09 4F 52 00             1727  MSG_OR                          DC.B    TAB,'OR',0
+00002582= 09 4E 4F 54 00          1728  MSG_NOT                         DC.B    TAB,'NOT',0
+00002587= 09 4C 53 00             1729  MSG_LSd                         DC.B    TAB,'LS',0
+0000258B= 09 41 53 00             1730  MSG_ASd                         DC.B    TAB,'AS',0
+0000258F= 09 52 4F 00             1731  MSG_ROd                         DC.B    TAB,'RO',0
+00002593= 09 42 43 43 00          1732  MSG_BCC                         DC.B    TAB,'BCC',0
+00002598= 09 42 43 53 00          1733  MSG_BCS                         DC.B    TAB,'BCS',0
+0000259D= 09 42 45 51 00          1734  MSG_BEQ                         DC.B    TAB,'BEQ',0
+000025A2= 09 42 4E 45 00          1735  MSG_BNE                         DC.B    TAB,'BNE',0
+000025A7= 09 42 47 45 00          1736  MSG_BGE                         DC.B    TAB,'BGE',0
+000025AC= 09 42 47 54 00          1737  MSG_BGT                         DC.B    TAB,'BGT',0
+000025B1= 09 42 48 49 00          1738  MSG_BHI                         DC.B    TAB,'BHI',0
+000025B6= 09 42 4C 45 00          1739  MSG_BLE                         DC.B    TAB,'BLE',0
+000025BB= 09 42 4C 53 00          1740  MSG_BLS                         DC.B    TAB,'BLS',0
+000025C0= 09 42 4C 54 00          1741  MSG_BLT                         DC.B    TAB,'BLT',0
+000025C5= 09 42 4D 49 00          1742  MSG_BMI                         DC.B    TAB,'BMI',0
+000025CA= 09 42 50 4C 00          1743  MSG_BPL                         DC.B    TAB,'BPL',0
+000025CF= 09 42 56 43 00          1744  MSG_BVC                         DC.B    TAB,'BVC',0
+000025D4= 09 42 56 53 00          1745  MSG_BVS                         DC.B    TAB,'BVS',0
+000025D9= 09 4A 53 52 00          1746  MSG_JSR                         DC.B    TAB,'JSR',0
+000025DE= 09 52 54 53 00          1747  MSG_RTS                         DC.B    TAB,'RTS',0
+000025E3= 09 42 52 41 00          1748  MSG_BRA                         DC.B    TAB,'BRA',0
+000025E8                          1749  
+000025E8                          1750  * Direction for LSd and ASd
+000025E8= 52 00                   1751  MSG_RIGHT                       DC.B    'R',0
+000025EA= 4C 00                   1752  MSG_LEFT                        DC.B    'L',0
+000025EC                          1753  
+000025EC                          1754  * Effective Addresses Messages
+000025EC= 44 00                   1755  MSG_DR                          DC.B    'D',0
+000025EE= 41 00                   1756  MSG_AR                          DC.B    'A',0
+000025F0= 28 00                   1757  MSG_LB                          DC.B    '(',0       ; left bracket, NEVER PRINTED WITHOUT RB
+000025F2= 29 00                   1758  MSG_RB                          DC.B    ')',0       ; right bracket, ALWAYS FOLLOWS AFTER LB
+000025F4= 2B 00                   1759  MSG_PLUS                        DC.B    '+',0
+000025F6= 2D 00                   1760  MSG_MINUS                       DC.B    '-',0
+000025F8= 23 00                   1761  MSG_POUND                       DC.B    '#',0 
+000025FA= 24 00                   1762  MSG_HEX                         DC.B    '$',0 
+000025FC= 2C 20 00                1763  MSG_COMMA                       DC.B    ', ',0
+000025FF= 2F 00                   1764  MSG_SLASH                       DC.B    '/',0  
+00002601= 20 00                   1765  MSG_SPACE                       DC.B    ' ',0
+00002603= 09 00                   1766  MSG_TAB                         DC.B    TAB,0
+00002605= 20 20 20 00             1767  MSG_3SPACES                     DC.B    '   ',0
+00002609= 20 20 20 20 00          1768  MSG_4SPACES                     DC.B    '    ',0
+0000260E= 20 20 20 20 20 00       1769  MSG_5SPACES                     DC.B    '     ',0
+00002614= 20 20 20 20 20 20 00    1770  MSG_6SPACES                     DC.B    '      ',0
+0000261B= 20 20 20 20 20 20 ...   1771  MSG_7SPACES                     DC.B    '       ',0
+00002623                          1772  
+00002623                          1773  * Size Messages
+00002623= 2E 42 00                1774  MSG_B                           DC.B    '.B',0
+00002626= 2E 57 00                1775  MSG_W                           DC.B    '.W',0
+00002629= 2E 4C 00                1776  MSG_L                           DC.B    '.L',0
+0000262C                          1777  
+0000262C                          1778  * Variables
+0000262C  =00000100               1779  STARTING_ADDRESS                EQU     $100
+0000262C  =00000150               1780  ENDING_ADDRESS                  EQU     $150
+0000262C  =00000200               1781  CURRENT_INSTR                   EQU     $200
+0000262C  =00000250               1782  REG_VAR                         EQU     $250 * Hold bits 11-9
+0000262C  =00000300               1783  OPMODE_VAR                      EQU     $300 * Hold bits 8-6
+0000262C  =00000350               1784  EA_MODE                         EQU     $350 * Hold bits 5-3
+0000262C  =00000400               1785  EA_REG                          EQU     $400 * Hold bits 2-0
+0000262C= 00                      1786  LINE_COUNT                      DC.B     0
+0000262D= 19                      1787  LINE_MAX                        DC.B     25
+0000262E                          1788              END     START        ; last line of source
 
 No errors detected
 No warnings generated
@@ -1819,7 +1819,7 @@ ANPOST              3
 ANPRE               4
 ASD_MEM             0
 ASD_REG             0
-BAD_INPUT           2463
+BAD_INPUT           2478
 CASE_ADD            1500
 CASE_ADDA           1658
 CASE_ADDQ           16DC
@@ -1879,7 +1879,7 @@ CHECK_XN            1E82
 CLEAR_SCREEN        11BA
 COMPLETE_REGIM      1C64
 CONCAT              1226
-CONTINUE            24EB
+CONTINUE            2500
 CONVERT             11F0
 CR                  D
 CURRENT_INSTR       200
@@ -1888,7 +1888,7 @@ DESTXN              1E32
 DISASSEMBLE         10D4
 DN                  0
 DN_PLUS_EA          1624
-DONE                24A7
+DONE                24BC
 DONEPRINTINGREG     1F88
 EASHIFT_VALID       1B76
 EAXN_INVALID        1E94
@@ -1897,11 +1897,11 @@ EA_MODE             350
 EA_REG              400
 EA_TO_STRING        1FC0
 EA_TO_STRING_EXIT   2162
-ENDING              242D
+ENDING              2442
 ENDING_ADDRESS      150
 END_CHECKGET        1E98
 ERROR               2316
-ERROR_MSG           2485
+ERROR_MSG           249A
 FINDTYPEEA          1E1C
 FINDTYPEXN          1E46
 FINISHED            10F8
@@ -1928,12 +1928,12 @@ INPUT2              1066
 INSERTA             1332
 INVALID             123E
 INVALIDEA           1FA0
-INVALID_INSTR       24A1
+INVALID_INSTR       24B6
 INV_INSTR           19B2
 ISNUMBER            1206
 LF                  A
-LINE_COUNT          2617
-LINE_MAX            2618
+LINE_COUNT          262C
+LINE_MAX            262D
 LSD_MEM             1
 LSD_REG             1
 MAKESHIFT8          1C60
@@ -1946,64 +1946,64 @@ MOVEM_REG2MEM       1390
 MOVE_BYTE           22EE
 MOVE_LONG           2302
 MOVE_WORD           22F8
-MSG_3SPACES         25F0
-MSG_4SPACES         25F4
-MSG_5SPACES         25F9
-MSG_6SPACES         25FF
-MSG_7SPACES         2606
-MSG_ADD             253D
-MSG_ADDA            2542
-MSG_ADDQ            2548
-MSG_AND             2564
-MSG_AR              25D9
-MSG_ASD             2576
-MSG_B               260E
-MSG_BCC             257E
-MSG_BCS             2583
-MSG_BEQ             2588
-MSG_BGE             2592
-MSG_BGT             2597
-MSG_BHI             259C
-MSG_BLE             25A1
-MSG_BLS             25A6
-MSG_BLT             25AB
-MSG_BMI             25B0
-MSG_BNE             258D
-MSG_BPL             25B5
-MSG_BRA             25CE
-MSG_BVC             25BA
-MSG_BVS             25BF
-MSG_COMMA           25E7
-MSG_DIVU            2559
-MSG_DR              25D7
-MSG_HEX             25E5
-MSG_JSR             25C4
-MSG_L               2614
-MSG_LB              25DB
-MSG_LEA             255F
-MSG_LEFT            25D5
-MSG_LSD             2572
-MSG_MINUS           25E1
-MSG_MOVE            2522
-MSG_MOVEA           2528
-MSG_MOVEM           2536
-MSG_MOVEQ           252F
-MSG_MULS            2553
-MSG_NOP             251D
-MSG_NOT             256D
-MSG_OR              2569
-MSG_PLUS            25DF
-MSG_POUND           25E3
-MSG_RB              25DD
-MSG_RIGHT           25D3
-MSG_ROD             257A
-MSG_RTS             25C9
-MSG_SLASH           25EA
-MSG_SPACE           25EC
-MSG_SUB             254E
-MSG_TAB             25EE
-MSG_W               2611
-NEW_LINE            2516
+MSG_3SPACES         2605
+MSG_4SPACES         2609
+MSG_5SPACES         260E
+MSG_6SPACES         2614
+MSG_7SPACES         261B
+MSG_ADD             2552
+MSG_ADDA            2557
+MSG_ADDQ            255D
+MSG_AND             2579
+MSG_AR              25EE
+MSG_ASD             258B
+MSG_B               2623
+MSG_BCC             2593
+MSG_BCS             2598
+MSG_BEQ             259D
+MSG_BGE             25A7
+MSG_BGT             25AC
+MSG_BHI             25B1
+MSG_BLE             25B6
+MSG_BLS             25BB
+MSG_BLT             25C0
+MSG_BMI             25C5
+MSG_BNE             25A2
+MSG_BPL             25CA
+MSG_BRA             25E3
+MSG_BVC             25CF
+MSG_BVS             25D4
+MSG_COMMA           25FC
+MSG_DIVU            256E
+MSG_DR              25EC
+MSG_HEX             25FA
+MSG_JSR             25D9
+MSG_L               2629
+MSG_LB              25F0
+MSG_LEA             2574
+MSG_LEFT            25EA
+MSG_LSD             2587
+MSG_MINUS           25F6
+MSG_MOVE            2537
+MSG_MOVEA           253D
+MSG_MOVEM           254B
+MSG_MOVEQ           2544
+MSG_MULS            2568
+MSG_NOP             2532
+MSG_NOT             2582
+MSG_OR              257E
+MSG_PLUS            25F4
+MSG_POUND           25F8
+MSG_RB              25F2
+MSG_RIGHT           25E8
+MSG_ROD             258F
+MSG_RTS             25DE
+MSG_SLASH           25FF
+MSG_SPACE           2601
+MSG_SUB             2563
+MSG_TAB             2603
+MSG_W               2626
+NEW_LINE            252B
 NEXT_SCREEN         119A
 NOTNUMBER           120E
 OPCODE_DECODE       128E
@@ -2063,12 +2063,12 @@ ROD_REG             3
 SOURCEEA            1E14
 SOURCEXN            1E3E
 START               1000
-STARTING            23F6
+STARTING            240B
 STARTING_ADDRESS    100
 TAB                 9
 TEST                1DFA
 TEST_RANGE          1262
-THREE_TAB           2519
+THREE_TAB           252E
 VALIDEA             1FA8
 VALIDEA_ADDSUB_DESTOPERAND  233B
 VALIDEA_ALL         2326

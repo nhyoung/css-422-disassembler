@@ -1699,7 +1699,7 @@ ROd_REG                         EQU     3
 * Messages
 WELCOME                         DC.B    'Welcome to Team Big Blue Disassembler',CR,LF,0
 FORMAT1                         DC.B    'Format: 8 digit address in hexadecimal format. Numbers and letters only.',CR,LF,0
-FORMAT2                         DC.B    'Letters must be capital case.',CR,LF,0
+FORMAT2                         DC.B    'Letters must be capital case. Even addresses only.',CR,LF,0
 STARTING                        DC.B    'Please enter a starting location in the above format',CR,LF,0
 ENDING                          DC.B    'Please enter an ending location in the above format',CR,LF,0
 BAD_INPUT                       DC.B    'Invalid input. Please try again',CR,LF,0
