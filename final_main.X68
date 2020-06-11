@@ -195,6 +195,9 @@ CONCAT          CMP.B   #0,D6               ; D6 stores counter
 RETURN          RTS
                 
 INVALID         MOVEA.L #$0000000, A1       ; clear A1
+                CLR.L   D3
+                CLR.L   D4
+                CLR.L   D5
                 LEA     BAD_INPUT,A1        ; output invalid message
                 MOVE.B  #14,D0
                 TRAP    #15
@@ -1144,6 +1147,8 @@ CASE_DATA       JSR INV_INSTR
 
 CASE_EPICFAIL   RTS
 
+TEST            MOVE.W  $0F3(A3),D3
+
 
 * Finds the EA type
 * Inputs: D0 = the instruction word, D1 = 0 (source EA), 1 (dest EA)
@@ -1781,6 +1786,7 @@ EA_REG                          EQU     $400 * Hold bits 2-0
 LINE_COUNT                      DC.B     0
 LINE_MAX                        DC.B     25
             END     START        ; last line of source
+
 
 
 
