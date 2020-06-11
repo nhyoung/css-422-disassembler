@@ -215,13 +215,7 @@ CHECK_ODD       BTST       #0,D5            ; check if input is odd
                 BNE        INVALID
                 RTS
 
-PRINT_ADDR      ;MOVEM.L D1/D4,-(SP)             ; saves D1 and D4
-*                MOVE.L  A6,D1                   ; loads current address in D1
-*                MOVE.L  #1,D4                   ; tells subroutine we want to make the address print as a long
-*                JSR     PRINTSHORTLONGNUM       ; prints out address
-*                MOVEM.L (SP)+, D1/D4            ; restores D1 and D4
-*                RTS
-                MOVE.L  A6,D1                   ; loads current address in D1
+PRINT_ADDR      MOVE.L  A6,D1                   ; loads current address in D1
                 MOVE.L  #1,D4                   ; tells subroutine we want to make the address print as a long
                 JSR     PRINTSHORTLONGNUM       ; prints out address
                 RTS
@@ -232,7 +226,7 @@ PRINT_ADDR      ;MOVEM.L D1/D4,-(SP)             ; saves D1 and D4
 * Inputs: (A2) which is a pointer to intruction word to be translated
 * Outputs: Prints out dissasembled content to console and A2 will increment appropriatley
 
-OPCODE_DECODE   MOVE.W  A2,A6
+OPCODE_DECODE   MOVE.L  A2,A6
                 MOVE.W  (A2)+,D0                ; load instruction word from memory, store in D0
                 JSR     PRINT_ADDR
                 
@@ -368,7 +362,6 @@ MEM2REGWORD     LEA     MSG_W,A5                        ; loads .W
                 BRA     PRINTMEM2REG                    ; prints the registers           
                 
 MEM2REGLONG     LEA     MSG_L,A5                        ; loads .L
-                JSR     PRINTNULL                       ; prints MOVEM 
            
 PRINTMEM2REG    JSR     PRINTNULL                       ; prints out size
                 LEA     MSG_3SPACES,A5                  ; loads spaces
@@ -801,19 +794,19 @@ CASE_AND        MOVE.W      D0,D1                           ; bitmask for 4 MSB
                 
 AND_BYTE        LEA         MSG_B,A5
                 JSR         PRINTNULL
-                LEA         MSG_7SPACES,A5                  ; loads spaces
+                LEA         MSG_5SPACES,A5                  ; loads spaces
                 JSR         PRINTNULL                       ; prints out spaces
                 BRA         FINISH_AND
                                   
 AND_WORD        LEA         MSG_W,A5
                 JSR         PRINTNULL
-                LEA         MSG_7SPACES,A5                  ; loads spaces
+                LEA         MSG_5SPACES,A5                  ; loads spaces
                 JSR         PRINTNULL                       ; prints out spaces
                 BRA         FINISH_AND
   
 AND_LONG        LEA         MSG_L,A5
                 JSR         PRINTNULL
-                LEA         MSG_7SPACES,A5                  ; loads spaces
+                LEA         MSG_5SPACES,A5                  ; loads spaces
                 JSR         PRINTNULL                       ; prints out spaces
                 BRA         FINISH_AND
       
@@ -830,7 +823,6 @@ INV_INSTR       LEA         INVALID_INSTR,A5
                 MOVE.L      D0,D1
                 MOVE.W      #0,D4
                 JSR         PRINTSHORTLONGNUM
-                JSR         PRINTNULL
                 RTS               
                 
 *---------------OR opcode----------------------            
@@ -844,9 +836,9 @@ CASE_OR         MOVE.W      D0,D1                           ; bitmask for 4 MSB
                 LSR.W       #8,D1
                 LSR.W       #6,D1                           ; get bits 6-7 (size)
                 CMP.W       #3,D1
-                MOVE.W      D1,D6
                 BEQ         INV_INSTR
-                
+                MOVE.W      D1,D6
+
                 
                 LEA         MSG_OR,A5
                 JSR         PRINTNULL                       ; print "OR"
@@ -1789,6 +1781,7 @@ EA_REG                          EQU     $400 * Hold bits 2-0
 LINE_COUNT                      DC.B     0
 LINE_MAX                        DC.B     25
             END     START        ; last line of source
+
 
 
 

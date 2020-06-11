@@ -1,6 +1,6 @@
-00001000 Starting Address
+00009000 Starting Address
 Assembler used: EASy68K Editor/Assembler v5.16.01
-Created On: 6/10/2020 2:39:37 AM
+Created On: 6/10/2020 5:11:45 PM
 
 00000000                             1  *-----------------------------------------------------------
 00000000                             2  * Title      :  Test Code
@@ -8,835 +8,835 @@ Created On: 6/10/2020 2:39:37 AM
 00000000                             4  * Date       :  06/10/2020
 00000000                             5  * Description:  Version 4
 00000000                             6  *-----------------------------------------------------------
-00001000                             7      ORG    $1000
-00001000                             8  START:                  
-00001000                             9  * NOP test
-00001000  4E71                      10                  NOP
-00001002                            11  
-00001002                            12  * MOVE test
-00001002                            13  MOVETEST            
-00001002                            14                  * Direct Addressing
-00001002  103C 000A                 15                  MOVE.B      #$A, D0
-00001006  323C AAAB                 16                  MOVE.W      #$AAAB, D1
-0000100A  243C AAAAAAAA             17                  MOVE.L      #$AAAAAAAA, D2
-00001010                            18                  
-00001010  11FC 000A 6000            19                  MOVE.B      #$A, $6000
-00001016  31FC AAAB 6020            20                  MOVE.W      #$AAAB, $6020
-0000101C  21FC AAAAAAAA 6040        21                  MOVE.L      #$AAAAAAAA, $6040
-00001024                            22                  
-00001024  327C AAAB                 23                  MOVE.W      #$AAAB, A1
-00001028  247C AAAAAAAA             24                  MOVE.L      #$AAAAAAAA, A2
-0000102E                            25                  
-0000102E  12BC 000A                 26                  MOVE.B      #$A, (A1)
-00001032  34BC AAAB                 27                  MOVE.W      #$AAAB, (A2)
-00001036  26BC AAAAAAAA             28                  MOVE.L      #$AAAAAAAA, (A3)
-0000103C                            29                  
-0000103C  12FC 000A                 30                  MOVE.B      #$A, (A1)+
-00001040  34FC AAAB                 31                  MOVE.W      #$AAAB, (A2)+
-00001044  26FC AAAAAAAA             32                  MOVE.L      #$AAAAAAAA, (A3)+
-0000104A                            33                  
-0000104A  133C 000A                 34                  MOVE.B      #$A, -(A1)
-0000104E  353C AAAB                 35                  MOVE.W      #$AAAB, -(A2)
-00001052  273C AAAAAAAA             36                  MOVE.L      #$AAAAAAAA, -(A3)
-00001058                            37                  
-00001058                            38                  * Data Register Direct
-00001058  1200                      39                  MOVE.B      D0,D1
-0000105A  3601                      40                  MOVE.W      D1,D3
-0000105C  2802                      41                  MOVE.L      D2,D4
-0000105E                            42                  
-0000105E  11C0 6000                 43                  MOVE.B      D0,$6000
-00001062  31C1 6020                 44                  MOVE.W      D1,$6020
-00001066  21C2 6040                 45                  MOVE.L      D2,$6040
-0000106A                            46                  
-0000106A  3441                      47                  MOVE.W      D1,A2
-0000106C  2642                      48                  MOVE.L      D2,A3
-0000106E                            49                  
-0000106E  1280                      50                  MOVE.B      D0,(A1)
-00001070  3481                      51                  MOVE.W      D1,(A2)
-00001072  2682                      52                  MOVE.L      D2,(A3)
-00001074                            53                  
-00001074  12C0                      54                  MOVE.B      D0,(A1)+
-00001076  34C1                      55                  MOVE.W      D1,(A2)+
-00001078  26C2                      56                  MOVE.L      D2,(A3)+
-0000107A                            57                  
-0000107A  1300                      58                  MOVE.B      D0,-(A1)
-0000107C  3501                      59                  MOVE.W      D1,-(A2)
-0000107E  2702                      60                  MOVE.L      D2,-(A3)
-00001080                            61                  
-00001080                            62                  * Address Register Direct
-00001080  3609                      63                  MOVE.W      A1,D3
-00001082  280A                      64                  MOVE.L      A2,D4
-00001084                            65                  
-00001084  31C9 6020                 66                  MOVE.W      A1,$6020
-00001088  21CA 6040                 67                  MOVE.L      A2,$6040
-0000108C                            68                  
-0000108C  3449                      69                  MOVE.W      A1,A2
-0000108E  264A                      70                  MOVE.L      A2,A3
-00001090                            71                  
-00001090  3489                      72                  MOVE.W      A1,(A2)
-00001092  268A                      73                  MOVE.L      A2,(A3)
-00001094                            74                  
-00001094  34C9                      75                  MOVE.W      A1,(A2)+
-00001096  26CA                      76                  MOVE.L      A2,(A3)+
-00001098                            77                  
-00001098  3509                      78                  MOVE.W      A1,-(A2)
-0000109A  270A                      79                  MOVE.L      A2,-(A3)
-0000109C                            80                  
-0000109C                            81                  * Address Register Indirect
-0000109C  1210                      82                  MOVE.B      (A0),D1
-0000109E  3611                      83                  MOVE.W      (A1),D3
-000010A0  2812                      84                  MOVE.L      (A2),D4
-000010A2                            85                  
-000010A2  11D0 6000                 86                  MOVE.B      (A0),$6000
-000010A6  31D1 6020                 87                  MOVE.W      (A1),$6020
-000010AA  21D2 6040                 88                  MOVE.L      (A2),$6040
-000010AE                            89                  
-000010AE  3451                      90                  MOVE.W      (A1),A2
-000010B0  2652                      91                  MOVE.L      (A2),A3
-000010B2                            92                  
-000010B2  1290                      93                  MOVE.B      (A0),(A1)
-000010B4  3491                      94                  MOVE.W      (A1),(A2)
-000010B6  2692                      95                  MOVE.L      (A2),(A3)
-000010B8                            96                  
-000010B8  12D0                      97                  MOVE.B      (A0),(A1)+
-000010BA  34D1                      98                  MOVE.W      (A1),(A2)+
-000010BC  26D2                      99                  MOVE.L      (A2),(A3)+
-000010BE                           100                  
-000010BE  1310                     101                  MOVE.B      (A0),-(A1)
-000010C0  3511                     102                  MOVE.W      (A1),-(A2)
-000010C2  2712                     103                  MOVE.L      (A2),-(A3)
-000010C4                           104                  
-000010C4                           105                  * Address Register Indirect with Post incrementing
-000010C4  1218                     106                  MOVE.B      (A0)+,D1
-000010C6  3619                     107                  MOVE.W      (A1)+,D3
-000010C8  281A                     108                  MOVE.L      (A2)+,D4
-000010CA                           109                  
-000010CA  11D8 6000                110                  MOVE.B      (A0)+,$6000
-000010CE  31D9 6020                111                  MOVE.W      (A1)+,$6020
-000010D2  21DA 6040                112                  MOVE.L      (A2)+,$6040
-000010D6                           113                  
-000010D6  3459                     114                  MOVE.W      (A1)+,A2
-000010D8  265A                     115                  MOVE.L      (A2)+,A3
-000010DA                           116                  
-000010DA  1298                     117                  MOVE.B      (A0)+,(A1)
-000010DC  3499                     118                  MOVE.W      (A1)+,(A2)
-000010DE  269A                     119                  MOVE.L      (A2)+,(A3)
-000010E0                           120                  
-000010E0  12D8                     121                  MOVE.B      (A0)+,(A1)+
-000010E2  34D9                     122                  MOVE.W      (A1)+,(A2)+
-000010E4  26DA                     123                  MOVE.L      (A2)+,(A3)+
-000010E6                           124                  
-000010E6  1318                     125                  MOVE.B      (A0)+,-(A1)
-000010E8  3519                     126                  MOVE.W      (A1)+,-(A2)
-000010EA  271A                     127                  MOVE.L      (A2)+,-(A3)
-000010EC                           128                  
-000010EC                           129                  * Address Register Indirect with Pre decrementing
-000010EC  1220                     130                  MOVE.B      -(A0),D1
-000010EE  3621                     131                  MOVE.W      -(A1),D3
-000010F0  2822                     132                  MOVE.L      -(A2),D4
-000010F2                           133                  
-000010F2  11E0 6000                134                  MOVE.B      -(A0),$6000
-000010F6  31E1 6020                135                  MOVE.W      -(A1),$6020
-000010FA  21E2 6040                136                  MOVE.L      -(A2),$6040
-000010FE                           137                  
-000010FE  3461                     138                  MOVE.W      -(A1),A2
-00001100  2662                     139                  MOVE.L      -(A2),A3
-00001102                           140                  
-00001102  12A0                     141                  MOVE.B      -(A0),(A1)
-00001104  34A1                     142                  MOVE.W      -(A1),(A2)
-00001106  26A2                     143                  MOVE.L      -(A2),(A3)
-00001108                           144                  
-00001108  12E0                     145                  MOVE.B      -(A0),(A1)+
-0000110A  34E1                     146                  MOVE.W      -(A1),(A2)+
-0000110C  26E2                     147                  MOVE.L      -(A2),(A3)+
-0000110E                           148                  
-0000110E  1320                     149                  MOVE.B      -(A0),-(A1)
-00001110  3521                     150                  MOVE.W      -(A1),-(A2)
-00001112  2722                     151                  MOVE.L      -(A2),-(A3)
-00001114                           152                  
-00001114                           153                  * Absolute Long Address
-00001114  1039 80000000            154                  MOVE.B      $80000000, D0
-0000111A  3239 80200000            155                  MOVE.W      $80200000, D1
-00001120  2439 80300000            156                  MOVE.L      $80300000, D2
-00001126                           157                  
-00001126  11F9 80000000 6000       158                  MOVE.B      $80000000, $6000
-0000112E  31F9 80200000 6020       159                  MOVE.W      $80200000, $6020
-00001136  21F9 80300000 6040       160                  MOVE.L      $80300000, $6040
-0000113E                           161                  
-0000113E  3279 80200000            162                  MOVE.W      $80200000, A1
-00001144  2479 80300000            163                  MOVE.L      $80300000, A2
-0000114A                           164                  
-0000114A  12B9 80000000            165                  MOVE.B      $80000000, (A1)
-00001150  34B9 80200000            166                  MOVE.W      $80200000, (A2)
-00001156  26B9 80300000            167                  MOVE.L      $80300000, (A3)
-0000115C                           168                  
-0000115C  12F9 80000000            169                  MOVE.B      $80000000, (A1)+
-00001162  34F9 80200000            170                  MOVE.W      $80200000, (A2)+
-00001168  26F9 80300000            171                  MOVE.L      $80300000, (A3)+
-0000116E                           172                  
-0000116E  1339 80000000            173                  MOVE.B      $80000000, -(A1)
-00001174  3539 80200000            174                  MOVE.W      $80200000, -(A2)
-0000117A  2739 80300000            175                  MOVE.L      $80300000, -(A3)
-00001180                           176                  
-00001180                           177                  * Absolute Word Address
-00001180  1039 00008000            178                  MOVE.B      $8000, D0
-00001186  3239 00008020            179                  MOVE.W      $8020, D1
-0000118C  2439 00008030            180                  MOVE.L      $8030, D2
-00001192                           181                  
-00001192  11F9 00008000 6000       182                  MOVE.B      $8000, $6000
-0000119A  31F9 00008020 6020       183                  MOVE.W      $8020, $6020
-000011A2  21F9 00008030 6040       184                  MOVE.L      $8030, $6040
-000011AA                           185                  
-000011AA  3279 00008020            186                  MOVE.W      $8020, A1
-000011B0  2479 00008030            187                  MOVE.L      $8030, A2
-000011B6                           188                  
-000011B6  12B9 00008000            189                  MOVE.B      $8000, (A1)
-000011BC  34B9 00008020            190                  MOVE.W      $8020, (A2)
-000011C2  26B9 00008030            191                  MOVE.L      $8030, (A3)
-000011C8                           192                  
-000011C8  12F9 00008000            193                  MOVE.B      $8000, (A1)+
-000011CE  34F9 00008020            194                  MOVE.W      $8020, (A2)+
-000011D4  26F9 00008030            195                  MOVE.L      $8030, (A3)+
-000011DA                           196                  
-000011DA  1339 00008000            197                  MOVE.B      $8000, -(A1)
-000011E0  3539 00008020            198                  MOVE.W      $8020, -(A2)
-000011E6  2739 00008030            199                  MOVE.L      $8030, -(A3)
-000011EC                           200                  
-000011EC                           201      
-000011EC                           202  * MOVEA test
-000011EC                           203  
-000011EC                           204  MOVEATEST
-000011EC                           205                  * Direct Addressing
-000011EC  327C AAAB                206                  MOVEA.W     #$AAAB, A1
-000011F0  247C AAAAAAAA            207                  MOVEA.L     #$AAAAAAAA, A2
-000011F6                           208                  
-000011F6                           209                  * Data Register Direct
-000011F6  3441                     210                  MOVEA.W     D1,A2
-000011F8  2642                     211                  MOVEA.L     D2,A3
-000011FA                           212                  
-000011FA                           213                  * Address Register Direct
-000011FA  3449                     214                  MOVEA.W     A1,A2
-000011FC  264A                     215                  MOVEA.L     A2,A3
-000011FE                           216                                 
-000011FE                           217                  * Address Register Indirect
-000011FE  3459                     218                  MOVEA.W     (A1)+,A2
-00001200  265A                     219                  MOVEA.L     (A2)+,A3
-00001202                           220                  
-00001202                           221                  * Address Register Indirect with Post incrementing
-00001202  3459                     222                  MOVEA.W     (A1)+,A2
-00001204  265A                     223                  MOVEA.L     (A2)+,A3
-00001206                           224                  
-00001206                           225                  * Address Register Indirect with Pre decrementing
-00001206  3461                     226                  MOVEA.W     -(A1),A2
-00001208  2662                     227                  MOVEA.L     -(A2),A3
-0000120A                           228                  
-0000120A                           229                  * Absolute Long Address
-0000120A  3279 80200000            230                  MOVEA.W     $80200000, A1
-00001210  2479 80300000            231                  MOVEA.L     $80300000, A2
-00001216                           232                  
-00001216                           233                  * Absolute Word Address
-00001216  3279 00008020            234                  MOVEA.W     $8020, A1
-0000121C  2479 00008030            235                  MOVEA.L     $8030, A2
-00001222                           236     
-00001222                           237               
-00001222                           238  * MOVEQ test
-00001222                           239  MOVEQTEST
-00001222  7002                     240                  MOVEQ.L     #2,D0
-00001224  7003                     241                  MOVEQ       #3,D0
-00001226                           242                  
-00001226                           243  * MOVEM test
-00001226                           244  MOVEMTEST
-00001226                           245                  * Direct Addressing
-00001226  48A7 FFFE                246                  MOVEM       A0-A6/D0-D7,-(SP)
-0000122A  4C9F 7FFF                247                  MOVEM       (SP)+,A0-A6/D0-D7
-0000122E                           248    
-0000122E                           249  * ADD test
-0000122E                           250  ADDTEST
-0000122E                           251                  * Direct Addressing
-0000122E  0600 000A                252                  ADD.B       #$A, D0
-00001232  0641 AAAB                253                  ADD.W       #$AAAB, D1
-00001236  0682 AAAAAAAA            254                  ADD.L       #$AAAAAAAA, D2
-0000123C                           255                  
-0000123C  0638 000A 6000           256                  ADD.B       #$A, $6000
-00001242  0678 AAAB 6020           257                  ADD.W       #$AAAB, $6020
-00001248  06B8 AAAAAAAA 6040       258                  ADD.L       #$AAAAAAAA, $6040
-00001250                           259                  
-00001250  D2FC AAAB                260                  ADD.W       #$AAAB, A1
-00001254  D5FC AAAAAAAA            261                  ADD.L       #$AAAAAAAA, A2
-0000125A                           262                  
-0000125A  0611 000A                263                  ADD.B       #$A, (A1)
-0000125E  0652 AAAB                264                  ADD.W       #$AAAB, (A2)
-00001262  0693 AAAAAAAA            265                  ADD.L       #$AAAAAAAA, (A3)
-00001268                           266                   
-00001268  0619 000A                267                  ADD.B       #$A, (A1)+
-0000126C  065A AAAB                268                  ADD.W       #$AAAB, (A2)+
-00001270  069B AAAAAAAA            269                  ADD.L       #$AAAAAAAA, (A3)+
-00001276                           270                  
-00001276  0621 000A                271                  ADD.B       #$A, -(A1)
-0000127A  0662 AAAB                272                  ADD.W       #$AAAB, -(A2)
-0000127E  06A3 AAAAAAAA            273                  ADD.L       #$AAAAAAAA, -(A3)
-00001284                           274                  
-00001284                           275                  * Data Register Direct
-00001284  D200                     276                  ADD.B       D0,D1
-00001286  D641                     277                  ADD.W       D1,D3
-00001288  D882                     278                  ADD.L       D2,D4
-0000128A                           279                  
-0000128A  D138 6000                280                  ADD.B       D0,$6000
-0000128E  D378 6020                281                  ADD.W       D1,$6020
-00001292  D5B8 6040                282                  ADD.L       D2,$6040
-00001296                           283                  
-00001296  D4C1                     284                  ADD.W       D1,A2
-00001298  D7C2                     285                  ADD.L       D2,A3
-0000129A                           286                  
-0000129A  D111                     287                  ADD.B       D0,(A1)
-0000129C  D352                     288                  ADD.W       D1,(A2)
-0000129E  D593                     289                  ADD.L       D2,(A3)
-000012A0                           290                  
-000012A0  D119                     291                  ADD.B       D0,(A1)+
-000012A2  D35A                     292                  ADD.W       D1,(A2)+
-000012A4  D59B                     293                  ADD.L       D2,(A3)+
-000012A6                           294                  
-000012A6  D121                     295                  ADD.B       D0,-(A1)
-000012A8  D362                     296                  ADD.W       D1,-(A2)
-000012AA  D5A3                     297                  ADD.L       D2,-(A3)
-000012AC                           298                  
-000012AC                           299                  * Address Register Direct
-000012AC  D649                     300                  ADD.W       A1,D3
-000012AE  D88A                     301                  ADD.L       A2,D4
-000012B0                           302                  
-000012B0  D4C9                     303                  ADD.W       A1,A2
-000012B2  D7CA                     304                  ADD.L       A2,A3
-000012B4                           305                  
-000012B4                           306                  * Address Register Indirect
-000012B4  D210                     307                  ADD.B      (A0),D1
-000012B6  D651                     308                  ADD.W      (A1),D3
-000012B8  D892                     309                  ADD.L      (A2),D4
-000012BA                           310                  
-000012BA  D4D1                     311                  ADD.W      (A1),A2
-000012BC  D7D2                     312                  ADD.L      (A2),A3
-000012BE                           313                  
-000012BE                           314                  * Address Register Indirect with Post incrementing
-000012BE  D218                     315                  ADD.B      (A0)+,D1
-000012C0  D659                     316                  ADD.W      (A1)+,D3
-000012C2  D89A                     317                  ADD.L      (A2)+,D4
-000012C4                           318                  
-000012C4  D4D9                     319                  ADD.W      (A1)+,A2
-000012C6  D7DA                     320                  ADD.L      (A2)+,A3
-000012C8                           321  
-000012C8                           322                  * Address Register Indirect with Pre decrementing
-000012C8  D220                     323                  ADD.B      -(A0),D1
-000012CA  D661                     324                  ADD.W      -(A1),D3
-000012CC  D8A2                     325                  ADD.L      -(A2),D4
-000012CE                           326                  
-000012CE  D4E1                     327                  ADD.W      -(A1),A2
-000012D0  D7E2                     328                  ADD.L      -(A2),A3
-000012D2                           329                  
-000012D2                           330                  * Absolute Long Address
-000012D2  D039 80000000            331                  ADD.B      $80000000, D0
-000012D8  D279 80200000            332                  ADD.W      $80200000, D1
-000012DE  D4B9 80300000            333                  ADD.L      $80300000, D2
-000012E4                           334                  
-000012E4  D2F9 80200000            335                  ADD.W      $80200000, A1
-000012EA  D5F9 80300000            336                  ADD.L      $80300000, A2
-000012F0                           337                  
-000012F0                           338                  * Absolute Word Address
-000012F0  D039 00008000            339                  ADD.B      $8000, D0
-000012F6  D279 00008020            340                  ADD.W      $8020, D1
-000012FC  D4B9 00008030            341                  ADD.L      $8030, D2
-00001302                           342                  
-00001302  D2F9 00008020            343                  ADD.W      $8020, A1
-00001308  D5F9 00008030            344                  ADD.L      $8030, A2
-0000130E                           345      
-0000130E                           346  * ADDA test
-0000130E                           347  ADDATEST
-0000130E                           348                  * Direct Addressing
-0000130E  D2FC AAAB                349                  ADDA.W      #$AAAB, A1
-00001312  D5FC AAAAAAAA            350                  ADDA.L      #$AAAAAAAA, A2
-00001318                           351                  
-00001318                           352                  * Data Register Direct
-00001318  D4C1                     353                  ADDA.W      D1,A2
-0000131A  D7C2                     354                  ADDA.L      D2,A3
-0000131C                           355                  
-0000131C                           356                  * Address Register Direct
-0000131C  D4C9                     357                  ADDA.W      A1,A2
-0000131E  D7CA                     358                  ADDA.L      A2,A3
-00001320                           359                  
-00001320                           360                  * Address Register Indirect                
-00001320  D4D1                     361                  ADDA.W     (A1),A2
-00001322  D7D2                     362                  ADDA.L     (A2),A3
-00001324                           363                  
-00001324                           364                  * Address Register Indirect with Post incrementing            
-00001324  D4D9                     365                  ADDA.W     (A1)+,A2
-00001326  D7DA                     366                  ADDA.L     (A2)+,A3
-00001328                           367                  
-00001328                           368                  * Address Register Indirect with Pre decrementing
-00001328  D4E1                     369                  ADDA.W     -(A1),A2
-0000132A  D7E2                     370                  ADDA.L     -(A2),A3
-0000132C                           371                  
-0000132C                           372                  * Absolute Long Address
-0000132C  D2F9 80200000            373                  ADDA.W      $80200000, A1
-00001332  D5F9 80300000            374                  ADDA.L      $80300000, A2
-00001338                           375                  
-00001338                           376                  * Absolute Word Address
-00001338  D2F9 00008020            377                  ADDA.W      $8020, A1
-0000133E  D5F9 00008030            378                  ADDA.L      $8030, A2
-00001344                           379      
-00001344                           380  * ADDQ test
-00001344                           381  ADDQTEST
-00001344  5480                     382                  ADDQ.L      #2,D0
-00001346  5640                     383                  ADDQ        #3,D0
-00001348                           384      
-00001348                           385  * SUB test
-00001348                           386  SUBTEST
-00001348                           387                  * Direct Addressing
-00001348  0400 000A                388                  SUB.B       #$A, D0
-0000134C                           389                  
-0000134C  0441 AAAB                390                  SUB.W       #$AAAB, D1
-00001350  0482 AAAAAAAA            391                  SUB.L       #$AAAAAAAA, D2
-00001356                           392                  
-00001356  0438 000A 6000           393                  SUB.B       #$A, $6000
-0000135C  0478 AAAB 6020           394                  SUB.W       #$AAAB, $6020
-00001362  04B8 AAAAAAAA 6040       395                  SUB.L       #$AAAAAAAA, $6040
-0000136A                           396                  
-0000136A  92FC AAAB                397                  SUB.W       #$AAAB, A1
-0000136E  95FC AAAAAAAA            398                  SUB.L       #$AAAAAAAA, A2
-00001374                           399                  
-00001374  0411 000A                400                  SUB.B       #$A, (A1)
-00001378  0452 AAAB                401                  SUB.W       #$AAAB, (A2)
-0000137C  0493 AAAAAAAA            402                  SUB.L       #$AAAAAAAA, (A3)
-00001382                           403                  
-00001382  0419 000A                404                  SUB.B       #$A, (A1)+
-00001386  045A AAAB                405                  SUB.W       #$AAAB, (A2)+
-0000138A  049B AAAAAAAA            406                  SUB.L       #$AAAAAAAA, (A3)+
-00001390                           407                  
-00001390  0421 000A                408                  SUB.B       #$A, -(A1)
-00001394  0462 AAAB                409                  SUB.W       #$AAAB, -(A2)
-00001398  04A3 AAAAAAAA            410                  SUB.L       #$AAAAAAAA, -(A3)
-0000139E                           411                  
-0000139E                           412                  * Data Register Direct
-0000139E  9200                     413                  SUB.B       D0,D1
-000013A0  9641                     414                  SUB.W       D1,D3
-000013A2  9882                     415                  SUB.L       D2,D4
-000013A4                           416                  
-000013A4  9138 6000                417                  SUB.B       D0,$6000
-000013A8  9378 6020                418                  SUB.W       D1,$6020
-000013AC  95B8 6040                419                  SUB.L       D2,$6040
-000013B0                           420                  
-000013B0  94C1                     421                  SUB.W       D1,A2
-000013B2  97C2                     422                  SUB.L       D2,A3
-000013B4                           423                  
-000013B4  9111                     424                  SUB.B       D0,(A1)
-000013B6  9352                     425                  SUB.W       D1,(A2)
-000013B8  9593                     426                  SUB.L       D2,(A3)
-000013BA                           427                  
-000013BA  9119                     428                  SUB.B       D0,(A1)+
-000013BC  935A                     429                  SUB.W       D1,(A2)+
-000013BE  959B                     430                  SUB.L       D2,(A3)+
-000013C0                           431                  
-000013C0  9121                     432                  SUB.B       D0,-(A1)
-000013C2  9362                     433                  SUB.W       D1,-(A2)
-000013C4  95A3                     434                  SUB.L       D2,-(A3)
-000013C6                           435                  
-000013C6                           436                  * Address Register Direct
-000013C6  9649                     437                  SUB.W       A1,D3
-000013C8  988A                     438                  SUB.L       A2,D4
-000013CA                           439                  
-000013CA  94C9                     440                  SUB.W       A1,A2
-000013CC  97CA                     441                  SUB.L       A2,A3
-000013CE                           442                  
-000013CE                           443                  * Address Register Indirect
-000013CE  9210                     444                  SUB.B       (A0),D1
-000013D0  9651                     445                  SUB.W       (A1),D3
-000013D2  9892                     446                  SUB.L       (A2),D4
-000013D4                           447                  
-000013D4  94D1                     448                  SUB.W       (A1),A2
-000013D6  97D2                     449                  SUB.L       (A2),A3
-000013D8                           450                  
-000013D8                           451                  * Address Register Indirect with Post incrementing
-000013D8  9218                     452                  SUB.B       (A0)+,D1
-000013DA  9659                     453                  SUB.W       (A1)+,D3
-000013DC  989A                     454                  SUB.L       (A2)+,D4
-000013DE                           455                  
-000013DE  94D9                     456                  SUB.W       (A1)+,A2
-000013E0  97DA                     457                  SUB.L       (A2)+,A3
-000013E2                           458                  
-000013E2                           459                  * Address Register Indirect with Pre decrementing
-000013E2  9220                     460                  SUB.B       -(A0),D1
-000013E4  9661                     461                  SUB.W       -(A1),D3
-000013E6  98A2                     462                  SUB.L       -(A2),D4
-000013E8                           463                  
-000013E8  94E1                     464                  SUB.W       -(A1),A2
-000013EA  97E2                     465                  SUB.L       -(A2),A3
-000013EC                           466                  
-000013EC                           467                  * Absolute Long Address
-000013EC  9039 80000000            468                  SUB.B       $80000000, D0
-000013F2  9279 80200000            469                  SUB.W       $80200000, D1
-000013F8  94B9 80300000            470                  SUB.L       $80300000, D2
-000013FE                           471                  
-000013FE  92F9 80200000            472                  SUB.W       $80200000, A1
-00001404  95F9 80300000            473                  SUB.L       $80300000, A2
-0000140A                           474                  
-0000140A                           475                  * Absolute Word Address
-0000140A  9039 00008000            476                  SUB.B       $8000, D0
-00001410  9279 00008020            477                  SUB.W       $8020, D1
-00001416  94B9 00008030            478                  SUB.L       $8030, D2
-0000141C                           479                  
-0000141C  92F9 00008020            480                  SUB.W       $8020, A1
-00001422  95F9 00008030            481                  SUB.L       $8030, A2
-00001428                           482      
-00001428                           483  * MULS test
-00001428                           484  MULSTEST
-00001428                           485                  * Direct Addressing
-00001428  C3FC AAAB                486                  MULS.W      #$AAAB, D1
-0000142C                           487                  
-0000142C                           488                  * Data Register Direct
-0000142C  C7C1                     489                  MULS.W      D1,D3
-0000142E                           490                                 
-0000142E                           491                  * Address Register Indirect
-0000142E  C7D1                     492                  MULS.W      (A1),D3
-00001430                           493                  
-00001430                           494                  * Address Register Indirect with Post incrementing
-00001430  C7D9                     495                  MULS.W      (A1)+,D3
-00001432                           496                  
-00001432                           497                  * Address Register Indirect with Pre decrementing
-00001432  C7E1                     498                  MULS.W      -(A1),D3
-00001434                           499                                  
-00001434                           500                  * Absolute Long Address
-00001434  C3F9 80200000            501                  MULS.W      $80200000, D1
-0000143A                           502                  
-0000143A                           503                  * Absolute Word Address
-0000143A  C3F9 00008020            504                  MULS.W      $8020, D1
-00001440                           505      
-00001440                           506  * DIVU test
-00001440                           507  DIVUTEST
-00001440                           508                  * Direct Addressing
-00001440  82FC AAAB                509                  DIVU.W      #$AAAB, D1
-00001444                           510                  
-00001444                           511                  * Data Register Direct
-00001444  86C1                     512                  DIVU.W      D1,D3
-00001446                           513                                 
-00001446                           514                  * Address Register Indirect
-00001446  86D1                     515                  DIVU.W      (A1),D3
-00001448                           516                  
-00001448                           517                  * Address Register Indirect with Post incrementing
-00001448  86D9                     518                  DIVU.W      (A1)+,D3
-0000144A                           519                  
-0000144A                           520                  * Address Register Indirect with Pre decrementing
-0000144A  86E1                     521                  DIVU.W      -(A1),D3
-0000144C                           522                                  
-0000144C                           523                  * Absolute Long Address
-0000144C  82F9 80200000            524                  DIVU.W      $80200000, D1
-00001452                           525                  
-00001452                           526                  * Absolute Word Address
-00001452  82F9 00008020            527                  DIVU.W      $8020, D1
-00001458                           528    
-00001458                           529  * LEA test
-00001458                           530  LEATEST            
-00001458  41D1                     531                  LEA         (A1),A0
-0000145A  43F8 6000                532                  LEA         $6000,A1
-0000145E  45F9 80000000            533                  LEA         $80000000,A2
-00001464                           534                    
-00001464                           535  * AND test
-00001464                           536  ANDTEST
-00001464                           537                  * Direct Addressing
-00001464  C03C 000A                538                  AND.B       #$A, D0
-00001468  C27C AAAB                539                  AND.W       #$AAAB, D1
-0000146C  C4BC AAAAAAAA            540                  AND.L       #$AAAAAAAA, D2
-00001472                           541                  
-00001472  0238 000A 6000           542                  AND.B       #$A, $6000
-00001478  0278 AAAB 6020           543                  AND.W       #$AAAB, $6020
-0000147E  02B8 AAAAAAAA 6040       544                  AND.L       #$AAAAAAAA, $6040
-00001486                           545                  
-00001486  0211 000A                546                  AND.B       #$A, (A1)
-0000148A  0252 AAAB                547                  AND.W       #$AAAB, (A2)
-0000148E  0293 AAAAAAAA            548                  AND.L       #$AAAAAAAA, (A3)
-00001494                           549                  
-00001494  0219 000A                550                  AND.B       #$A, (A1)+
-00001498  025A AAAB                551                  AND.W       #$AAAB, (A2)+
-0000149C  029B AAAAAAAA            552                  AND.L       #$AAAAAAAA, (A3)+
-000014A2                           553                  
-000014A2  0221 000A                554                  AND.B       #$A, -(A1)
-000014A6  0262 AAAB                555                  AND.W       #$AAAB, -(A2)
-000014AA  02A3 AAAAAAAA            556                  AND.L       #$AAAAAAAA, -(A3)
-000014B0                           557  
-000014B0                           558                  * Data Register Direct
-000014B0  C200                     559                  AND.B       D0,D1
-000014B2  C641                     560                  AND.W       D1,D3
-000014B4  C882                     561                  AND.L       D2,D4
-000014B6                           562                  
-000014B6  C138 6000                563                  AND.B       D0,$6000
-000014BA  C378 6020                564                  AND.W       D1,$6020
-000014BE  C5B8 6040                565                  AND.L       D2,$6040
-000014C2                           566                  
-000014C2  C111                     567                  AND.B       D0,(A1)
-000014C4  C352                     568                  AND.W       D1,(A2)
-000014C6  C593                     569                  AND.L       D2,(A3)
-000014C8                           570                  
-000014C8  C119                     571                  AND.B       D0,(A1)+
-000014CA  C35A                     572                  AND.W       D1,(A2)+
-000014CC  C59B                     573                  AND.L       D2,(A3)+
-000014CE                           574                  
-000014CE  C121                     575                  AND.B       D0,-(A1)
-000014D0  C362                     576                  AND.W       D1,-(A2)
-000014D2  C5A3                     577                  AND.L       D2,-(A3)
-000014D4                           578                  
-000014D4                           579                  * Address Register Indirect
-000014D4  C210                     580                  AND.B       (A0),D1
-000014D6  C651                     581                  AND.W       (A1),D3
-000014D8  C892                     582                  AND.L       (A2),D4
-000014DA                           583                  
-000014DA                           584                  * Address Register Indirect with Post incrementing
-000014DA  C218                     585                  AND.B       (A0)+,D1
-000014DC  C659                     586                  AND.W       (A1)+,D3
-000014DE  C89A                     587                  AND.L       (A2)+,D4
-000014E0                           588                  
-000014E0                           589                  * Address Register Indirect with Pre decrementing
-000014E0  C220                     590                  AND.B       -(A0),D1
-000014E2  C661                     591                  AND.W       -(A1),D3
-000014E4  C8A2                     592                  AND.L       -(A2),D4
-000014E6                           593  
-000014E6                           594                  * Absolute Long Address
-000014E6  C039 80000000            595                  AND.B       $80000000, D0
-000014EC  C279 80200000            596                  AND.W       $80200000, D1
-000014F2  C4B9 80300000            597                  AND.L       $80300000, D2
-000014F8                           598                  
-000014F8                           599                  * Absolute Word Address
-000014F8  C039 00008000            600                  AND.B       $8000, D0
-000014FE  C279 00008020            601                  AND.W       $8020, D1
-00001504  C4B9 00008030            602                  AND.L       $8030, D2
-0000150A                           603  
-0000150A                           604  * OR test
-0000150A                           605                  * Direct Addressing
-0000150A  803C 000A                606                  OR.B        #$A, D0
-0000150E  827C AAAB                607                  OR.W        #$AAAB, D1
-00001512  84BC AAAAAAAA            608                  OR.L        #$AAAAAAAA, D2
-00001518                           609                  
-00001518  0038 000A 6000           610                  OR.B        #$A, $6000
-0000151E  0078 AAAB 6020           611                  OR.W        #$AAAB, $6020
-00001524  00B8 AAAAAAAA 6040       612                  OR.L        #$AAAAAAAA, $6040
-0000152C                           613                  
-0000152C  0011 000A                614                  OR.B        #$A, (A1)
-00001530  0052 AAAB                615                  OR.W        #$AAAB, (A2)
-00001534  0093 AAAAAAAA            616                  OR.L        #$AAAAAAAA, (A3)
-0000153A                           617                  
-0000153A  0019 000A                618                  OR.B        #$A, (A1)+
-0000153E  005A AAAB                619                  OR.W        #$AAAB, (A2)+
-00001542  009B AAAAAAAA            620                  OR.L        #$AAAAAAAA, (A3)+
-00001548                           621                   
-00001548  0021 000A                622                  OR.B        #$A, -(A1)
-0000154C  0062 AAAB                623                  OR.W        #$AAAB, -(A2)
-00001550  00A3 AAAAAAAA            624                  OR.L        #$AAAAAAAA, -(A3)
-00001556                           625  
-00001556                           626                  * Data Register Direct
-00001556  8200                     627                  OR.B        D0,D1
-00001558  8641                     628                  OR.W        D1,D3
-0000155A  8882                     629                  OR.L        D2,D4
-0000155C                           630                  
-0000155C  8138 6000                631                  OR.B        D0,$6000
-00001560  8378 6020                632                  OR.W        D1,$6020
-00001564  85B8 6040                633                  OR.L        D2,$6040
-00001568                           634                  
-00001568  8111                     635                  OR.B        D0,(A1)
-0000156A  8352                     636                  OR.W        D1,(A2)
-0000156C  8593                     637                  OR.L        D2,(A3)
-0000156E                           638                  
-0000156E  8119                     639                  OR.B        D0,(A1)+
-00001570  835A                     640                  OR.W        D1,(A2)+
-00001572  859B                     641                  OR.L        D2,(A3)+
-00001574                           642                  
-00001574  8121                     643                  OR.B        D0,-(A1)
-00001576  8362                     644                  OR.W        D1,-(A2)
-00001578  85A3                     645                  OR.L        D2,-(A3)
-0000157A                           646   
-0000157A                           647                  * Address Register Indirect
-0000157A  8210                     648                  OR.B        (A0),D1
-0000157C  8651                     649                  OR.W        (A1),D3
-0000157E  8892                     650                  OR.L        (A2),D4
-00001580                           651  
-00001580                           652                  * Address Register Indirect with Post incrementing
-00001580  8220                     653                  OR.B        -(A0),D1
-00001582  8661                     654                  OR.W        -(A1),D3
-00001584  88A2                     655                  OR.L        -(A2),D4
-00001586                           656  
-00001586                           657                  * Address Register Indirect with Pre decrementing
-00001586  8218                     658                  OR.B        (A0)+,D1
-00001588  8659                     659                  OR.W        (A1)+,D3
-0000158A  889A                     660                  OR.L        (A2)+,D4
-0000158C                           661  
-0000158C                           662                  * Absolute Long Address
-0000158C  8039 80000000            663                  OR.B        $80000000, D0
-00001592  8279 80200000            664                  OR.W        $80200000, D1
-00001598  84B9 80300000            665                  OR.L        $80300000, D2
-0000159E                           666  
-0000159E                           667                  * Absolute Word Address
-0000159E  8039 00008000            668                  OR.B        $8000, D0
-000015A4  8279 00008020            669                  OR.W        $8020, D1
-000015AA  84B9 00008030            670                  OR.L        $8030, D2
-000015B0                           671  
-000015B0                           672  * NOT test
-000015B0                           673  NOTTEST
-000015B0                           674                  * Direct Addressing
-000015B0                           675                  
-000015B0                           676                  * Data Register Direct
-000015B0  4600                     677                  NOT.B       D0
-000015B2  4641                     678                  NOT.W       D1
-000015B4  4682                     679                  NOT.L       D2
-000015B6                           680                                  
-000015B6                           681                  * Address Register Indirect
-000015B6  4610                     682                  NOT.B       (A0)
-000015B8  4651                     683                  NOT.W       (A1)
-000015BA  4692                     684                  NOT.L       (A2)
-000015BC                           685  
-000015BC                           686                  * Address Register Indirect with Post incrementing
-000015BC  4618                     687                  NOT.B       (A0)+
-000015BE  4659                     688                  NOT.W       (A1)+
-000015C0  469A                     689                  NOT.L       (A2)+
-000015C2                           690  
-000015C2                           691                  * Address Register Indirect with Pre decrementing
-000015C2  4620                     692                  NOT.B       -(A0)
-000015C4  4661                     693                  NOT.W       -(A1)
-000015C6  46A2                     694                  NOT.L       -(A2)
-000015C8                           695                  
-000015C8                           696                  * Absolute Long Address
-000015C8  4639 0AFF0000            697                  NOT.B       $00AFF0000 
-000015CE  4679 0BFF0000            698                  NOT.W       $00BFF0000  
-000015D4  46B9 0CFF0000            699                  NOT.L       $00CFF0000
-000015DA                           700                  
-000015DA                           701                  * Absolute Word Address
-000015DA  4638 0AFF                702                  NOT.B       $00AFF
-000015DE  4678 0BFF                703                  NOT.W       $00BFF 
-000015E2  46B8 0CFF                704                  NOT.L       $00CFF     
-000015E6                           705                  
-000015E6                           706  * LSL test
-000015E6                           707  LSLTEST
-000015E6  E308                     708                  LSL.B       #1,D0
-000015E8  E54A                     709                  LSL.W       #2,D2
-000015EA  E78B                     710                  LSL.L       #3,D3
-000015EC                           711                  
-000015EC  E129                     712                  LSL.B       D0,D1
-000015EE  E56F                     713                  LSL.W       D2,D7
-000015F0  E7AC                     714                  LSL.L       D3,D4
-000015F2                           715                  
-000015F2  E3F9 0000A000            716                  LSL.W       $0000A000
-000015F8  E3EC 0021                717                  LSL.W       $21(A4)
-000015FC  E3D6                     718                  LSL.W       (A6)
-000015FE  E3D9                     719                  LSL.W       (A1)+
-00001600  E3E2                     720                  LSL.W       -(A2)
-00001602                           721                  
-00001602                           722                  
-00001602                           723  * LSR test
-00001602                           724  LSRTEST
-00001602  E208                     725                  LSR.B       #1,D0
-00001604  E44A                     726                  LSR.W       #2,D2
-00001606  E68B                     727                  LSR.L       #3,D3
-00001608                           728                  
-00001608  E029                     729                  LSR.B       D0,D1
-0000160A  E46F                     730                  LSR.W       D2,D7
-0000160C  E6AC                     731                  LSR.L       D3,D4
-0000160E                           732                  
-0000160E  E2F9 0000A000            733                  LSR.W       $0000A000
-00001614  E2F9 0000BBBB            734                  LSR.W       $BBBB
-0000161A  E2D6                     735                  LSR.W       (A6)
-0000161C  E2D9                     736                  LSR.W       (A1)+
-0000161E  E2E2                     737                  LSR.W       -(A2)
-00001620                           738  
-00001620                           739  * ASL test
-00001620                           740  ASLTEST 
-00001620  E300                     741                  ASL.B       #1,D0
-00001622  E542                     742                  ASL.W       #2,D2
-00001624  E783                     743                  ASL.L       #3,D3
-00001626                           744                  
-00001626  E121                     745                  ASL.B       D0,D1
-00001628  E567                     746                  ASL.W       D2,D7
-0000162A  E7A4                     747                  ASL.L       D3,D4
-0000162C                           748                  
-0000162C  E1F9 0000A000            749                  ASL.W       $0000A000
-00001632  E1EC 0021                750                  ASL.W       $21(A4)
-00001636  E1D6                     751                  ASL.W       (A6)
-00001638  E1D9                     752                  ASL.W       (A1)+
-0000163A  E1E2                     753                  ASL.W       -(A2)
-0000163C                           754                 
-0000163C                           755      
-0000163C                           756  * ASR test
-0000163C                           757  ASRTEST
-0000163C  E200                     758                  ASR.B       #1,D0
-0000163E  E442                     759                  ASR.W       #2,D2
-00001640  E683                     760                  ASR.L       #3,D3
-00001642                           761                  
-00001642  E021                     762                  ASR.B       D0,D1
-00001644  E467                     763                  ASR.W       D2,D7
-00001646  E6A4                     764                  ASR.L       D3,D4
-00001648                           765                  
-00001648  E0F9 0000A000            766                  ASR.W       $0000A000
-0000164E  E0F9 0000BBBB            767                  ASR.W       $BBBB
-00001654  E0D6                     768                  ASR.W       (A6)
-00001656  E0D9                     769                  ASR.W       (A1)+
-00001658  E0E2                     770                  ASR.W       -(A2)
-0000165A                           771  * ROL test
-0000165A                           772  ROLTEST 
-0000165A  E318                     773                  ROL.B       #1,D0
-0000165C  E55A                     774                  ROL.W       #2,D2
-0000165E  E79B                     775                  ROL.L       #3,D3
-00001660                           776                  
-00001660  E139                     777                  ROL.B       D0,D1
-00001662  E57F                     778                  ROL.W       D2,D7
-00001664  E7BC                     779                  ROL.L       D3,D4
-00001666                           780                  
-00001666  E7F9 0000A000            781                  ROL.W       $0000A000
-0000166C  E7EC 0021                782                  ROL.W       $21(A4)
-00001670  E7D6                     783                  ROL.W       (A6)
-00001672  E7D9                     784                  ROL.W       (A1)+
-00001674  E7E2                     785                  ROL.W       -(A2)
-00001676                           786                 
-00001676                           787      
-00001676                           788  * ROR test
-00001676                           789  RORTEST
-00001676  E218                     790                  ROR.B       #1,D0
-00001678  E45A                     791                  ROR.W       #2,D2
-0000167A  E69B                     792                  ROR.L       #3,D3
-0000167C                           793                  
-0000167C  E039                     794                  ROR.B       D0,D1
-0000167E  E47F                     795                  ROR.W       D2,D7
-00001680  E6BC                     796                  ROR.L       D3,D4
-00001682                           797                  
-00001682  E6F9 0000A000            798                  ROR.W       $0000A000
-00001688  E6F9 0000BBBB            799                  ROR.W       $BBBB
-0000168E  E6D6                     800                  ROR.W       (A6)
-00001690  E6D9                     801                  ROR.W       (A1)+
-00001692  E6E2                     802                  ROR.W       -(A2)
-00001694                           803  
-00001694                           804      
-00001694                           805  * JSR & RTS test
-00001694                           806  JSRTEST             
-00001694  4EB9 000016DA            807                  JSR     SUBROUTINE
-0000169A                           808  * Bcc & BRA test 
-0000169A                           809  BCCTEST
-0000169A  6400 0036                810                  BCC         BRANCH
-0000169E  6500 0032                811                  BCS         BRANCH
-000016A2  6700 002E                812                  BEQ         BRANCH
-000016A6  6600 002A                813                  BNE         BRANCH
-000016AA  6C00 0026                814                  BGE         BRANCH
-000016AE  6E00 0022                815                  BGT         BRANCH
-000016B2  6200 001E                816                  BHI         BRANCH
-000016B6  6F00 001A                817                  BLE         BRANCH
-000016BA  6300 0016                818                  BLS         BRANCH
-000016BE  6D00 0012                819                  BLT         BRANCH
-000016C2  6B00 000E                820                  BMI         BRANCH
-000016C6  6A00 000A                821                  BPL         BRANCH
-000016CA  6800 0006                822                  BVC         BRANCH
-000016CE  6900 0002                823                  BVS         BRANCH
-000016D2                           824  
-000016D2                           825  BRANCH 
-000016D2                           826  BRATEST
-000016D2  6000 0002                827                  BRA         TESTBRANCH
-000016D6                           828                  
-000016D6                           829  TESTBRANCH                
-000016D6                           830  
-000016D6  FFFF FFFF                831      SIMHALT             ; halt simulator
-000016DA                           832  
-000016DA  4E75                     833  SUBROUTINE      RTS
-000016DC                           834  
-000016DC                           835      END    START        ; last line of source
+00009000                             7      ORG    $9000
+00009000                             8  START:                  
+00009000                             9  * NOP test
+00009000  4E71                      10                  NOP
+00009002                            11  
+00009002                            12  * MOVE test
+00009002                            13  MOVETEST            
+00009002                            14                  * Direct Addressing
+00009002  103C 000A                 15                  MOVE.B      #$A, D0
+00009006  323C AAAB                 16                  MOVE.W      #$AAAB, D1
+0000900A  243C AAAAAAAA             17                  MOVE.L      #$AAAAAAAA, D2
+00009010                            18                  
+00009010  11FC 000A 6000            19                  MOVE.B      #$A, $6000
+00009016  31FC AAAB 6020            20                  MOVE.W      #$AAAB, $6020
+0000901C  21FC AAAAAAAA 6040        21                  MOVE.L      #$AAAAAAAA, $6040
+00009024                            22                  
+00009024  327C AAAB                 23                  MOVE.W      #$AAAB, A1
+00009028  247C AAAAAAAA             24                  MOVE.L      #$AAAAAAAA, A2
+0000902E                            25                  
+0000902E  12BC 000A                 26                  MOVE.B      #$A, (A1)
+00009032  34BC AAAB                 27                  MOVE.W      #$AAAB, (A2)
+00009036  26BC AAAAAAAA             28                  MOVE.L      #$AAAAAAAA, (A3)
+0000903C                            29                  
+0000903C  12FC 000A                 30                  MOVE.B      #$A, (A1)+
+00009040  34FC AAAB                 31                  MOVE.W      #$AAAB, (A2)+
+00009044  26FC AAAAAAAA             32                  MOVE.L      #$AAAAAAAA, (A3)+
+0000904A                            33                  
+0000904A  133C 000A                 34                  MOVE.B      #$A, -(A1)
+0000904E  353C AAAB                 35                  MOVE.W      #$AAAB, -(A2)
+00009052  273C AAAAAAAA             36                  MOVE.L      #$AAAAAAAA, -(A3)
+00009058                            37                  
+00009058                            38                  * Data Register Direct
+00009058  1200                      39                  MOVE.B      D0,D1
+0000905A  3601                      40                  MOVE.W      D1,D3
+0000905C  2802                      41                  MOVE.L      D2,D4
+0000905E                            42                  
+0000905E  11C0 6000                 43                  MOVE.B      D0,$6000
+00009062  31C1 6020                 44                  MOVE.W      D1,$6020
+00009066  21C2 6040                 45                  MOVE.L      D2,$6040
+0000906A                            46                  
+0000906A  3441                      47                  MOVE.W      D1,A2
+0000906C  2642                      48                  MOVE.L      D2,A3
+0000906E                            49                  
+0000906E  1280                      50                  MOVE.B      D0,(A1)
+00009070  3481                      51                  MOVE.W      D1,(A2)
+00009072  2682                      52                  MOVE.L      D2,(A3)
+00009074                            53                  
+00009074  12C0                      54                  MOVE.B      D0,(A1)+
+00009076  34C1                      55                  MOVE.W      D1,(A2)+
+00009078  26C2                      56                  MOVE.L      D2,(A3)+
+0000907A                            57                  
+0000907A  1300                      58                  MOVE.B      D0,-(A1)
+0000907C  3501                      59                  MOVE.W      D1,-(A2)
+0000907E  2702                      60                  MOVE.L      D2,-(A3)
+00009080                            61                  
+00009080                            62                  * Address Register Direct
+00009080  3609                      63                  MOVE.W      A1,D3
+00009082  280A                      64                  MOVE.L      A2,D4
+00009084                            65                  
+00009084  31C9 6020                 66                  MOVE.W      A1,$6020
+00009088  21CA 6040                 67                  MOVE.L      A2,$6040
+0000908C                            68                  
+0000908C  3449                      69                  MOVE.W      A1,A2
+0000908E  264A                      70                  MOVE.L      A2,A3
+00009090                            71                  
+00009090  3489                      72                  MOVE.W      A1,(A2)
+00009092  268A                      73                  MOVE.L      A2,(A3)
+00009094                            74                  
+00009094  34C9                      75                  MOVE.W      A1,(A2)+
+00009096  26CA                      76                  MOVE.L      A2,(A3)+
+00009098                            77                  
+00009098  3509                      78                  MOVE.W      A1,-(A2)
+0000909A  270A                      79                  MOVE.L      A2,-(A3)
+0000909C                            80                  
+0000909C                            81                  * Address Register Indirect
+0000909C  1210                      82                  MOVE.B      (A0),D1
+0000909E  3611                      83                  MOVE.W      (A1),D3
+000090A0  2812                      84                  MOVE.L      (A2),D4
+000090A2                            85                  
+000090A2  11D0 6000                 86                  MOVE.B      (A0),$6000
+000090A6  31D1 6020                 87                  MOVE.W      (A1),$6020
+000090AA  21D2 6040                 88                  MOVE.L      (A2),$6040
+000090AE                            89                  
+000090AE  3451                      90                  MOVE.W      (A1),A2
+000090B0  2652                      91                  MOVE.L      (A2),A3
+000090B2                            92                  
+000090B2  1290                      93                  MOVE.B      (A0),(A1)
+000090B4  3491                      94                  MOVE.W      (A1),(A2)
+000090B6  2692                      95                  MOVE.L      (A2),(A3)
+000090B8                            96                  
+000090B8  12D0                      97                  MOVE.B      (A0),(A1)+
+000090BA  34D1                      98                  MOVE.W      (A1),(A2)+
+000090BC  26D2                      99                  MOVE.L      (A2),(A3)+
+000090BE                           100                  
+000090BE  1310                     101                  MOVE.B      (A0),-(A1)
+000090C0  3511                     102                  MOVE.W      (A1),-(A2)
+000090C2  2712                     103                  MOVE.L      (A2),-(A3)
+000090C4                           104                  
+000090C4                           105                  * Address Register Indirect with Post incrementing
+000090C4  1218                     106                  MOVE.B      (A0)+,D1
+000090C6  3619                     107                  MOVE.W      (A1)+,D3
+000090C8  281A                     108                  MOVE.L      (A2)+,D4
+000090CA                           109                  
+000090CA  11D8 6000                110                  MOVE.B      (A0)+,$6000
+000090CE  31D9 6020                111                  MOVE.W      (A1)+,$6020
+000090D2  21DA 6040                112                  MOVE.L      (A2)+,$6040
+000090D6                           113                  
+000090D6  3459                     114                  MOVE.W      (A1)+,A2
+000090D8  265A                     115                  MOVE.L      (A2)+,A3
+000090DA                           116                  
+000090DA  1298                     117                  MOVE.B      (A0)+,(A1)
+000090DC  3499                     118                  MOVE.W      (A1)+,(A2)
+000090DE  269A                     119                  MOVE.L      (A2)+,(A3)
+000090E0                           120                  
+000090E0  12D8                     121                  MOVE.B      (A0)+,(A1)+
+000090E2  34D9                     122                  MOVE.W      (A1)+,(A2)+
+000090E4  26DA                     123                  MOVE.L      (A2)+,(A3)+
+000090E6                           124                  
+000090E6  1318                     125                  MOVE.B      (A0)+,-(A1)
+000090E8  3519                     126                  MOVE.W      (A1)+,-(A2)
+000090EA  271A                     127                  MOVE.L      (A2)+,-(A3)
+000090EC                           128                  
+000090EC                           129                  * Address Register Indirect with Pre decrementing
+000090EC  1220                     130                  MOVE.B      -(A0),D1
+000090EE  3621                     131                  MOVE.W      -(A1),D3
+000090F0  2822                     132                  MOVE.L      -(A2),D4
+000090F2                           133                  
+000090F2  11E0 6000                134                  MOVE.B      -(A0),$6000
+000090F6  31E1 6020                135                  MOVE.W      -(A1),$6020
+000090FA  21E2 6040                136                  MOVE.L      -(A2),$6040
+000090FE                           137                  
+000090FE  3461                     138                  MOVE.W      -(A1),A2
+00009100  2662                     139                  MOVE.L      -(A2),A3
+00009102                           140                  
+00009102  12A0                     141                  MOVE.B      -(A0),(A1)
+00009104  34A1                     142                  MOVE.W      -(A1),(A2)
+00009106  26A2                     143                  MOVE.L      -(A2),(A3)
+00009108                           144                  
+00009108  12E0                     145                  MOVE.B      -(A0),(A1)+
+0000910A  34E1                     146                  MOVE.W      -(A1),(A2)+
+0000910C  26E2                     147                  MOVE.L      -(A2),(A3)+
+0000910E                           148                  
+0000910E  1320                     149                  MOVE.B      -(A0),-(A1)
+00009110  3521                     150                  MOVE.W      -(A1),-(A2)
+00009112  2722                     151                  MOVE.L      -(A2),-(A3)
+00009114                           152                  
+00009114                           153                  * Absolute Long Address
+00009114  1039 80000000            154                  MOVE.B      $80000000, D0
+0000911A  3239 80200000            155                  MOVE.W      $80200000, D1
+00009120  2439 80300000            156                  MOVE.L      $80300000, D2
+00009126                           157                  
+00009126  11F9 80000000 6000       158                  MOVE.B      $80000000, $6000
+0000912E  31F9 80200000 6020       159                  MOVE.W      $80200000, $6020
+00009136  21F9 80300000 6040       160                  MOVE.L      $80300000, $6040
+0000913E                           161                  
+0000913E  3279 80200000            162                  MOVE.W      $80200000, A1
+00009144  2479 80300000            163                  MOVE.L      $80300000, A2
+0000914A                           164                  
+0000914A  12B9 80000000            165                  MOVE.B      $80000000, (A1)
+00009150  34B9 80200000            166                  MOVE.W      $80200000, (A2)
+00009156  26B9 80300000            167                  MOVE.L      $80300000, (A3)
+0000915C                           168                  
+0000915C  12F9 80000000            169                  MOVE.B      $80000000, (A1)+
+00009162  34F9 80200000            170                  MOVE.W      $80200000, (A2)+
+00009168  26F9 80300000            171                  MOVE.L      $80300000, (A3)+
+0000916E                           172                  
+0000916E  1339 80000000            173                  MOVE.B      $80000000, -(A1)
+00009174  3539 80200000            174                  MOVE.W      $80200000, -(A2)
+0000917A  2739 80300000            175                  MOVE.L      $80300000, -(A3)
+00009180                           176                  
+00009180                           177                  * Absolute Word Address
+00009180  1039 00008000            178                  MOVE.B      $8000, D0
+00009186  3239 00008020            179                  MOVE.W      $8020, D1
+0000918C  2439 00008030            180                  MOVE.L      $8030, D2
+00009192                           181                  
+00009192  11F9 00008000 6000       182                  MOVE.B      $8000, $6000
+0000919A  31F9 00008020 6020       183                  MOVE.W      $8020, $6020
+000091A2  21F9 00008030 6040       184                  MOVE.L      $8030, $6040
+000091AA                           185                  
+000091AA  3279 00008020            186                  MOVE.W      $8020, A1
+000091B0  2479 00008030            187                  MOVE.L      $8030, A2
+000091B6                           188                  
+000091B6  12B9 00008000            189                  MOVE.B      $8000, (A1)
+000091BC  34B9 00008020            190                  MOVE.W      $8020, (A2)
+000091C2  26B9 00008030            191                  MOVE.L      $8030, (A3)
+000091C8                           192                  
+000091C8  12F9 00008000            193                  MOVE.B      $8000, (A1)+
+000091CE  34F9 00008020            194                  MOVE.W      $8020, (A2)+
+000091D4  26F9 00008030            195                  MOVE.L      $8030, (A3)+
+000091DA                           196                  
+000091DA  1339 00008000            197                  MOVE.B      $8000, -(A1)
+000091E0  3539 00008020            198                  MOVE.W      $8020, -(A2)
+000091E6  2739 00008030            199                  MOVE.L      $8030, -(A3)
+000091EC                           200                  
+000091EC                           201      
+000091EC                           202  * MOVEA test
+000091EC                           203  
+000091EC                           204  MOVEATEST
+000091EC                           205                  * Direct Addressing
+000091EC  327C AAAB                206                  MOVEA.W     #$AAAB, A1
+000091F0  247C AAAAAAAA            207                  MOVEA.L     #$AAAAAAAA, A2
+000091F6                           208                  
+000091F6                           209                  * Data Register Direct
+000091F6  3441                     210                  MOVEA.W     D1,A2
+000091F8  2642                     211                  MOVEA.L     D2,A3
+000091FA                           212                  
+000091FA                           213                  * Address Register Direct
+000091FA  3449                     214                  MOVEA.W     A1,A2
+000091FC  264A                     215                  MOVEA.L     A2,A3
+000091FE                           216                                 
+000091FE                           217                  * Address Register Indirect
+000091FE  3459                     218                  MOVEA.W     (A1)+,A2
+00009200  265A                     219                  MOVEA.L     (A2)+,A3
+00009202                           220                  
+00009202                           221                  * Address Register Indirect with Post incrementing
+00009202  3459                     222                  MOVEA.W     (A1)+,A2
+00009204  265A                     223                  MOVEA.L     (A2)+,A3
+00009206                           224                  
+00009206                           225                  * Address Register Indirect with Pre decrementing
+00009206  3461                     226                  MOVEA.W     -(A1),A2
+00009208  2662                     227                  MOVEA.L     -(A2),A3
+0000920A                           228                  
+0000920A                           229                  * Absolute Long Address
+0000920A  3279 80200000            230                  MOVEA.W     $80200000, A1
+00009210  2479 80300000            231                  MOVEA.L     $80300000, A2
+00009216                           232                  
+00009216                           233                  * Absolute Word Address
+00009216  3279 00008020            234                  MOVEA.W     $8020, A1
+0000921C  2479 00008030            235                  MOVEA.L     $8030, A2
+00009222                           236     
+00009222                           237               
+00009222                           238  * MOVEQ test
+00009222                           239  MOVEQTEST
+00009222  7002                     240                  MOVEQ.L     #2,D0
+00009224  7003                     241                  MOVEQ       #3,D0
+00009226                           242                  
+00009226                           243  * MOVEM test
+00009226                           244  MOVEMTEST
+00009226                           245                  * Direct Addressing
+00009226  48A7 FFFE                246                  MOVEM       A0-A6/D0-D7,-(SP)
+0000922A  4C9F 7FFF                247                  MOVEM       (SP)+,A0-A6/D0-D7
+0000922E                           248    
+0000922E                           249  * ADD test
+0000922E                           250  ADDTEST
+0000922E                           251                  * Direct Addressing
+0000922E  0600 000A                252                  ADD.B       #$A, D0
+00009232  0641 AAAB                253                  ADD.W       #$AAAB, D1
+00009236  0682 AAAAAAAA            254                  ADD.L       #$AAAAAAAA, D2
+0000923C                           255                  
+0000923C  0638 000A 6000           256                  ADD.B       #$A, $6000
+00009242  0678 AAAB 6020           257                  ADD.W       #$AAAB, $6020
+00009248  06B8 AAAAAAAA 6040       258                  ADD.L       #$AAAAAAAA, $6040
+00009250                           259                  
+00009250  D2FC AAAB                260                  ADD.W       #$AAAB, A1
+00009254  D5FC AAAAAAAA            261                  ADD.L       #$AAAAAAAA, A2
+0000925A                           262                  
+0000925A  0611 000A                263                  ADD.B       #$A, (A1)
+0000925E  0652 AAAB                264                  ADD.W       #$AAAB, (A2)
+00009262  0693 AAAAAAAA            265                  ADD.L       #$AAAAAAAA, (A3)
+00009268                           266                   
+00009268  0619 000A                267                  ADD.B       #$A, (A1)+
+0000926C  065A AAAB                268                  ADD.W       #$AAAB, (A2)+
+00009270  069B AAAAAAAA            269                  ADD.L       #$AAAAAAAA, (A3)+
+00009276                           270                  
+00009276  0621 000A                271                  ADD.B       #$A, -(A1)
+0000927A  0662 AAAB                272                  ADD.W       #$AAAB, -(A2)
+0000927E  06A3 AAAAAAAA            273                  ADD.L       #$AAAAAAAA, -(A3)
+00009284                           274                  
+00009284                           275                  * Data Register Direct
+00009284  D200                     276                  ADD.B       D0,D1
+00009286  D641                     277                  ADD.W       D1,D3
+00009288  D882                     278                  ADD.L       D2,D4
+0000928A                           279                  
+0000928A  D138 6000                280                  ADD.B       D0,$6000
+0000928E  D378 6020                281                  ADD.W       D1,$6020
+00009292  D5B8 6040                282                  ADD.L       D2,$6040
+00009296                           283                  
+00009296  D4C1                     284                  ADD.W       D1,A2
+00009298  D7C2                     285                  ADD.L       D2,A3
+0000929A                           286                  
+0000929A  D111                     287                  ADD.B       D0,(A1)
+0000929C  D352                     288                  ADD.W       D1,(A2)
+0000929E  D593                     289                  ADD.L       D2,(A3)
+000092A0                           290                  
+000092A0  D119                     291                  ADD.B       D0,(A1)+
+000092A2  D35A                     292                  ADD.W       D1,(A2)+
+000092A4  D59B                     293                  ADD.L       D2,(A3)+
+000092A6                           294                  
+000092A6  D121                     295                  ADD.B       D0,-(A1)
+000092A8  D362                     296                  ADD.W       D1,-(A2)
+000092AA  D5A3                     297                  ADD.L       D2,-(A3)
+000092AC                           298                  
+000092AC                           299                  * Address Register Direct
+000092AC  D649                     300                  ADD.W       A1,D3
+000092AE  D88A                     301                  ADD.L       A2,D4
+000092B0                           302                  
+000092B0  D4C9                     303                  ADD.W       A1,A2
+000092B2  D7CA                     304                  ADD.L       A2,A3
+000092B4                           305                  
+000092B4                           306                  * Address Register Indirect
+000092B4  D210                     307                  ADD.B      (A0),D1
+000092B6  D651                     308                  ADD.W      (A1),D3
+000092B8  D892                     309                  ADD.L      (A2),D4
+000092BA                           310                  
+000092BA  D4D1                     311                  ADD.W      (A1),A2
+000092BC  D7D2                     312                  ADD.L      (A2),A3
+000092BE                           313                  
+000092BE                           314                  * Address Register Indirect with Post incrementing
+000092BE  D218                     315                  ADD.B      (A0)+,D1
+000092C0  D659                     316                  ADD.W      (A1)+,D3
+000092C2  D89A                     317                  ADD.L      (A2)+,D4
+000092C4                           318                  
+000092C4  D4D9                     319                  ADD.W      (A1)+,A2
+000092C6  D7DA                     320                  ADD.L      (A2)+,A3
+000092C8                           321  
+000092C8                           322                  * Address Register Indirect with Pre decrementing
+000092C8  D220                     323                  ADD.B      -(A0),D1
+000092CA  D661                     324                  ADD.W      -(A1),D3
+000092CC  D8A2                     325                  ADD.L      -(A2),D4
+000092CE                           326                  
+000092CE  D4E1                     327                  ADD.W      -(A1),A2
+000092D0  D7E2                     328                  ADD.L      -(A2),A3
+000092D2                           329                  
+000092D2                           330                  * Absolute Long Address
+000092D2  D039 80000000            331                  ADD.B      $80000000, D0
+000092D8  D279 80200000            332                  ADD.W      $80200000, D1
+000092DE  D4B9 80300000            333                  ADD.L      $80300000, D2
+000092E4                           334                  
+000092E4  D2F9 80200000            335                  ADD.W      $80200000, A1
+000092EA  D5F9 80300000            336                  ADD.L      $80300000, A2
+000092F0                           337                  
+000092F0                           338                  * Absolute Word Address
+000092F0  D039 00008000            339                  ADD.B      $8000, D0
+000092F6  D279 00008020            340                  ADD.W      $8020, D1
+000092FC  D4B9 00008030            341                  ADD.L      $8030, D2
+00009302                           342                  
+00009302  D2F9 00008020            343                  ADD.W      $8020, A1
+00009308  D5F9 00008030            344                  ADD.L      $8030, A2
+0000930E                           345      
+0000930E                           346  * ADDA test
+0000930E                           347  ADDATEST
+0000930E                           348                  * Direct Addressing
+0000930E  D2FC AAAB                349                  ADDA.W      #$AAAB, A1
+00009312  D5FC AAAAAAAA            350                  ADDA.L      #$AAAAAAAA, A2
+00009318                           351                  
+00009318                           352                  * Data Register Direct
+00009318  D4C1                     353                  ADDA.W      D1,A2
+0000931A  D7C2                     354                  ADDA.L      D2,A3
+0000931C                           355                  
+0000931C                           356                  * Address Register Direct
+0000931C  D4C9                     357                  ADDA.W      A1,A2
+0000931E  D7CA                     358                  ADDA.L      A2,A3
+00009320                           359                  
+00009320                           360                  * Address Register Indirect                
+00009320  D4D1                     361                  ADDA.W     (A1),A2
+00009322  D7D2                     362                  ADDA.L     (A2),A3
+00009324                           363                  
+00009324                           364                  * Address Register Indirect with Post incrementing            
+00009324  D4D9                     365                  ADDA.W     (A1)+,A2
+00009326  D7DA                     366                  ADDA.L     (A2)+,A3
+00009328                           367                  
+00009328                           368                  * Address Register Indirect with Pre decrementing
+00009328  D4E1                     369                  ADDA.W     -(A1),A2
+0000932A  D7E2                     370                  ADDA.L     -(A2),A3
+0000932C                           371                  
+0000932C                           372                  * Absolute Long Address
+0000932C  D2F9 80200000            373                  ADDA.W      $80200000, A1
+00009332  D5F9 80300000            374                  ADDA.L      $80300000, A2
+00009338                           375                  
+00009338                           376                  * Absolute Word Address
+00009338  D2F9 00008020            377                  ADDA.W      $8020, A1
+0000933E  D5F9 00008030            378                  ADDA.L      $8030, A2
+00009344                           379      
+00009344                           380  * ADDQ test
+00009344                           381  ADDQTEST
+00009344  5480                     382                  ADDQ.L      #2,D0
+00009346  5640                     383                  ADDQ        #3,D0
+00009348                           384      
+00009348                           385  * SUB test
+00009348                           386  SUBTEST
+00009348                           387                  * Direct Addressing
+00009348  0400 000A                388                  SUB.B       #$A, D0
+0000934C                           389                  
+0000934C  0441 AAAB                390                  SUB.W       #$AAAB, D1
+00009350  0482 AAAAAAAA            391                  SUB.L       #$AAAAAAAA, D2
+00009356                           392                  
+00009356  0438 000A 6000           393                  SUB.B       #$A, $6000
+0000935C  0478 AAAB 6020           394                  SUB.W       #$AAAB, $6020
+00009362  04B8 AAAAAAAA 6040       395                  SUB.L       #$AAAAAAAA, $6040
+0000936A                           396                  
+0000936A  92FC AAAB                397                  SUB.W       #$AAAB, A1
+0000936E  95FC AAAAAAAA            398                  SUB.L       #$AAAAAAAA, A2
+00009374                           399                  
+00009374  0411 000A                400                  SUB.B       #$A, (A1)
+00009378  0452 AAAB                401                  SUB.W       #$AAAB, (A2)
+0000937C  0493 AAAAAAAA            402                  SUB.L       #$AAAAAAAA, (A3)
+00009382                           403                  
+00009382  0419 000A                404                  SUB.B       #$A, (A1)+
+00009386  045A AAAB                405                  SUB.W       #$AAAB, (A2)+
+0000938A  049B AAAAAAAA            406                  SUB.L       #$AAAAAAAA, (A3)+
+00009390                           407                  
+00009390  0421 000A                408                  SUB.B       #$A, -(A1)
+00009394  0462 AAAB                409                  SUB.W       #$AAAB, -(A2)
+00009398  04A3 AAAAAAAA            410                  SUB.L       #$AAAAAAAA, -(A3)
+0000939E                           411                  
+0000939E                           412                  * Data Register Direct
+0000939E  9200                     413                  SUB.B       D0,D1
+000093A0  9641                     414                  SUB.W       D1,D3
+000093A2  9882                     415                  SUB.L       D2,D4
+000093A4                           416                  
+000093A4  9138 6000                417                  SUB.B       D0,$6000
+000093A8  9378 6020                418                  SUB.W       D1,$6020
+000093AC  95B8 6040                419                  SUB.L       D2,$6040
+000093B0                           420                  
+000093B0  94C1                     421                  SUB.W       D1,A2
+000093B2  97C2                     422                  SUB.L       D2,A3
+000093B4                           423                  
+000093B4  9111                     424                  SUB.B       D0,(A1)
+000093B6  9352                     425                  SUB.W       D1,(A2)
+000093B8  9593                     426                  SUB.L       D2,(A3)
+000093BA                           427                  
+000093BA  9119                     428                  SUB.B       D0,(A1)+
+000093BC  935A                     429                  SUB.W       D1,(A2)+
+000093BE  959B                     430                  SUB.L       D2,(A3)+
+000093C0                           431                  
+000093C0  9121                     432                  SUB.B       D0,-(A1)
+000093C2  9362                     433                  SUB.W       D1,-(A2)
+000093C4  95A3                     434                  SUB.L       D2,-(A3)
+000093C6                           435                  
+000093C6                           436                  * Address Register Direct
+000093C6  9649                     437                  SUB.W       A1,D3
+000093C8  988A                     438                  SUB.L       A2,D4
+000093CA                           439                  
+000093CA  94C9                     440                  SUB.W       A1,A2
+000093CC  97CA                     441                  SUB.L       A2,A3
+000093CE                           442                  
+000093CE                           443                  * Address Register Indirect
+000093CE  9210                     444                  SUB.B       (A0),D1
+000093D0  9651                     445                  SUB.W       (A1),D3
+000093D2  9892                     446                  SUB.L       (A2),D4
+000093D4                           447                  
+000093D4  94D1                     448                  SUB.W       (A1),A2
+000093D6  97D2                     449                  SUB.L       (A2),A3
+000093D8                           450                  
+000093D8                           451                  * Address Register Indirect with Post incrementing
+000093D8  9218                     452                  SUB.B       (A0)+,D1
+000093DA  9659                     453                  SUB.W       (A1)+,D3
+000093DC  989A                     454                  SUB.L       (A2)+,D4
+000093DE                           455                  
+000093DE  94D9                     456                  SUB.W       (A1)+,A2
+000093E0  97DA                     457                  SUB.L       (A2)+,A3
+000093E2                           458                  
+000093E2                           459                  * Address Register Indirect with Pre decrementing
+000093E2  9220                     460                  SUB.B       -(A0),D1
+000093E4  9661                     461                  SUB.W       -(A1),D3
+000093E6  98A2                     462                  SUB.L       -(A2),D4
+000093E8                           463                  
+000093E8  94E1                     464                  SUB.W       -(A1),A2
+000093EA  97E2                     465                  SUB.L       -(A2),A3
+000093EC                           466                  
+000093EC                           467                  * Absolute Long Address
+000093EC  9039 80000000            468                  SUB.B       $80000000, D0
+000093F2  9279 80200000            469                  SUB.W       $80200000, D1
+000093F8  94B9 80300000            470                  SUB.L       $80300000, D2
+000093FE                           471                  
+000093FE  92F9 80200000            472                  SUB.W       $80200000, A1
+00009404  95F9 80300000            473                  SUB.L       $80300000, A2
+0000940A                           474                  
+0000940A                           475                  * Absolute Word Address
+0000940A  9039 00008000            476                  SUB.B       $8000, D0
+00009410  9279 00008020            477                  SUB.W       $8020, D1
+00009416  94B9 00008030            478                  SUB.L       $8030, D2
+0000941C                           479                  
+0000941C  92F9 00008020            480                  SUB.W       $8020, A1
+00009422  95F9 00008030            481                  SUB.L       $8030, A2
+00009428                           482      
+00009428                           483  * MULS test
+00009428                           484  MULSTEST
+00009428                           485                  * Direct Addressing
+00009428  C3FC AAAB                486                  MULS.W      #$AAAB, D1
+0000942C                           487                  
+0000942C                           488                  * Data Register Direct
+0000942C  C7C1                     489                  MULS.W      D1,D3
+0000942E                           490                                 
+0000942E                           491                  * Address Register Indirect
+0000942E  C7D1                     492                  MULS.W      (A1),D3
+00009430                           493                  
+00009430                           494                  * Address Register Indirect with Post incrementing
+00009430  C7D9                     495                  MULS.W      (A1)+,D3
+00009432                           496                  
+00009432                           497                  * Address Register Indirect with Pre decrementing
+00009432  C7E1                     498                  MULS.W      -(A1),D3
+00009434                           499                                  
+00009434                           500                  * Absolute Long Address
+00009434  C3F9 80200000            501                  MULS.W      $80200000, D1
+0000943A                           502                  
+0000943A                           503                  * Absolute Word Address
+0000943A  C3F9 00008020            504                  MULS.W      $8020, D1
+00009440                           505      
+00009440                           506  * DIVU test
+00009440                           507  DIVUTEST
+00009440                           508                  * Direct Addressing
+00009440  82FC AAAB                509                  DIVU.W      #$AAAB, D1
+00009444                           510                  
+00009444                           511                  * Data Register Direct
+00009444  86C1                     512                  DIVU.W      D1,D3
+00009446                           513                                 
+00009446                           514                  * Address Register Indirect
+00009446  86D1                     515                  DIVU.W      (A1),D3
+00009448                           516                  
+00009448                           517                  * Address Register Indirect with Post incrementing
+00009448  86D9                     518                  DIVU.W      (A1)+,D3
+0000944A                           519                  
+0000944A                           520                  * Address Register Indirect with Pre decrementing
+0000944A  86E1                     521                  DIVU.W      -(A1),D3
+0000944C                           522                                  
+0000944C                           523                  * Absolute Long Address
+0000944C  82F9 80200000            524                  DIVU.W      $80200000, D1
+00009452                           525                  
+00009452                           526                  * Absolute Word Address
+00009452  82F9 00008020            527                  DIVU.W      $8020, D1
+00009458                           528    
+00009458                           529  * LEA test
+00009458                           530  LEATEST            
+00009458  41D1                     531                  LEA         (A1),A0
+0000945A  43F8 6000                532                  LEA         $6000,A1
+0000945E  45F9 80000000            533                  LEA         $80000000,A2
+00009464                           534                    
+00009464                           535  * AND test
+00009464                           536  ANDTEST
+00009464                           537                  * Direct Addressing
+00009464  C03C 000A                538                  AND.B       #$A, D0
+00009468  C27C AAAB                539                  AND.W       #$AAAB, D1
+0000946C  C4BC AAAAAAAA            540                  AND.L       #$AAAAAAAA, D2
+00009472                           541                  
+00009472  0238 000A 6000           542                  AND.B       #$A, $6000
+00009478  0278 AAAB 6020           543                  AND.W       #$AAAB, $6020
+0000947E  02B8 AAAAAAAA 6040       544                  AND.L       #$AAAAAAAA, $6040
+00009486                           545                  
+00009486  0211 000A                546                  AND.B       #$A, (A1)
+0000948A  0252 AAAB                547                  AND.W       #$AAAB, (A2)
+0000948E  0293 AAAAAAAA            548                  AND.L       #$AAAAAAAA, (A3)
+00009494                           549                  
+00009494  0219 000A                550                  AND.B       #$A, (A1)+
+00009498  025A AAAB                551                  AND.W       #$AAAB, (A2)+
+0000949C  029B AAAAAAAA            552                  AND.L       #$AAAAAAAA, (A3)+
+000094A2                           553                  
+000094A2  0221 000A                554                  AND.B       #$A, -(A1)
+000094A6  0262 AAAB                555                  AND.W       #$AAAB, -(A2)
+000094AA  02A3 AAAAAAAA            556                  AND.L       #$AAAAAAAA, -(A3)
+000094B0                           557  
+000094B0                           558                  * Data Register Direct
+000094B0  C200                     559                  AND.B       D0,D1
+000094B2  C641                     560                  AND.W       D1,D3
+000094B4  C882                     561                  AND.L       D2,D4
+000094B6                           562                  
+000094B6  C138 6000                563                  AND.B       D0,$6000
+000094BA  C378 6020                564                  AND.W       D1,$6020
+000094BE  C5B8 6040                565                  AND.L       D2,$6040
+000094C2                           566                  
+000094C2  C111                     567                  AND.B       D0,(A1)
+000094C4  C352                     568                  AND.W       D1,(A2)
+000094C6  C593                     569                  AND.L       D2,(A3)
+000094C8                           570                  
+000094C8  C119                     571                  AND.B       D0,(A1)+
+000094CA  C35A                     572                  AND.W       D1,(A2)+
+000094CC  C59B                     573                  AND.L       D2,(A3)+
+000094CE                           574                  
+000094CE  C121                     575                  AND.B       D0,-(A1)
+000094D0  C362                     576                  AND.W       D1,-(A2)
+000094D2  C5A3                     577                  AND.L       D2,-(A3)
+000094D4                           578                  
+000094D4                           579                  * Address Register Indirect
+000094D4  C210                     580                  AND.B       (A0),D1
+000094D6  C651                     581                  AND.W       (A1),D3
+000094D8  C892                     582                  AND.L       (A2),D4
+000094DA                           583                  
+000094DA                           584                  * Address Register Indirect with Post incrementing
+000094DA  C218                     585                  AND.B       (A0)+,D1
+000094DC  C659                     586                  AND.W       (A1)+,D3
+000094DE  C89A                     587                  AND.L       (A2)+,D4
+000094E0                           588                  
+000094E0                           589                  * Address Register Indirect with Pre decrementing
+000094E0  C220                     590                  AND.B       -(A0),D1
+000094E2  C661                     591                  AND.W       -(A1),D3
+000094E4  C8A2                     592                  AND.L       -(A2),D4
+000094E6                           593  
+000094E6                           594                  * Absolute Long Address
+000094E6  C039 80000000            595                  AND.B       $80000000, D0
+000094EC  C279 80200000            596                  AND.W       $80200000, D1
+000094F2  C4B9 80300000            597                  AND.L       $80300000, D2
+000094F8                           598                  
+000094F8                           599                  * Absolute Word Address
+000094F8  C039 00008000            600                  AND.B       $8000, D0
+000094FE  C279 00008020            601                  AND.W       $8020, D1
+00009504  C4B9 00008030            602                  AND.L       $8030, D2
+0000950A                           603  
+0000950A                           604  * OR test
+0000950A                           605                  * Direct Addressing
+0000950A  803C 000A                606                  OR.B        #$A, D0
+0000950E  827C AAAB                607                  OR.W        #$AAAB, D1
+00009512  84BC AAAAAAAA            608                  OR.L        #$AAAAAAAA, D2
+00009518                           609                  
+00009518  0038 000A 6000           610                  OR.B        #$A, $6000
+0000951E  0078 AAAB 6020           611                  OR.W        #$AAAB, $6020
+00009524  00B8 AAAAAAAA 6040       612                  OR.L        #$AAAAAAAA, $6040
+0000952C                           613                  
+0000952C  0011 000A                614                  OR.B        #$A, (A1)
+00009530  0052 AAAB                615                  OR.W        #$AAAB, (A2)
+00009534  0093 AAAAAAAA            616                  OR.L        #$AAAAAAAA, (A3)
+0000953A                           617                  
+0000953A  0019 000A                618                  OR.B        #$A, (A1)+
+0000953E  005A AAAB                619                  OR.W        #$AAAB, (A2)+
+00009542  009B AAAAAAAA            620                  OR.L        #$AAAAAAAA, (A3)+
+00009548                           621                   
+00009548  0021 000A                622                  OR.B        #$A, -(A1)
+0000954C  0062 AAAB                623                  OR.W        #$AAAB, -(A2)
+00009550  00A3 AAAAAAAA            624                  OR.L        #$AAAAAAAA, -(A3)
+00009556                           625  
+00009556                           626                  * Data Register Direct
+00009556  8200                     627                  OR.B        D0,D1
+00009558  8641                     628                  OR.W        D1,D3
+0000955A  8882                     629                  OR.L        D2,D4
+0000955C                           630                  
+0000955C  8138 6000                631                  OR.B        D0,$6000
+00009560  8378 6020                632                  OR.W        D1,$6020
+00009564  85B8 6040                633                  OR.L        D2,$6040
+00009568                           634                  
+00009568  8111                     635                  OR.B        D0,(A1)
+0000956A  8352                     636                  OR.W        D1,(A2)
+0000956C  8593                     637                  OR.L        D2,(A3)
+0000956E                           638                  
+0000956E  8119                     639                  OR.B        D0,(A1)+
+00009570  835A                     640                  OR.W        D1,(A2)+
+00009572  859B                     641                  OR.L        D2,(A3)+
+00009574                           642                  
+00009574  8121                     643                  OR.B        D0,-(A1)
+00009576  8362                     644                  OR.W        D1,-(A2)
+00009578  85A3                     645                  OR.L        D2,-(A3)
+0000957A                           646   
+0000957A                           647                  * Address Register Indirect
+0000957A  8210                     648                  OR.B        (A0),D1
+0000957C  8651                     649                  OR.W        (A1),D3
+0000957E  8892                     650                  OR.L        (A2),D4
+00009580                           651  
+00009580                           652                  * Address Register Indirect with Post incrementing
+00009580  8220                     653                  OR.B        -(A0),D1
+00009582  8661                     654                  OR.W        -(A1),D3
+00009584  88A2                     655                  OR.L        -(A2),D4
+00009586                           656  
+00009586                           657                  * Address Register Indirect with Pre decrementing
+00009586  8218                     658                  OR.B        (A0)+,D1
+00009588  8659                     659                  OR.W        (A1)+,D3
+0000958A  889A                     660                  OR.L        (A2)+,D4
+0000958C                           661  
+0000958C                           662                  * Absolute Long Address
+0000958C  8039 80000000            663                  OR.B        $80000000, D0
+00009592  8279 80200000            664                  OR.W        $80200000, D1
+00009598  84B9 80300000            665                  OR.L        $80300000, D2
+0000959E                           666  
+0000959E                           667                  * Absolute Word Address
+0000959E  8039 00008000            668                  OR.B        $8000, D0
+000095A4  8279 00008020            669                  OR.W        $8020, D1
+000095AA  84B9 00008030            670                  OR.L        $8030, D2
+000095B0                           671  
+000095B0                           672  * NOT test
+000095B0                           673  NOTTEST
+000095B0                           674                  * Direct Addressing
+000095B0                           675                  
+000095B0                           676                  * Data Register Direct
+000095B0  4600                     677                  NOT.B       D0
+000095B2  4641                     678                  NOT.W       D1
+000095B4  4682                     679                  NOT.L       D2
+000095B6                           680                                  
+000095B6                           681                  * Address Register Indirect
+000095B6  4610                     682                  NOT.B       (A0)
+000095B8  4651                     683                  NOT.W       (A1)
+000095BA  4692                     684                  NOT.L       (A2)
+000095BC                           685  
+000095BC                           686                  * Address Register Indirect with Post incrementing
+000095BC  4618                     687                  NOT.B       (A0)+
+000095BE  4659                     688                  NOT.W       (A1)+
+000095C0  469A                     689                  NOT.L       (A2)+
+000095C2                           690  
+000095C2                           691                  * Address Register Indirect with Pre decrementing
+000095C2  4620                     692                  NOT.B       -(A0)
+000095C4  4661                     693                  NOT.W       -(A1)
+000095C6  46A2                     694                  NOT.L       -(A2)
+000095C8                           695                  
+000095C8                           696                  * Absolute Long Address
+000095C8  4639 0AFF0000            697                  NOT.B       $00AFF0000 
+000095CE  4679 0BFF0000            698                  NOT.W       $00BFF0000  
+000095D4  46B9 0CFF0000            699                  NOT.L       $00CFF0000
+000095DA                           700                  
+000095DA                           701                  * Absolute Word Address
+000095DA  4638 0AFF                702                  NOT.B       $00AFF
+000095DE  4678 0BFF                703                  NOT.W       $00BFF 
+000095E2  46B8 0CFF                704                  NOT.L       $00CFF     
+000095E6                           705                  
+000095E6                           706  * LSL test
+000095E6                           707  LSLTEST
+000095E6  E308                     708                  LSL.B       #1,D0
+000095E8  E54A                     709                  LSL.W       #2,D2
+000095EA  E78B                     710                  LSL.L       #3,D3
+000095EC                           711                  
+000095EC  E129                     712                  LSL.B       D0,D1
+000095EE  E56F                     713                  LSL.W       D2,D7
+000095F0  E7AC                     714                  LSL.L       D3,D4
+000095F2                           715                  
+000095F2  E3F9 0000A000            716                  LSL.W       $0000A000
+000095F8  E3EC 0021                717                  LSL.W       $21(A4)
+000095FC  E3D6                     718                  LSL.W       (A6)
+000095FE  E3D9                     719                  LSL.W       (A1)+
+00009600  E3E2                     720                  LSL.W       -(A2)
+00009602                           721                  
+00009602                           722                  
+00009602                           723  * LSR test
+00009602                           724  LSRTEST
+00009602  E208                     725                  LSR.B       #1,D0
+00009604  E44A                     726                  LSR.W       #2,D2
+00009606  E68B                     727                  LSR.L       #3,D3
+00009608                           728                  
+00009608  E029                     729                  LSR.B       D0,D1
+0000960A  E46F                     730                  LSR.W       D2,D7
+0000960C  E6AC                     731                  LSR.L       D3,D4
+0000960E                           732                  
+0000960E  E2F9 0000A000            733                  LSR.W       $0000A000
+00009614  E2F9 0000BBBB            734                  LSR.W       $BBBB
+0000961A  E2D6                     735                  LSR.W       (A6)
+0000961C  E2D9                     736                  LSR.W       (A1)+
+0000961E  E2E2                     737                  LSR.W       -(A2)
+00009620                           738  
+00009620                           739  * ASL test
+00009620                           740  ASLTEST 
+00009620  E300                     741                  ASL.B       #1,D0
+00009622  E542                     742                  ASL.W       #2,D2
+00009624  E783                     743                  ASL.L       #3,D3
+00009626                           744                  
+00009626  E121                     745                  ASL.B       D0,D1
+00009628  E567                     746                  ASL.W       D2,D7
+0000962A  E7A4                     747                  ASL.L       D3,D4
+0000962C                           748                  
+0000962C  E1F9 0000A000            749                  ASL.W       $0000A000
+00009632  E1EC 0021                750                  ASL.W       $21(A4)
+00009636  E1D6                     751                  ASL.W       (A6)
+00009638  E1D9                     752                  ASL.W       (A1)+
+0000963A  E1E2                     753                  ASL.W       -(A2)
+0000963C                           754                 
+0000963C                           755      
+0000963C                           756  * ASR test
+0000963C                           757  ASRTEST
+0000963C  E200                     758                  ASR.B       #1,D0
+0000963E  E442                     759                  ASR.W       #2,D2
+00009640  E683                     760                  ASR.L       #3,D3
+00009642                           761                  
+00009642  E021                     762                  ASR.B       D0,D1
+00009644  E467                     763                  ASR.W       D2,D7
+00009646  E6A4                     764                  ASR.L       D3,D4
+00009648                           765                  
+00009648  E0F9 0000A000            766                  ASR.W       $0000A000
+0000964E  E0F9 0000BBBB            767                  ASR.W       $BBBB
+00009654  E0D6                     768                  ASR.W       (A6)
+00009656  E0D9                     769                  ASR.W       (A1)+
+00009658  E0E2                     770                  ASR.W       -(A2)
+0000965A                           771  * ROL test
+0000965A                           772  ROLTEST 
+0000965A  E318                     773                  ROL.B       #1,D0
+0000965C  E55A                     774                  ROL.W       #2,D2
+0000965E  E79B                     775                  ROL.L       #3,D3
+00009660                           776                  
+00009660  E139                     777                  ROL.B       D0,D1
+00009662  E57F                     778                  ROL.W       D2,D7
+00009664  E7BC                     779                  ROL.L       D3,D4
+00009666                           780                  
+00009666  E7F9 0000A000            781                  ROL.W       $0000A000
+0000966C  E7EC 0021                782                  ROL.W       $21(A4)
+00009670  E7D6                     783                  ROL.W       (A6)
+00009672  E7D9                     784                  ROL.W       (A1)+
+00009674  E7E2                     785                  ROL.W       -(A2)
+00009676                           786                 
+00009676                           787      
+00009676                           788  * ROR test
+00009676                           789  RORTEST
+00009676  E218                     790                  ROR.B       #1,D0
+00009678  E45A                     791                  ROR.W       #2,D2
+0000967A  E69B                     792                  ROR.L       #3,D3
+0000967C                           793                  
+0000967C  E039                     794                  ROR.B       D0,D1
+0000967E  E47F                     795                  ROR.W       D2,D7
+00009680  E6BC                     796                  ROR.L       D3,D4
+00009682                           797                  
+00009682  E6F9 0000A000            798                  ROR.W       $0000A000
+00009688  E6F9 0000BBBB            799                  ROR.W       $BBBB
+0000968E  E6D6                     800                  ROR.W       (A6)
+00009690  E6D9                     801                  ROR.W       (A1)+
+00009692  E6E2                     802                  ROR.W       -(A2)
+00009694                           803  
+00009694                           804      
+00009694                           805  * JSR & RTS test
+00009694                           806  JSRTEST             
+00009694  4EB9 000096DA            807                  JSR     SUBROUTINE
+0000969A                           808  * Bcc & BRA test 
+0000969A                           809  BCCTEST
+0000969A  6400 0036                810                  BCC         BRANCH
+0000969E  6500 0032                811                  BCS         BRANCH
+000096A2  6700 002E                812                  BEQ         BRANCH
+000096A6  6600 002A                813                  BNE         BRANCH
+000096AA  6C00 0026                814                  BGE         BRANCH
+000096AE  6E00 0022                815                  BGT         BRANCH
+000096B2  6200 001E                816                  BHI         BRANCH
+000096B6  6F00 001A                817                  BLE         BRANCH
+000096BA  6300 0016                818                  BLS         BRANCH
+000096BE  6D00 0012                819                  BLT         BRANCH
+000096C2  6B00 000E                820                  BMI         BRANCH
+000096C6  6A00 000A                821                  BPL         BRANCH
+000096CA  6800 0006                822                  BVC         BRANCH
+000096CE  6900 0002                823                  BVS         BRANCH
+000096D2                           824  
+000096D2                           825  BRANCH 
+000096D2                           826  BRATEST
+000096D2  6000 0002                827                  BRA         TESTBRANCH
+000096D6                           828                  
+000096D6                           829  TESTBRANCH                
+000096D6                           830  
+000096D6  FFFF FFFF                831      SIMHALT             ; halt simulator
+000096DA                           832  
+000096DA  4E75                     833  SUBROUTINE      RTS
+000096DC                           834  
+000096DC                           835      END    START        ; last line of source
 
 No errors detected
 No warnings generated
@@ -845,29 +845,29 @@ No warnings generated
 SYMBOL TABLE INFORMATION
 Symbol-name         Value
 -------------------------
-ADDATEST            130E
-ADDQTEST            1344
-ADDTEST             122E
-ANDTEST             1464
-ASLTEST             1620
-ASRTEST             163C
-BCCTEST             169A
-BRANCH              16D2
-BRATEST             16D2
-DIVUTEST            1440
-JSRTEST             1694
-LEATEST             1458
-LSLTEST             15E6
-LSRTEST             1602
-MOVEATEST           11EC
-MOVEMTEST           1226
-MOVEQTEST           1222
-MOVETEST            1002
-MULSTEST            1428
-NOTTEST             15B0
-ROLTEST             165A
-RORTEST             1676
-START               1000
-SUBROUTINE          16DA
-SUBTEST             1348
-TESTBRANCH          16D6
+ADDATEST            930E
+ADDQTEST            9344
+ADDTEST             922E
+ANDTEST             9464
+ASLTEST             9620
+ASRTEST             963C
+BCCTEST             969A
+BRANCH              96D2
+BRATEST             96D2
+DIVUTEST            9440
+JSRTEST             9694
+LEATEST             9458
+LSLTEST             95E6
+LSRTEST             9602
+MOVEATEST           91EC
+MOVEMTEST           9226
+MOVEQTEST           9222
+MOVETEST            9002
+MULSTEST            9428
+NOTTEST             95B0
+ROLTEST             965A
+RORTEST             9676
+START               9000
+SUBROUTINE          96DA
+SUBTEST             9348
+TESTBRANCH          96D6

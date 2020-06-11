@@ -4,7 +4,7 @@
 * Date       :  06/10/2020
 * Description:  Version 4
 *-----------------------------------------------------------
-    ORG    $1000
+    ORG    $9000
 START:                  
 * NOP test
                 NOP
@@ -833,6 +833,7 @@ TESTBRANCH
 SUBROUTINE      RTS
 
     END    START        ; last line of source
+
 *~Font name~Courier New~
 *~Font size~10~
 *~Tab type~1~
