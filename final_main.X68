@@ -26,7 +26,7 @@ INPUT1          MOVE.L  #$0000000, A1       ;clear A1
                 MOVE.B  #14,D0
                 TRAP    #15
             
-                MOVE.L  #$0000000, A1       ;clear A1
+                MOVE.L  #$0000000, A1        ;clear A1
                 MOVE.B  #2,D0                   
                 TRAP    #15                 ; take input from user
                 MOVE.B  #1,D2               ; D2 stores if starting or ending address
@@ -64,12 +64,12 @@ CHECK_ORDER     MOVE.L  A2,D3
                 BLT     RESET_INPUT
                 LEA     NEW_LINE,A5
                 JSR     PRINTNULL
-                               
-DISASSEMBLE     ;MOVE.L  A2,A6               ; loads current address in D1
-                ; MOVE.L  #1,D4               ; tells subroutine we want to make the address print as a long
-                ; JSR     PRINTSHORTLONGNUM   ; prints out address
                 
                 MOVE.B  LINE_COUNT,D2       ; move to D2 for editing
+                MOVE.B  #7,D2               ; set variable to 0
+                MOVE.B  D2,LINE_COUNT       ; store back in the variabl
+                               
+DISASSEMBLE     MOVE.B  LINE_COUNT,D2       ; move to D2 for editing
                 ADD.B   #1,D2               ; add 1 to counter
                 MOVE.B  D2,LINE_COUNT       ; store back in the variable
                 
@@ -365,7 +365,6 @@ MOVEM_MEM2REG  ; loads EA and XN
                 BNE     MEM2REGLONG                     ; if it isn't 0 go to MEM2REGLONG
 
 MEM2REGWORD     LEA     MSG_W,A5                        ; loads .W
-                JSR     PRINTNULL                       ; prints MOVEM
                 BRA     PRINTMEM2REG                    ; prints the registers           
                 
 MEM2REGLONG     LEA     MSG_L,A5                        ; loads .L
@@ -470,7 +469,7 @@ ADD_SUB_HELP    LEA         VALIDEA_ALL,A5           ; Loads valid EA types in A
 PRINTADD        LEA         MSG_ADD,A5              ; loads string pointer for MOVE into A5
                 JSR         PRINTNULL               ; print ADD
                 MOVE.W      D0,D1                   ; bits 7-8 contain size
-                JSR         ADD_SUB_SIZE
+                JSR         ADD_SUB_SIZE            ; D1 = size
                 LEA         MSG_5SPACES,A5          ; loads spaces
                 JSR         PRINTNULL               ; prints out spaces
                 BRA         FINISH_ADD
@@ -503,7 +502,8 @@ ADD_SUB_LONG    LEA         MSG_L,A5
 FINISH_ADD      JSR         ADD_SUB_OPERAND
                 RTS
   
-ADD_SUB_OPERAND LSL.W       #7,D1
+ADD_SUB_OPERAND MOVE.W      D0,D1
+                LSL.W       #7,D1
                 LSR.W       #7,D1
                 LSR.W       #8,D1
                 CMP.W       #1,D1
@@ -521,13 +521,21 @@ ADD_SUB_OPERAND LSL.W       #7,D1
                
                 ; below is EA+Dn->Dn  
                 MOVE.W      D4,D2                    ; Moves D4 (source effective address) to D2
-                MOVE.W      D5,D3                    ; Moves D5 (source Xn) to D3 
+                MOVE.W      D5,D3                    ; Moves D5 (source Xn) to D3
+                MOVE.W      D0,D1
+                LSL.W       #8,D1
+                LSR.W       #8,D1
+                LSR.W       #6,D1                   ; gets bits 6-7 
                 JSR         EA_TO_STRING             ; outputs it into a string
                 RTS                                 ; exits subroutine 
 
 Dn_PLUS_EA      ; below is Dn+EA->EA  
                 MOVE.W      D4,D2                    ; Moves D4 (source effective address) to D2
                 MOVE.W      D5,D3                    ; Moves D5 (source Xn) to D3 
+                MOVE.W      D0,D1
+                LSL.W       #8,D1
+                LSR.W       #8,D1
+                LSR.W       #6,D1                   ; gets bits 6-7
                 JSR         EA_TO_STRING             ; outputs it into a string   
                 
                 ; prints a comma to seperate
@@ -560,7 +568,8 @@ CASE_ADDA       ; gets bit 8 (size bit)
                 JSR         PRINTNULL               ; prints out spaces
                 BRA         FINISH_ADDA   
                   
-ADDA_LONG       LEA         MSG_L,A5
+ADDA_LONG       MOVE.W      #2,D1                   ;sets D1 to be word sized for EA to string
+                LEA         MSG_L,A5
                 JSR         PRINTNULL
                 LEA         MSG_4SPACES,A5          ; loads spaces
                 JSR         PRINTNULL               ; prints out spaces
@@ -585,17 +594,7 @@ CASE_ADDQ       MOVE.W      D0,D1
                 AND.W       #$F000,D1       
                 CMP.W       #$5000,D1
                 BNE         CASE_SUB
-                                                 
-                LEA         MSG_ADDQ,A5             ; print ADDQ
-                JSR         PRINTNULL
-                
-                ; get bits 6-7 (size bits)
-                MOVE.W      D0,D1
-                LSL.W       #8,D1
-                LSR.W       #8,D1
-                LSR.W       #6,D1
-                MOVE.W      D1,D2
-                
+                                                    
                 ; Check bits 0-5 
                 LEA         VALIDEA_ALL,A5           ; Loads valid EA types in A5
                 LEA         VALIDXN_ALL,A6           ; Loads valid Xn types in A6
@@ -603,12 +602,22 @@ CASE_ADDQ       MOVE.W      D0,D1
                 JSR         CHECKGET_EAXN            ; getting if its valid (D1), EA (D2), and Xn (D3)
                 CMP.W       #1,D1                    ; checks if invalid
                 BEQ         CASE_DATA                ; branches to CASE_DATA if invalid
+                
+                LEA         MSG_ADDQ,A5             ; print ADDQ
+                JSR         PRINTNULL
+                
                 MOVE.W      D2,D4                    ; Moves D2 (source effective address) to D4
                 MOVE.W      D3,D5                    ; Moves D3 (source Xn if applicable) to D5  
                 
-                CMP.W       #1,D2
+                 ; get bits 6-7 (size bits)
+                MOVE.W      D0,D1
+                LSL.W       #8,D1
+                LSR.W       #8,D1
+                LSR.W       #6,D1
+                MOVE.W      D7,D1                  ; stores D1 in D7 so it won't get overwritten
+                CMP.W       #1,D1
                 BEQ         ADDQ_WORD
-                CMP.W       #2,D2
+                CMP.W       #2,D1
                 BEQ         ADDQ_LONG
                   
 ADDQ_BYTE       LEA         MSG_B,A5
@@ -638,6 +647,7 @@ FINISH_ADDQ     JSR         PRINT_ADDQ_DATA
                 ; prints destination
                 MOVE.W      D4,D2                    ; Moves D4 (source effective address) to D2
                 MOVE.W      D5,D3                    ; Moves D5 (source Xn) to D3 
+                MOVE.W      D7,D1                    ; Moves size bit to D1
                 JSR         EA_TO_STRING             ; outputs it into a string
                
                 RTS
@@ -645,6 +655,7 @@ FINISH_ADDQ     JSR         PRINT_ADDQ_DATA
 PRINT_ADDQ_DATA LEA         MSG_POUND,A5
                 JSR         PRINTNULL
                 ; gets bits 9-11 (data bits)
+                MOVE.W      D0,D1                               ; gets D0
                 LSL.W       #4,D1
                 LSR.W       #4,D1                               ; get rid of left 4 bits
                 LSR.W       #8,D1
@@ -819,7 +830,6 @@ INV_INSTR       LEA         INVALID_INSTR,A5
                 MOVE.L      D0,D1
                 MOVE.W      #0,D4
                 JSR         PRINTSHORTLONGNUM
-                LEA         NEW_LINE,A5
                 JSR         PRINTNULL
                 RTS               
                 
@@ -1236,7 +1246,7 @@ PRINTADDRESS        ADD.W     A5,D2                 ; Adds address to D2 to get 
                     
                     MOVEM.L    (SP)+,D1/A5              ; restores D1
                     
-
+                   
 * Gets the rotation value for ASd and LSd
 * Input: D2 = instruction word copy (of D0)                                    
 * Output: rotation  value in D2             
@@ -1270,7 +1280,7 @@ GETROTATIONLOCATION AND.W      #$0020,D2            ; gets the rotation location
 * Input: A2 = pointer to next instruction, D4 = -1(MEM TO REG) or 1(REG TO MEM)
 * Output: printed out registers
 * D5 = counter for loop, D6 = current number, D7 = bitmask location
-PRINTREGISTERS      MOVEM.L    D5-D7/A5-A6,-(SP)    ; saves D5-D7/A5-A6
+PRINTREGISTERS      MOVEM.L    D1/D5-D7/A5-A6,-(SP) ; saves D1/D5-D7/A5-A6
                     MOVE.W     #0,D5                ; sets counter to 0
                     MOVE.W     (A2)+, D7            ; gets the register bitmask    
                     CMP.B      #1,D4                ; checks if MEM TO REG or REG TO MEM
@@ -1321,7 +1331,7 @@ MEMTOREG2           MOVE.W     #7,D6                ; moves 0 to D1
                     LEA        MSG_DR,A5            ; loads D to A5
                     BRA        PRINTREGISTERLOOP    ; loops
 
-DONEPRINTINGREG     MOVEM.L    (SP)+,D5-D7/A5-A6    ; saves D5-D7/A5-A6
+DONEPRINTINGREG     MOVEM.L    (SP)+,D1/D5-D7/A5-A6 ; saves D1/D5-D7/A5-A6
 
                         
 * Checks if EA or Xn is valid
@@ -1350,7 +1360,7 @@ CHECKEAEXIT        MOVE.L    (SP)+,D2               ; restores D2
                    RTS                              ; returns from subroutine
 
 * Converts EA and Xn into a string                                
-* Inputs: D2 = EA, D3 = Xn, A2 = NEXT INSTRUCTION WORD
+* Inputs: D1 = operation size, D2 = EA, D3 = Xn, A2 = NEXT INSTRUCTION WORD
 * Outputs: Prints out EA and Xn into a string
 EA_TO_STRING       MOVEM.L  D0-D1/A5,-(SP)          ; saves D1, D0, and A5
                    CMP.W    #An,D2                  ; checks if it is An
@@ -1435,9 +1445,23 @@ CASE_IMMEDIATE     LEA      MSG_POUND,A5            ; Loads # into A5
                    JSR      PRINTNULL               ; Prints #  
                    LEA      MSG_HEX,A5              ; Loads $ into A5
                    JSR      PRINTNULL               ; Prints $
+                   
+                   CMP.W    #2,D1                   ; checks if it is long size
+                   BEQ      IMMEDIATE_LONG          ; branches if it is a long
+                   
                    MOVE.W   D0, D1                  ; moves instruction word into d1
                    JSR      PRINTHEXNUM 
-                   BRA      EA_TO_STRING_EXIT       ; exits subroutine                  
+                   BRA      EA_TO_STRING_EXIT       ; exits subroutine  
+
+IMMEDIATE_LONG     MOVE.W   D0, D1                  ; moves instruction word into d1
+                   MOVE.W   #0, D4                  ; moves word size into d4
+                   JSR      PRINTSHORTLONGNUM       ; reformats the number to the proper length and prints out the number
+                   MOVE.W   (A2)+, D0               ; Moves next instruction word into D1 since A2 is auxilliary instruction word
+                   MOVE.W   D0, D1                  ; moves instruction word into d1
+                   MOVE.W   #0, D4                  ; moves word size into d4
+                   JSR      PRINTSHORTLONGNUM       ; reformats the number to the proper length and prints out the number
+                   *MOVE     (A2)+, D0               ; Moves next instruction word into D1 since A2 is auxilliary instruction word
+                   BRA      EA_TO_STRING_EXIT       ; exits subroutine
                    
 * word address
 CASE_WORD          
@@ -1453,13 +1477,13 @@ CASE_LONG
                    LEA      MSG_HEX,A5              ; Loads $ into A5
                    JSR      PRINTNULL               ; Prints $
                    MOVE.W   D0, D1                  ; moves instruction word into d1
-                   MOVE.W   #0, D4                  ; moves word size (long) into d4
+                   MOVE.W   #0, D4                  ; moves word size into d4
                    JSR      PRINTSHORTLONGNUM       ; reformats the number to the proper length and prints out the number
                    MOVE.W   (A2)+, D0               ; Moves next instruction word into D1 since A2 is auxilliary instruction word
                    MOVE.W   D0, D1                  ; moves instruction word into d1
-                   MOVE.W   #0, D4                  ; moves word size (long) into d4
+                   MOVE.W   #0, D4                  ; moves word size into d4
                    JSR      PRINTSHORTLONGNUM       ; reformats the number to the proper length and prints out the number
-                   MOVE     (A2)+, D1               ; Moves next instruction word into D1 since A2 is auxilliary instruction word
+                   *MOVE.W   (A2)+, D0               ; Moves next instruction word into D1 since A2 is auxilliary instruction word
                    
 * exits subroutine
 EA_TO_STRING_EXIT   MOVEM.L  (SP)+,D0-D1/A5          ; restoers D1, D0, and A5
@@ -1598,12 +1622,12 @@ PRINTENTER      MOVE.L      A5, -(SP)       ; saves A5
 * Prints the size of the MOVE or MOVEA operation  
 * input: D0
 * output: prints out the size of a MOVE or MOVEA operation        
-PRINTMOVESIZE   MOVEM.L D0/A5,-(SP)         ; saves D0 and A5
+PRINTMOVESIZE   MOVEM.L A5,-(SP)         ; saves D0 and A5
                 MOVE.W  D0,D1               ; stores d0 in d1
-                AND.W   #$3000,D0           ; gets the size
-                CMP.W   #$2000,D0           ; checks if is long
+                AND.W   #$3000,D1           ; gets the size
+                CMP.W   #$2000,D1           ; checks if is long
                 BEQ     MOVE_LONG
-                CMP.W   #$3000,D0           ; checks if is word
+                CMP.W   #$3000,D1           ; checks if is word
                 BEQ     MOVE_WORD      
                 
 MOVE_BYTE       LEA     MSG_B,A5            ; loads string pointer into a1
@@ -1615,7 +1639,9 @@ MOVE_WORD       LEA     MSG_W,A5            ; loads string pointer into a1
 MOVE_LONG       LEA     MSG_L,A5            ; loads string pointer into a1         
                 
 FINISHMOVE      JSR     PRINTNULL           ; prints out the size
-                MOVEM.L (SP)+,D0/A5         ; restores D0 and A5
+                LSR.W   #8,D1               ; shifts bytes 8 to the right
+                LSR.W   #4,D1               ; shifts bytes 4 to the right
+                MOVEM.L (SP)+,A5            ; restores D0 and A5
                 RTS
 
 ERROR           LEA     ERROR_MSG,A1
@@ -1761,8 +1787,10 @@ OPMODE_VAR                      EQU     $300 * Hold bits 8-6
 EA_MODE                         EQU     $350 * Hold bits 5-3
 EA_REG                          EQU     $400 * Hold bits 2-0
 LINE_COUNT                      DC.B     0
-LINE_MAX                        DC.B     20
+LINE_MAX                        DC.B     25
             END     START        ; last line of source
+
+
 
 *~Font name~Courier New~
 *~Font size~10~
